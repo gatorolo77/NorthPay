@@ -90,7 +90,9 @@ export class AppComponent implements OnInit {
     accountNumber: '',
     swiftCode: '',
     mpAliasOrCvu: '',
-    mpAccountHolder: ''
+    mpAccountHolder: '',
+    paypalEmail: '',
+    paypalName: ''
   };
 
   identityProvider = 'STRIPE_IDENTITY';
