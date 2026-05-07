@@ -181,6 +181,7 @@
             <span style="color: var(--text-secondary); font-size: 0.85rem;">{{ h }}</span>
           </div>
         </div>
+      </div>
     <!-- Payment Confirmation Modal -->
     <div class="glass-modal-backdrop" *ngIf="selectedProcessForPayment">
       <div class="glass-panel cyber-modal-card">
@@ -218,11 +219,11 @@
           <button class="cyber-btn cyber-btn-primary" style="padding: 8px 25px; border-radius: 8px; font-weight: 700;" (click)="confirmPayment()" [disabled]="isProcessingPayment">
             {{ isProcessingPayment ? 'Transfiriendo...' : 'Confirmar Envío de Fondos ⚡' }}
           </button>
-        </div>
       </div>
     </div>
-    </div>
-  </main>
+  </div>
+  </div>
+</main>
 
   <footer class="glass-panel app-footer">
     <span>&copy; 2026 NorthPay Global Payments & Compliance Inc.</span>
