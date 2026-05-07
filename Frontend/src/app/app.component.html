@@ -24,7 +24,7 @@
           [style.color]="isLocalMock ? 'var(--accent-amber)' : 'var(--accent-mint)'">
         </span>
         <span style="color: var(--text-secondary);">
-          {{ isLocalMock ? 'Simulación Local' : 'Servidor Spring Boot' }}
+          {{ isLocalMock ? 'Local' : 'Servidor NorthPay' }}
         </span>
       </div>
 
@@ -137,7 +137,8 @@
             </span>
           </div>
           <div>
-            <h4 class="font-display" style="font-size: 1.1rem; font-weight: 600; color: var(--text-primary);">Progreso de
+            <h4 class="font-display" style="font-size: 1.1rem; font-weight: 600; color: var(--text-primary);">Progreso
+              de
               Activación</h4>
             <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;">TIEMPO PROMEDIO: &lt; 3
               DÍAS</span>
@@ -193,7 +194,8 @@
         </div>
 
         <div *ngIf="summary.currentStep === 'PERSONAL_DATA'" style="flex: 1; display: flex; flex-direction: column;">
-          <h3 class="font-display text-gradient" style="font-size: 1.6rem; font-weight: 700; margin-bottom: 10px;">Paso 1:
+          <h3 class="font-display text-gradient" style="font-size: 1.6rem; font-weight: 700; margin-bottom: 10px;">Paso
+            1:
             Información Personal</h3>
           <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 30px;">
             Por favor, completa tus datos básicos fiscales. Esto nos permite generar de forma automatizada tu contrato
@@ -235,7 +237,8 @@
         </div>
 
         <div *ngIf="summary.currentStep === 'DOCUMENT_UPLOAD'" style="flex: 1; display: flex; flex-direction: column;">
-          <h3 class="font-display text-gradient" style="font-size: 1.6rem; font-weight: 700; margin-bottom: 10px;">Paso 2:
+          <h3 class="font-display text-gradient" style="font-size: 1.6rem; font-weight: 700; margin-bottom: 10px;">Paso
+            2:
             Subir Documentación</h3>
           <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 30px;">
             Sube un documento oficial de identificación para que nuestro departamento legal lo valide. Los formatos
@@ -286,7 +289,8 @@
         </div>
 
         <div *ngIf="summary.currentStep === 'CONTRACT_SIGN'" style="flex: 1; display: flex; flex-direction: column;">
-          <h3 class="font-display text-gradient" style="font-size: 1.6rem; font-weight: 700; margin-bottom: 10px;">Paso 3:
+          <h3 class="font-display text-gradient" style="font-size: 1.6rem; font-weight: 700; margin-bottom: 10px;">Paso
+            3:
             Firma de Contrato Digital</h3>
           <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 25px;">
             Lee detenidamente el acuerdo de contratista remoto de NorthPay y firma digitalmente.
@@ -294,16 +298,19 @@
 
           <div class="glass-panel"
             style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 25px; height: 220px; overflow-y: auto; font-family: monospace; font-size: 0.8rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 25px;">
-            <h4 style="text-align: center; color: var(--text-primary); margin-bottom: 15px; font-weight: 700;">ACUERDO DE
+            <h4 style="text-align: center; color: var(--text-primary); margin-bottom: 15px; font-weight: 700;">ACUERDO
+              DE
               CONTRATACIÓN INDEPENDIENTE</h4>
-            <p>Este acuerdo se celebra el día de hoy entre <strong>NorthPay Ltd.</strong> ("La Compañía") y el Contratista
+            <p>Este acuerdo se celebra el día de hoy entre <strong>NorthPay Ltd.</strong> ("La Compañía") y el
+              Contratista
               registrado ("El Contratista").</p>
             <br>
             <p><strong>1. Servicios:</strong> El Contratista acuerda prestar servicios de desarrollo y soporte bajo
               demanda a los clientes asignados de NorthPay.</p>
             <p><strong>2. Compensación:</strong> La Compañía compensará al Contratista según el método de cobro
               establecido en el Paso 4 del onboarding.</p>
-            <p><strong>3. Confidencialidad:</strong> Toda información sobre clientes, claves API y operaciones internas se
+            <p><strong>3. Confidencialidad:</strong> Toda información sobre clientes, claves API y operaciones internas
+              se
               considerará Estrictamente Confidencial.</p>
             <br>
             <p><em>Al hacer clic en el botón de firma digital, certifico que he leído y acepto los términos de este
@@ -331,10 +338,12 @@
         </div>
 
         <div *ngIf="summary.currentStep === 'PAYMENT_METHOD'" style="flex: 1; display: flex; flex-direction: column;">
-          <h3 class="font-display text-gradient" style="font-size: 1.6rem; font-weight: 700; margin-bottom: 10px;">Paso 4:
+          <h3 class="font-display text-gradient" style="font-size: 1.6rem; font-weight: 700; margin-bottom: 10px;">Paso
+            4:
             Configuración de Método de Pago</h3>
           <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 30px;">
-            Indícanos dónde deseas recibir tus honorarios mensuales. Soportamos transferencias bancarias internacionales y
+            Indícanos dónde deseas recibir tus honorarios mensuales. Soportamos transferencias bancarias internacionales
+            y
             cuentas Payoneer.
           </p>
 
@@ -393,7 +402,8 @@
 
         <div *ngIf="summary.currentStep === 'IDENTITY_VERIFICATION'"
           style="flex: 1; display: flex; flex-direction: column;">
-          <h3 class="font-display text-gradient" style="font-size: 1.6rem; font-weight: 700; margin-bottom: 10px;">Paso 5:
+          <h3 class="font-display text-gradient" style="font-size: 1.6rem; font-weight: 700; margin-bottom: 10px;">Paso
+            5:
             Verificación de Identidad Biométrica</h3>
           <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 25px;">
             Para prevenir fraudes y asegurar el cumplimiento, utilizaremos la webcam de tu dispositivo para realizar una
@@ -436,7 +446,9 @@
           </button>
         </div>
 
-        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px 0;" *ngIf="summary.status === 'COMPLETED'">
+        <div
+          style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px 0;"
+          *ngIf="summary.status === 'COMPLETED'">
           <div
             style="width: 90px; height: 90px; border-radius: 50%; background: rgba(0, 255, 157, 0.06); border: 1px solid rgba(0, 255, 157, 0.25); display: flex; align-items: center; justify-content: center; margin-bottom: 25px; box-shadow: 0 0 40px rgba(0, 255, 157, 0.15);">
             <span style="font-size: 3rem; animation: pulse-soft 2s infinite;">🏆</span>
@@ -446,7 +458,8 @@
           <p
             style="color: var(--text-secondary); font-size: 0.95rem; max-width: 500px; line-height: 1.6; margin-bottom: 30px;">
             Felicitaciones <strong>{{ personalData.firstName }}</strong>. El proceso de onboarding legal de NorthPay ha
-            finalizado con éxito en menos de 24 horas. Tu perfil ya se encuentra operativo en el motor de compensaciones.
+            finalizado con éxito en menos de 24 horas. Tu perfil ya se encuentra operativo en el motor de
+            compensaciones.
           </p>
 
           <div class="glass-panel"
@@ -460,7 +473,8 @@
           style="margin-top: 30px; padding: 15px 20px; border-radius: 12px; background: rgba(255, 82, 82, 0.05); border-color: rgba(255, 82, 82, 0.25); border-left: 4px solid var(--accent-coral); display: flex; align-items: center; gap: 15px;">
           <span style="font-size: 1.4rem;">⚠️</span>
           <div>
-            <h5 style="font-size: 0.85rem; font-weight: 700; color: var(--accent-coral);">PASO BLOQUEADO POR REVISIÓN</h5>
+            <h5 style="font-size: 0.85rem; font-weight: 700; color: var(--accent-coral);">PASO BLOQUEADO POR REVISIÓN
+            </h5>
             <p *ngFor="let issue of summary.blockingIssues"
               style="font-size: 0.8rem; color: var(--text-primary); margin-top: 3px;">
               {{ issue }}
@@ -476,14 +490,16 @@
         <div>
           <h2 class="font-display text-gradient" style="font-size: 1.8rem; font-weight: 700;">Panel de Operaciones de
             NorthPay</h2>
-          <p style="color: var(--text-secondary); font-size: 0.9rem;">Monitoreo en tiempo real de los procesos de activación
+          <p style="color: var(--text-secondary); font-size: 0.9rem;">Monitoreo en tiempo real de los procesos de
+            activación
             de contratistas internacionales.</p>
         </div>
       </div>
 
       <!-- Contractors list -->
       <div class="glass-panel" style="padding: 25px; border-color: rgba(0, 245, 230, 0.08);">
-        <h4 class="font-display" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 20px;">Procesos de Onboarding
+        <h4 class="font-display" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 20px;">Procesos de
+          Onboarding
           Activos</h4>
 
         <div style="display: flex; flex-direction: column; gap: 15px;">
@@ -491,7 +507,8 @@
             style="padding: 18px 25px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2);">
             <div>
               <h5 class="font-display" style="font-size: 1rem; font-weight: 600;">
-                {{ personalData.firstName ? personalData.firstName + ' ' + personalData.lastName : 'Contratista Registrado' }}
+                {{ personalData.firstName ? personalData.firstName + ' ' + personalData.lastName : 'Contratista
+                Registrado' }}
               </h5>
               <span style="font-size: 0.8rem; color: var(--text-muted);">
                 País: {{ personalData.country || 'No especificado' }} | ID Proceso: #{{ p.id }}
@@ -549,7 +566,8 @@
         <div style="display: flex; gap: 20px; align-items: start; margin-bottom: 25px;">
           <div class="glass-panel"
             style="flex: 1; padding: 20px; background: rgba(0,0,0,0.3); font-size: 0.85rem; font-family: monospace; border-color: var(--glass-border);">
-            <h5 style="font-weight: 700; margin-bottom: 10px; color: var(--text-primary);">DATOS EXTRAÍDOS DEL DOCUMENTO:
+            <h5 style="font-weight: 700; margin-bottom: 10px; color: var(--text-primary);">DATOS EXTRAÍDOS DEL
+              DOCUMENTO:
             </h5>
             <p>Nombres: {{ personalData.firstName }}</p>
             <p>Apellidos: {{ personalData.lastName }}</p>
