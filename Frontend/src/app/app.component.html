@@ -501,9 +501,9 @@
 
             <div>
               <span class="glass-panel contractor-status-badge"
-                [style.color]="p.status === 'COMPLETED' ? 'var(--accent-mint)' : p.status === 'IN_REVIEW' ? 'var(--accent-amber)' : 'var(--accent-cyan)'"
-                [style.border-color]="p.status === 'COMPLETED' ? 'rgba(0,255,157,0.2)' : p.status === 'IN_REVIEW' ? 'rgba(255,193,7,0.2)' : 'rgba(0,245,230,0.2)'">
-                {{ p.status === 'COMPLETED' ? 'Completado' : p.status === 'IN_REVIEW' ? 'En Revisión' : 'En Progreso' }}
+                [style.color]="p.status === 'PAID' ? 'var(--accent-cyan)' : p.status === 'COMPLETED' ? 'var(--accent-mint)' : p.status === 'IN_REVIEW' ? 'var(--accent-amber)' : 'var(--accent-cyan)'"
+                [style.border-color]="p.status === 'PAID' ? 'rgba(0,245,230,0.2)' : p.status === 'COMPLETED' ? 'rgba(0,255,157,0.2)' : p.status === 'IN_REVIEW' ? 'rgba(255,193,7,0.2)' : 'rgba(0,245,230,0.2)'">
+                {{ p.status === 'PAID' ? 'Pagado' : p.status === 'COMPLETED' ? 'Completado' : p.status === 'IN_REVIEW' ? 'En Revisión' : 'En Progreso' }}
               </span>
             </div>
 
@@ -518,7 +518,11 @@
                 *ngIf="p.status === 'COMPLETED'" (click)="openPaymentModal(p)">
                 💸 Emitir Pago
               </button>
-              <span *ngIf="p.status !== 'IN_REVIEW' && p.status !== 'COMPLETED'"
+              <span *ngIf="p.status === 'PAID'"
+                style="font-size: 0.85rem; color: var(--accent-mint); font-weight: 700; display: flex; align-items: center; gap: 5px;">
+                ✓ Nómina Enviada 💸
+              </span>
+              <span *ngIf="p.status !== 'IN_REVIEW' && p.status !== 'COMPLETED' && p.status !== 'PAID'"
                 style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">
                 Onboarding en proceso
               </span>

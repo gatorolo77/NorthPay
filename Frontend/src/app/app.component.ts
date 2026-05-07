@@ -116,6 +116,9 @@ export class AppComponent implements OnInit {
     if (this.operatorFilter === 'ALL') {
       return this.mockContractors;
     }
+    if (this.operatorFilter === 'COMPLETED') {
+      return this.mockContractors.filter(c => c.status === 'COMPLETED' || c.status === 'PAID');
+    }
     return this.mockContractors.filter(c => c.status === this.operatorFilter);
   }
 
@@ -128,7 +131,7 @@ export class AppComponent implements OnInit {
   }
 
   getCompletedCount() {
-    return this.mockContractors.filter(c => c.status === 'COMPLETED').length;
+    return this.mockContractors.filter(c => c.status === 'COMPLETED' || c.status === 'PAID').length;
   }
 
   constructor(private http: HttpClient) { }
@@ -447,6 +450,13 @@ export class AppComponent implements OnInit {
       const c = this.selectedProcessForPayment;
       this.isProcessingPayment = false;
       this.selectedProcessForPayment = null;
+
+      // Update contractor state to PAID in mockContractors
+      const target = this.mockContractors.find(item => item.id === c.id);
+      if (target) {
+        target.status = 'PAID';
+        target.paid = true;
+      }
 
       const method = c.id === 500 ? this.paymentMethod.provider : 'BANK_TRANSFER';
       this.changeHistory.unshift(`Pago de $${this.paymentAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD procesado y enviado a ${c.name} vía ${method}.`);
