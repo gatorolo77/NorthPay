@@ -100,6 +100,10 @@ export class AppComponent implements OnInit {
   reviewFeedback = '';
   notifications: Notification[] = [];
 
+  selectedProcessForPayment: any | null = null;
+  paymentAmount = 2500;
+  isProcessingPayment = false;
+
   operatorFilter = 'ALL';
   changeHistory: string[] = [
     'Invitación de acceso generada para contractor@northpay.com',
@@ -427,7 +431,26 @@ export class AppComponent implements OnInit {
         },
         error: (err) => this.handleError(err)
       });
-    }
+  }
+
+  openPaymentModal(contractor: any) {
+    this.selectedProcessForPayment = contractor;
+    this.paymentAmount = 2500;
+  }
+
+  confirmPayment() {
+    if (!this.selectedProcessForPayment) return;
+    this.isProcessingPayment = true;
+
+    setTimeout(() => {
+      const c = this.selectedProcessForPayment;
+      this.isProcessingPayment = false;
+      this.selectedProcessForPayment = null;
+
+      const method = c.id === 500 ? this.paymentMethod.provider : 'BANK_TRANSFER';
+      this.changeHistory.unshift(`Pago de $${this.paymentAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD procesado y enviado a ${c.name} vía ${method}.`);
+      this.addLocalNotification(`¡Pago de $${this.paymentAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD enviado con éxito a ${c.name}! 💸`, 'SUCCESS');
+    }, 1500);
   }
 
   resolveLocalState() {

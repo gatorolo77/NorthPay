@@ -507,15 +507,20 @@
               </span>
             </div>
 
-            <div style="display: flex; gap: 10px;">
+            <div style="display: flex; gap: 10px; align-items: center;">
               <button class="cyber-btn cyber-btn-secondary"
                 style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px;"
                 *ngIf="p.status === 'IN_REVIEW'" (click)="selectedProcessIdForReview = p.id">
                 🔍 Revisar Documentos
               </button>
-              <span *ngIf="p.status !== 'IN_REVIEW'"
+              <button class="cyber-btn cyber-btn-primary"
+                style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; background: linear-gradient(135deg, var(--accent-mint), #00b0ff); color: var(--bg-darker); box-shadow: 0 0 10px rgba(0, 255, 157, 0.3);"
+                *ngIf="p.status === 'COMPLETED'" (click)="openPaymentModal(p)">
+                💸 Emitir Pago
+              </button>
+              <span *ngIf="p.status !== 'IN_REVIEW' && p.status !== 'COMPLETED'"
                 style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">
-                Sin pendientes de revisión
+                Onboarding en proceso
               </span>
             </div>
           </div>
@@ -573,6 +578,46 @@
           </button>
         </div>
       </div>
+    <!-- Payment Confirmation Modal -->
+    <div class="glass-modal-backdrop" *ngIf="selectedProcessForPayment">
+      <div class="glass-panel cyber-modal-card">
+        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; margin-bottom: 20px;">
+          <h3 class="font-display text-mint-gradient" style="font-size: 1.4rem; font-weight: 800; margin: 0;">💸 Confirmar Envío de Fondos</h3>
+          <button class="modal-close-btn" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem;" (click)="selectedProcessForPayment = null">✕</button>
+        </div>
+        <div class="modal-body">
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">
+            Estás a punto de procesar la nómina/pago para este contratista remoto certificado. Revisa la liquidación detallada:
+          </p>
+          
+          <div class="glass-panel payment-details-box" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem;">
+            <p style="margin-bottom: 8px;">👤 <strong>Beneficiario:</strong> {{ selectedProcessForPayment.name }}</p>
+            <p style="margin-bottom: 8px;">🌍 <strong>País / Destino:</strong> {{ selectedProcessForPayment.country }}</p>
+            <p style="margin-bottom: 8px;">💳 <strong>Método de Pago:</strong> 
+              <span class="payment-card-badge" style="background: rgba(0, 245, 230, 0.1); color: var(--accent-cyan); padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; margin-left: 5px;">
+                {{ selectedProcessForPayment.id === 500 ? paymentMethod.provider : 'BANK_TRANSFER' }}
+              </span>
+            </p>
+          </div>
+
+          <div class="cyber-input-group">
+            <label class="cyber-input-label">MONTO A TRANSFERIR (USD)</label>
+            <div style="position: relative;">
+              <span style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--accent-cyan); font-weight: 700;">$</span>
+              <input type="number" class="cyber-input" [(ngModel)]="paymentAmount" style="padding-left: 30px;" placeholder="0.00">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer" style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 25px;">
+          <button class="cyber-btn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 8px 20px; border-radius: 8px;" (click)="selectedProcessForPayment = null" [disabled]="isProcessingPayment">
+            Cancelar
+          </button>
+          <button class="cyber-btn cyber-btn-primary" style="padding: 8px 25px; border-radius: 8px; font-weight: 700;" (click)="confirmPayment()" [disabled]="isProcessingPayment">
+            {{ isProcessingPayment ? 'Transfiriendo...' : 'Confirmar Envío de Fondos ⚡' }}
+          </button>
+        </div>
+      </div>
+    </div>
     </div>
 
   </main>

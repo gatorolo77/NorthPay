@@ -35,6 +35,10 @@ export class AdminDashboardComponent implements OnInit {
   selectedProcessSummary: OnboardingSummary | null = null;
   reviewFeedback = '';
 
+  selectedProcessForPayment: any | null = null;
+  paymentAmount = 2500;
+  isProcessingPayment = false;
+
   operatorFilter = 'ALL';
   changeHistory: string[] = [
     'Invitación de acceso generada para contractor@northpay.com',
@@ -162,5 +166,23 @@ export class AdminDashboardComponent implements OnInit {
         error: (err) => console.error(err)
       });
     }
+  }
+
+  openPaymentModal(contractor: any) {
+    this.selectedProcessForPayment = contractor;
+    this.paymentAmount = 2500;
+  }
+
+  confirmPayment() {
+    if (!this.selectedProcessForPayment) return;
+    this.isProcessingPayment = true;
+
+    setTimeout(() => {
+      const c = this.selectedProcessForPayment;
+      this.isProcessingPayment = false;
+      this.selectedProcessForPayment = null;
+
+      this.changeHistory.unshift(`Pago de $${this.paymentAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD procesado y enviado a ${c.name} vía transferencia bancaria.`);
+    }, 1500);
   }
 }

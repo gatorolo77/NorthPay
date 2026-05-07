@@ -841,6 +841,42 @@
   border: 2px solid var(--bg-dark);
 }
 
+.glass-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(1, 4, 3, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+  animation: fadeIn 0.3s forwards;
+}
+
+.cyber-modal-card {
+  width: 100%;
+  max-width: 500px;
+  background: rgba(2, 9, 8, 0.85);
+  border: 1px solid var(--accent-cyan-glow);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 30px rgba(0, 245, 230, 0.15);
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
 .app-footer {
   margin: 20px 0px;
   padding: 12px 30px;
