@@ -431,6 +431,7 @@ export class AppComponent implements OnInit {
         },
         error: (err) => this.handleError(err)
       });
+    }
   }
 
   openPaymentModal(contractor: any) {
