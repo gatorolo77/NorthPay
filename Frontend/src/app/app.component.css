@@ -1,0 +1,7 @@
+footer {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-display);
+    font-size: 1rem;
+
+}
