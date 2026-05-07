@@ -88,7 +88,9 @@ export class AppComponent implements OnInit {
     provider: 'BANK_TRANSFER',
     bankName: '',
     accountNumber: '',
-    swiftCode: ''
+    swiftCode: '',
+    mpAliasOrCvu: '',
+    mpAccountHolder: ''
   };
 
   identityProvider = 'STRIPE_IDENTITY';

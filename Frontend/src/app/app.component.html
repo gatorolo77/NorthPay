@@ -281,7 +281,7 @@
         <div *ngIf="summary.currentStep === 'PAYMENT_METHOD'" class="step-form-container">
           <h3 class="font-display text-gradient step-form-title">Paso 4: Configuración de Método de Pago</h3>
           <p class="step-form-desc">
-            Indícanos dónde deseas recibir tus honorarios mensuales. Soportamos transferencias bancarias internacionales y cuentas Payoneer.
+            Indícanos dónde deseas recibir tus honorarios mensuales. Soportamos transferencias bancarias internacionales, Payoneer y Mercado Pago.
           </p>
 
           <div class="payment-provider-list">
@@ -289,7 +289,7 @@
               [class.glass-panel-active]="paymentMethod.provider === 'BANK_TRANSFER'"
               (click)="paymentMethod.provider = 'BANK_TRANSFER'">
               <span class="payment-card-icon">🏦</span>
-              <h4 class="font-display payment-card-title">Transferencia Directa</h4>
+              <h4 class="font-display payment-card-title">Transferencia</h4>
               <span class="payment-card-desc">Banco local, SWIFT/IBAN</span>
             </div>
 
@@ -297,8 +297,16 @@
               [class.glass-panel-active]="paymentMethod.provider === 'PAYONEER'"
               (click)="paymentMethod.provider = 'PAYONEER'">
               <span class="payment-card-icon">💳</span>
-              <h4 class="font-display payment-card-title">Cuenta Payoneer</h4>
-              <span class="payment-card-desc">Pago global, retiro directo</span>
+              <h4 class="font-display payment-card-title">Payoneer</h4>
+              <span class="payment-card-desc">Retiro global directo</span>
+            </div>
+
+            <div class="glass-panel payment-card"
+              [class.glass-panel-active]="paymentMethod.provider === 'MERCADO_PAGO'"
+              (click)="paymentMethod.provider = 'MERCADO_PAGO'">
+              <span class="payment-card-icon">💙</span>
+              <h4 class="font-display payment-card-title">Mercado Pago</h4>
+              <span class="payment-card-desc">Alias, CVU inmediato</span>
             </div>
           </div>
 
@@ -323,6 +331,17 @@
             <div class="cyber-input-group">
               <label class="cyber-input-label">ID DE CLIENTE O CORREO DE PAYONEER</label>
               <input type="email" class="cyber-input" [(ngModel)]="paymentMethod.accountNumber" placeholder="ejemplo@payoneer.com">
+            </div>
+          </div>
+
+          <div *ngIf="paymentMethod.provider === 'MERCADO_PAGO'" style="display: flex; flex-direction: column; gap: 15px;">
+            <div class="cyber-input-group">
+              <label class="cyber-input-label">ALIAS O CLAVE VIRTUAL UNIFICADA (CVU)</label>
+              <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.mpAliasOrCvu" placeholder="Ej. juan.perez.mp o 000000310000...">
+            </div>
+            <div class="cyber-input-group">
+              <label class="cyber-input-label">NOMBRE COMPLETO DEL TITULAR</label>
+              <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.mpAccountHolder" placeholder="Ej. Juan Pérez">
             </div>
           </div>
 
