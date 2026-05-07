@@ -5,10 +5,14 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { OnboardingComponent } from './onboarding/onboarding.component';
+import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    OnboardingComponent,
+    AdminDashboardComponent
   ],
   imports: [
     BrowserModule,

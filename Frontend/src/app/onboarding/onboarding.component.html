@@ -1,0 +1,417 @@
+<div class="main-container">
+  <header class="glass-panel app-header">
+    <div class="logo-container">
+      <div class="logo-icon">
+        <span class="logo-letter">N</span>
+      </div>
+      <div>
+        <h1 class="font-display text-mint-gradient logo-title">NorthPay</h1>
+        <span class="logo-subtitle">ONBOARDING PORTAL</span>
+      </div>
+    </div>
+
+    <div class="header-nav">
+      <div class="glass-panel status-badge">
+        <span class="status-bullet"
+          [style.background-color]="isLocalMock ? 'var(--accent-amber)' : 'var(--accent-mint)'"
+          [style.color]="isLocalMock ? 'var(--accent-amber)' : 'var(--accent-mint)'">
+        </span>
+        <span style="color: var(--text-secondary);">
+          {{ isLocalMock ? 'Local' : 'Servidor NorthPay' }}
+        </span>
+      </div>
+
+      <div class="notification-trigger" *ngIf="notifications.length > 0">
+        <div class="glass-panel bell-icon">
+          🔔
+          <span class="bell-dot"></span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="alerts-container" *ngIf="notifications.length > 0">
+    <div *ngFor="let n of notifications.slice(0, 1)" class="glass-panel alert-panel"
+      [style.border-left-color]="n.type === 'SUCCESS' ? 'var(--accent-mint)' : n.type === 'ERROR' ? 'var(--accent-coral)' : 'var(--accent-cyan)'">
+      <div class="alert-content">
+        <span>{{ n.type === 'SUCCESS' ? '✅' : n.type === 'ERROR' ? '❌' : 'ℹ️' }}</span>
+        <span style="color: var(--text-primary); font-weight: 500;">{{ n.message }}</span>
+      </div>
+      <button (click)="markNotificationRead(n.id)" class="alert-close">✕</button>
+    </div>
+  </div>
+
+  <main class="main-content">
+    <section *ngIf="currentView === 'welcome'" class="glass-panel welcome-card">
+      <div class="envelope-wrapper">
+        <span style="font-size: 2.2rem;">✉️</span>
+      </div>
+      <h2 class="font-display text-gradient welcome-title">Portal de Onboarding</h2>
+      <p class="welcome-text">
+        Bienvenido a NorthPay. Para iniciar el proceso de activación de tu cuenta de contratista remoto, ingresa el
+        correo de invitación proporcionado por tu operador.
+      </p>
+
+      <div class="cyber-input-group input-left">
+        <label class="cyber-input-label">CORREO ELECTRÓNICO DEL CONTRATISTA</label>
+        <input type="email" class="cyber-input" [(ngModel)]="invitationEmail" placeholder="ejemplo@correo.com">
+      </div>
+
+      <button class="cyber-btn cyber-btn-primary full-width-btn" (click)="generateInvitation()">
+        Generar Invitación de Acceso ⚡
+      </button>
+    </section>
+
+    <section *ngIf="currentView === 'register'" class="glass-panel register-card">
+      <h2 class="font-display text-mint-gradient register-title">Completar Registro</h2>
+      <p class="register-text">
+        Se ha detectado un token de invitación válido para registrar tu perfil de contratista.
+      </p>
+
+      <div class="cyber-input-group">
+        <label class="cyber-input-label">CORREO ASOCIADO</label>
+        <input type="email" class="cyber-input" [(ngModel)]="invitationEmail" disabled>
+      </div>
+
+      <div class="cyber-input-group">
+        <label class="cyber-input-label">TOKEN DE INVITACIÓN</label>
+        <input type="text" class="cyber-input" [(ngModel)]="invitationToken" disabled class="cyber-input token-code">
+      </div>
+
+      <div class="cyber-input-group">
+        <label class="cyber-input-label">CONFIGURAR CONTRASEÑA</label>
+        <input type="password" class="cyber-input" [(ngModel)]="registerPassword" placeholder="••••••••">
+      </div>
+
+      <button class="cyber-btn cyber-btn-primary register-submit-btn"
+        (click)="register()">
+        Iniciar Mi Onboarding
+      </button>
+    </section>
+
+    <div *ngIf="currentView === 'onboarding'" class="onboarding-grid">
+      <aside class="glass-panel sidebar">
+        <div class="sidebar-header">
+          <div class="progress-circle-wrapper">
+            <div class="progress-circle-overlay"
+              [style.transform]="'rotate(' + (summary.progress * 3.6) + 'deg)'"
+              [style.box-shadow]="'0 0 15px var(--accent-cyan-glow)'">
+            </div>
+            <span class="font-display progress-percent">
+              {{ summary.progress }}%
+            </span>
+          </div>
+          <div>
+            <h4 class="font-display progress-title">Progreso de Activación</h4>
+            <span class="progress-notice">TIEMPO PROMEDIO: &lt; 3 DÍAS</span>
+          </div>
+        </div>
+
+        <div class="steps-list">
+          <div *ngFor="let step of summary.steps; let idx = index" class="glass-panel step-card"
+            [class.glass-panel-active]="summary.currentStep === step.type"
+            [style.opacity]="step.status === 'NOT_STARTED' ? '0.5' : '1'">
+
+            <div class="step-card-content">
+              <div class="step-number"
+                [style.background-color]="summary.currentStep === step.type ? 'var(--accent-cyan)' : 'var(--bg-light)'"
+                [style.color]="summary.currentStep === step.type ? 'var(--bg-darker)' : 'var(--text-secondary)'">
+                {{ idx + 1 }}
+              </div>
+              <div>
+                <span class="step-name"
+                  [style.color]="summary.currentStep === step.type ? 'var(--accent-cyan)' : 'var(--text-primary)'">
+                  {{ step.type === 'PERSONAL_DATA' ? 'Datos Personales' :
+                  step.type === 'DOCUMENT_UPLOAD' ? 'Documentación' :
+                  step.type === 'CONTRACT_SIGN' ? 'Firma de Contrato' :
+                  step.type === 'PAYMENT_METHOD' ? 'Método de Pago' : 'Identidad Biométrica' }}
+                </span>
+                <span class="step-status-text"
+                  [style.color]="step.status === 'COMPLETED' ? 'var(--accent-mint)' : step.status === 'IN_REVIEW' ? 'var(--accent-amber)' : step.status === 'REJECTED' ? 'var(--accent-coral)' : 'var(--text-muted)'">
+                  {{ step.status === 'NOT_STARTED' ? 'Pendiente' :
+                  step.status === 'IN_PROGRESS' ? 'En Progreso' :
+                  step.status === 'IN_REVIEW' ? 'En Revisión' :
+                  step.status === 'REJECTED' ? 'Requiere Ajustes' : 'Completado' }}
+                </span>
+              </div>
+            </div>
+
+            <span class="step-status-icon">
+              {{ step.status === 'COMPLETED' ? '🟢' :
+              step.status === 'IN_REVIEW' ? '⏳' :
+              step.status === 'REJECTED' ? '⚠️' : '⚪' }}
+            </span>
+          </div>
+        </div>
+      </aside>
+
+      <section class="glass-panel viewport-card">
+        <div class="corner-glow"></div>
+
+        <div *ngIf="summary.currentStep === 'PERSONAL_DATA'" class="step-form-container">
+          <h3 class="font-display text-gradient step-form-title">Paso 1: Información Personal</h3>
+          <p class="step-form-desc">
+            Por favor, completa tus datos básicos fiscales. Esto nos permite generar de forma automatizada tu contrato legal.
+          </p>
+
+          <div class="input-grid-2">
+            <div class="cyber-input-group">
+              <label class="cyber-input-label">NOMBRES</label>
+              <input type="text" class="cyber-input" [(ngModel)]="personalData.firstName" placeholder="Ej. Juan">
+            </div>
+            <div class="cyber-input-group">
+              <label class="cyber-input-label">APELLIDOS</label>
+              <input type="text" class="cyber-input" [(ngModel)]="personalData.lastName" placeholder="Ej. Pérez">
+            </div>
+          </div>
+
+          <div class="cyber-input-group">
+            <label class="cyber-input-label">NÚMERO DE TELÉFONO</label>
+            <input type="text" class="cyber-input" [(ngModel)]="personalData.phone" placeholder="Ej. +34 600 000 000">
+          </div>
+
+          <div class="cyber-input-group">
+            <label class="cyber-input-label">PAÍS DE RESIDENCIA FISCAL</label>
+            <select class="cyber-input" [(ngModel)]="personalData.country">
+              <option value="Spain">España</option>
+              <option value="Mexico">México</option>
+              <option value="Colombia">Colombia</option>
+              <option value="Argentina">Argentina</option>
+              <option value="Chile">Chile</option>
+              <option value="United States">Estados Unidos</option>
+            </select>
+          </div>
+
+          <button class="cyber-btn cyber-btn-primary submit-action-btn" (click)="submitPersonalData()">
+            Guardar y Siguiente Paso ➡️
+          </button>
+        </div>
+
+        <div *ngIf="summary.currentStep === 'DOCUMENT_UPLOAD'" class="step-form-container">
+          <h3 class="font-display text-gradient step-form-title">Paso 2: Subir Documentación</h3>
+          <p class="step-form-desc">
+            Sube un documento oficial de identificación para que nuestro departamento legal lo valide. Los formatos permitidos son PDF o imágenes claras.
+          </p>
+
+          <div class="upload-grid">
+            <div class="cyber-input-group">
+              <label class="cyber-input-label">TIPO DE DOCUMENTO</label>
+              <select class="cyber-input" [(ngModel)]="selectedDocType">
+                <option value="PASSPORT">Pasaporte o D.N.I</option>
+                <option value="TAX_FORM">Identificación Fiscal</option>
+              </select>
+            </div>
+
+            <div class="cyber-input-group" style="flex: 1;">
+              <label class="cyber-input-label">SELECCIONAR ARCHIVO</label>
+              <div class="upload-dropzone">
+                <span class="dropzone-icon">📁</span>
+                <input type="file" (change)="onFileSelected($event)" id="fileInput" style="display: none;">
+                <label for="fileInput" class="cyber-btn cyber-btn-secondary dropzone-btn">
+                  Buscar archivo local
+                </label>
+                <span *ngIf="selectedFile" class="dropzone-file">
+                  ✓ {{ selectedFile.name }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="uploaded-list" *ngIf="uploadedDocs.length > 0">
+            <h5 class="uploaded-list-title">Archivos Subidos</h5>
+            <div *ngFor="let doc of uploadedDocs" class="glass-panel uploaded-item">
+              <span>📄 {{ doc.type }}: <strong>{{ doc.filename }}</strong></span>
+              <span style="color: var(--accent-amber); font-weight: 600;">EN REVISIÓN</span>
+            </div>
+          </div>
+
+          <button class="cyber-btn cyber-btn-primary submit-action-btn"
+            [disabled]="isUploadingDoc || !selectedFile" (click)="uploadDocument()">
+            {{ isUploadingDoc ? 'Subiendo archivo...' : 'Enviar para Revisión Legal ⚡' }}
+          </button>
+        </div>
+
+        <div *ngIf="summary.currentStep === 'CONTRACT_SIGN'" class="step-form-container">
+          <h3 class="font-display text-gradient step-form-title">Paso 3: Firma de Contrato Digital</h3>
+          <p class="step-form-desc">
+            Lee detenidamente el acuerdo de contratista remoto de NorthPay y firma digitalmente.
+          </p>
+
+          <div class="glass-panel contract-viewer">
+            <h4 style="text-align: center; color: var(--text-primary); margin-bottom: 15px; font-weight: 700;">ACUERDO DE CONTRATACIÓN INDEPENDIENTE</h4>
+            <p>Este acuerdo se celebra el día de hoy entre <strong>NorthPay Ltd.</strong> ("La Compañía") y el Contratista registrado ("El Contratista").</p>
+            <br>
+            <p><strong>1. Servicios:</strong> El Contratista acuerda prestar servicios de desarrollo y soporte bajo demanda a los clientes asignados de NorthPay.</p>
+            <p><strong>2. Compensación:</strong> La Compañía compensará al Contratista según el método de cobro establecido en el Paso 4 del onboarding.</p>
+            <p><strong>3. Confidencialidad:</strong> Toda información sobre clientes, claves API y operaciones internas se considerará Estrictamente Confidencial.</p>
+            <br>
+            <p><em>Al hacer clic en el botón de firma digital, certifico que he leído y acepto los términos de este acuerdo legal.</em></p>
+          </div>
+
+          <div class="glass-panel signature-box">
+            <p class="signature-label">RECUADRO DE FIRMA DIGITALIZADA</p>
+            <div class="signature-text">
+              {{ personalData.firstName ? personalData.firstName + ' ' + personalData.lastName : 'John Doe' }}
+            </div>
+            <span class="signature-certificate">
+              Certificado Hash Único: NP_MD5_HASH_73628495
+            </span>
+          </div>
+
+          <button class="cyber-btn cyber-btn-primary submit-action-btn"
+            [disabled]="isSigningContract" (click)="signContract()">
+            {{ isSigningContract ? 'Procesando firma...' : 'Firmar Acuerdo Legal de Forma Segura ✍️' }}
+          </button>
+        </div>
+
+        <div *ngIf="summary.currentStep === 'PAYMENT_METHOD'" class="step-form-container">
+          <h3 class="font-display text-gradient step-form-title">Paso 4: Configuración de Método de Pago</h3>
+          <p class="step-form-desc">
+            Indícanos dónde deseas recibir tus honorarios mensuales. Soportamos transferencias bancarias, Payoneer, Mercado Pago y PayPal.
+          </p>
+
+          <div class="payment-provider-list">
+            <div class="glass-panel payment-card"
+              [class.glass-panel-active]="paymentMethod.provider === 'BANK_TRANSFER'"
+              (click)="paymentMethod.provider = 'BANK_TRANSFER'">
+              <span class="payment-card-icon">🏦</span>
+              <h4 class="font-display payment-card-title">Transferencia</h4>
+              <span class="payment-card-desc">SWIFT / IBAN local</span>
+            </div>
+
+            <div class="glass-panel payment-card"
+              [class.glass-panel-active]="paymentMethod.provider === 'PAYONEER'"
+              (click)="paymentMethod.provider = 'PAYONEER'">
+              <span class="payment-card-icon">💳</span>
+              <h4 class="font-display payment-card-title">Payoneer</h4>
+              <span class="payment-card-desc">Retiro global</span>
+            </div>
+
+            <div class="glass-panel payment-card"
+              [class.glass-panel-active]="paymentMethod.provider === 'MERCADO_PAGO'"
+              (click)="paymentMethod.provider = 'MERCADO_PAGO'">
+              <span class="payment-card-icon">💙</span>
+              <h4 class="font-display payment-card-title">Mercado Pago</h4>
+              <span class="payment-card-desc">Alias, CVU local</span>
+            </div>
+
+            <div class="glass-panel payment-card"
+              [class.glass-panel-active]="paymentMethod.provider === 'PAYPAL'"
+              (click)="paymentMethod.provider = 'PAYPAL'">
+              <span class="payment-card-icon">🌐</span>
+              <h4 class="font-display payment-card-title">PayPal</h4>
+              <span class="payment-card-desc">Billetera global</span>
+            </div>
+          </div>
+
+          <div *ngIf="paymentMethod.provider === 'BANK_TRANSFER'" style="display: flex; flex-direction: column; gap: 15px;">
+            <div class="cyber-input-group">
+              <label class="cyber-input-label">NOMBRE DEL BANCO</label>
+              <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.bankName" placeholder="Ej. BBVA España">
+            </div>
+            <div class="input-grid-2">
+              <div class="cyber-input-group">
+                <label class="cyber-input-label">CÓDIGO SWIFT / BIC</label>
+                <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.swiftCode" placeholder="Ej. BBVAESMMXXX">
+              </div>
+              <div class="cyber-input-group">
+                <label class="cyber-input-label">NÚMERO DE CUENTA (IBAN)</label>
+                <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.accountNumber" placeholder="Ej. ES21 0000...">
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="paymentMethod.provider === 'PAYONEER'" style="display: flex; flex-direction: column; gap: 15px;">
+            <div class="cyber-input-group">
+              <label class="cyber-input-label">ID DE CLIENTE O CORREO DE PAYONEER</label>
+              <input type="email" class="cyber-input" [(ngModel)]="paymentMethod.accountNumber" placeholder="ejemplo@payoneer.com">
+            </div>
+          </div>
+
+          <div *ngIf="paymentMethod.provider === 'MERCADO_PAGO'" style="display: flex; flex-direction: column; gap: 15px;">
+            <div class="cyber-input-group">
+              <label class="cyber-input-label">ALIAS O CLAVE VIRTUAL UNIFICADA (CVU)</label>
+              <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.mpAliasOrCvu" placeholder="Ej. juan.perez.mp o 000000310000...">
+            </div>
+            <div class="cyber-input-group">
+              <label class="cyber-input-label">NOMBRE COMPLETO DEL TITULAR</label>
+              <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.mpAccountHolder" placeholder="Ej. Juan Pérez">
+            </div>
+          </div>
+
+          <div *ngIf="paymentMethod.provider === 'PAYPAL'" style="display: flex; flex-direction: column; gap: 15px;">
+            <div class="cyber-input-group">
+              <label class="cyber-input-label">CORREO ELECTRÓNICO ASOCIADO A PAYPAL</label>
+              <input type="email" class="cyber-input" [(ngModel)]="paymentMethod.paypalEmail" placeholder="ejemplo@paypal.com">
+            </div>
+            <div class="cyber-input-group">
+              <label class="cyber-input-label">NOMBRE COMPLETO DEL TITULAR DE LA CUENTA</label>
+              <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.paypalName" placeholder="Ej. Juan Pérez">
+            </div>
+          </div>
+
+          <button class="cyber-btn cyber-btn-primary submit-action-btn" (click)="savePaymentMethod()">
+            Guardar y Configurar Pago ⚡
+          </button>
+        </div>
+
+        <div *ngIf="summary.currentStep === 'IDENTITY_VERIFICATION'" class="step-form-container">
+          <h3 class="font-display text-gradient step-form-title">Paso 5: Verificación de Identidad Biométrica</h3>
+          <p class="step-form-desc">
+            Para prevenir fraudes y asegurar el cumplimiento, utilizaremos la webcam de tu dispositivo para realizar una autenticación facial rápida.
+          </p>
+
+          <div class="glass-panel scanner-screen">
+            <div *ngIf="isScanningIdentity" class="scanner-line"></div>
+            <div class="scanner-grid"></div>
+            <div class="scanner-oval" [style.border-color]="isScanningIdentity ? 'var(--accent-cyan)' : 'rgba(0, 245, 230, 0.3)'">
+              <span class="scanner-icon">👤</span>
+            </div>
+            <div *ngIf="isScanningIdentity" class="scanner-progress-badge">
+              ESCANEO ACTIVO: {{ scanProgress }}%
+            </div>
+          </div>
+
+          <div class="simulation-control-row">
+            <span>SIMULAR AUTO-VERIFICACIÓN CON ÉXITO:</span>
+            <input type="checkbox" [(ngModel)]="scanSuccess" class="simulation-checkbox">
+          </div>
+
+          <button class="cyber-btn cyber-btn-primary submit-action-btn"
+            [disabled]="isScanningIdentity" (click)="startIdentityScanning()">
+            {{ isScanningIdentity ? 'Escaneando rostro...' : 'Iniciar Escaneo Biométrico de Identidad 📷' }}
+          </button>
+        </div>
+
+        <div class="congrats-card" *ngIf="summary.status === 'COMPLETED'">
+          <div class="medal-wrapper">
+            <span class="medal-icon">🏆</span>
+          </div>
+          <h3 class="font-display text-mint-gradient" style="font-size: 1.8rem; font-weight: 800; margin-bottom: 15px;">
+            ¡Cuenta Totalmente Activada!</h3>
+          <p class="congrats-text">
+            Felicitaciones <strong>{{ personalData.firstName }}</strong>. El proceso de onboarding legal de NorthPay ha finalizado con éxito en menos de 24 horas. Tu perfil ya se encuentra operativo en el motor de compensaciones.
+          </p>
+
+          <div class="glass-panel congrats-certificate">
+            ✓ REGISTRO DE CUMPLIMIENTO INTERNO: NP_CERT_OK_2026
+          </div>
+        </div>
+
+        <div *ngIf="summary.blockingIssues.length > 0 && summary.status !== 'COMPLETED'" class="glass-panel blocking-card">
+          <span style="font-size: 1.4rem;">⚠️</span>
+          <div>
+            <h5 style="font-size: 0.85rem; font-weight: 700; color: var(--accent-coral);">PASO BLOQUEADO POR REVISIÓN</h5>
+            <p *ngFor="let issue of summary.blockingIssues" class="blocking-text">
+              {{ issue }}
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="glass-panel app-footer">
+    <span>&copy; 2026 NorthPay Global Payments & Compliance Inc.</span>
+  </footer>
+</div>

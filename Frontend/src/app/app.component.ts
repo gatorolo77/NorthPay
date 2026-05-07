@@ -238,7 +238,7 @@ export class AppComponent implements OnInit {
     }
   }
 
-  // STEP 2: Document Upload Simulation/Execution
+
   onFileSelected(event: any) {
     this.selectedFile = event.target.files[0];
   }
@@ -281,7 +281,7 @@ export class AppComponent implements OnInit {
     }
   }
 
-  // STEP 3: Sign Contract
+
   signContract() {
     this.isSigningContract = true;
     setTimeout(() => {
@@ -311,7 +311,6 @@ export class AppComponent implements OnInit {
     }, 1500);
   }
 
-  // STEP 4: Configure Payment Method
   savePaymentMethod() {
     if (this.isLocalMock) {
       this.summary.steps[3].status = 'COMPLETED';
@@ -332,7 +331,6 @@ export class AppComponent implements OnInit {
     }
   }
 
-  // STEP 5: Identity Biometrics Scanner Simulation
   startIdentityScanning() {
     this.isScanningIdentity = true;
     this.scanProgress = 0;
@@ -365,11 +363,9 @@ export class AppComponent implements OnInit {
     }, 300);
   }
 
-  // Operator Actions Simulator
   loadOperatorPanel() {
     this.currentView = 'operator';
-    
-    // Sync active contractor's progress and status dynamically
+
     const currentName = this.personalData.firstName ? `${this.personalData.firstName} ${this.personalData.lastName} (Tú)` : 'Juan Pérez (Tú)';
     const currentCountry = this.personalData.country || 'España';
     const currentStatus = this.summary.steps[1].status === 'IN_REVIEW' ? 'IN_REVIEW' : this.summary.status;
@@ -434,7 +430,6 @@ export class AppComponent implements OnInit {
     }
   }
 
-  // Local state machine engine for mockup offline use
   resolveLocalState() {
     let progress = 0;
     let currentStep: string | null = 'PERSONAL_DATA';
@@ -505,7 +500,6 @@ export class AppComponent implements OnInit {
     };
   }
 
-  // Notifications handler
   addLocalNotification(message: string, type: string) {
     const newNotif: Notification = {
       id: Date.now(),

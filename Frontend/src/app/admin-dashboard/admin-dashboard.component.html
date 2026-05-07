@@ -1,0 +1,182 @@
+<div class="main-container">
+  <header class="glass-panel app-header">
+    <div class="logo-container">
+      <div class="logo-icon">
+        <span class="logo-letter">N</span>
+      </div>
+      <div>
+        <h1 class="font-display text-mint-gradient logo-title">NorthPay</h1>
+        <span class="logo-subtitle">OPERATIONS TEAM</span>
+      </div>
+    </div>
+
+    <div class="header-nav">
+      <div class="glass-panel status-badge">
+        <span class="status-bullet"
+          [style.background-color]="isLocalMock ? 'var(--accent-amber)' : 'var(--accent-mint)'"
+          [style.color]="isLocalMock ? 'var(--accent-amber)' : 'var(--accent-mint)'">
+        </span>
+        <span style="color: var(--text-secondary);">
+          {{ isLocalMock ? 'Local' : 'Servidor NorthPay' }}
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="operator-view-container">
+      <div class="operator-header">
+        <div>
+          <h2 class="font-display text-gradient" style="font-size: 1.8rem; font-weight: 700;">Panel de Operaciones de NorthPay</h2>
+          <p style="color: var(--text-secondary); font-size: 0.9rem;">Monitoreo en tiempo real de los procesos de activación de contratistas internacionales.</p>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Grid -->
+      <div class="metrics-grid">
+        <div class="glass-panel metric-card">
+          <span class="metric-icon">👥</span>
+          <div>
+            <p class="metric-label">Contratistas Activos</p>
+            <h3 class="font-display metric-value">{{ mockContractors.length }}</h3>
+          </div>
+        </div>
+        <div class="glass-panel metric-card">
+          <span class="metric-icon">⏳</span>
+          <div>
+            <p class="metric-label">Tiempo de Activación</p>
+            <h3 class="font-display metric-value">2.4 Días</h3>
+          </div>
+        </div>
+        <div class="glass-panel metric-card">
+          <span class="metric-icon">🔎</span>
+          <div>
+            <p class="metric-label">En Revisión</p>
+            <h3 class="font-display metric-value">{{ getInReviewCount() }}</h3>
+          </div>
+        </div>
+        <div class="glass-panel metric-card">
+          <span class="metric-icon">✅</span>
+          <div>
+            <p class="metric-label">Completados</p>
+            <h3 class="font-display metric-value">{{ getCompletedCount() }}</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters and Contractors list -->
+      <div class="glass-panel operator-card">
+        <div class="dashboard-list-header">
+          <h4 class="font-display" style="font-size: 1.1rem; font-weight: 600;">Procesos de Onboarding</h4>
+          
+          <div class="filter-buttons">
+            <button class="filter-btn" [class.active]="operatorFilter === 'ALL'" (click)="operatorFilter = 'ALL'">Todos</button>
+            <button class="filter-btn" [class.active]="operatorFilter === 'IN_PROGRESS'" (click)="operatorFilter = 'IN_PROGRESS'">En Progreso</button>
+            <button class="filter-btn" [class.active]="operatorFilter === 'IN_REVIEW'" (click)="operatorFilter = 'IN_REVIEW'">En Revisión</button>
+            <button class="filter-btn" [class.active]="operatorFilter === 'COMPLETED'" (click)="operatorFilter = 'COMPLETED'">Completados</button>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+          <div *ngFor="let p of getFilteredContractors()" class="glass-panel contractor-row">
+            <div>
+              <h5 class="font-display" style="font-size: 1rem; font-weight: 600;">
+                {{ p.name }}
+              </h5>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">
+                País: {{ p.country }} | Correo: {{ p.email }} | Iniciado: {{ p.date }}
+              </span>
+            </div>
+
+            <div class="progress-bar-column">
+              <div class="progress-bar-labels">
+                <span>Progreso Onboarding</span>
+                <strong>{{ p.progress }}%</strong>
+              </div>
+              <div class="progress-bar-track">
+                <div class="progress-bar-fill" [style.width.%]="p.progress"></div>
+              </div>
+            </div>
+
+            <div>
+              <span class="glass-panel contractor-status-badge"
+                [style.color]="p.status === 'COMPLETED' ? 'var(--accent-mint)' : p.status === 'IN_REVIEW' ? 'var(--accent-amber)' : 'var(--accent-cyan)'"
+                [style.border-color]="p.status === 'COMPLETED' ? 'rgba(0,255,157,0.2)' : p.status === 'IN_REVIEW' ? 'rgba(255,193,7,0.2)' : 'rgba(0,245,230,0.2)'">
+                {{ p.status === 'COMPLETED' ? 'Completado' : p.status === 'IN_REVIEW' ? 'En Revisión' : 'En Progreso' }}
+              </span>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+              <button class="cyber-btn cyber-btn-secondary"
+                style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px;"
+                *ngIf="p.status === 'IN_REVIEW'" (click)="selectedProcessIdForReview = p.id">
+                🔍 Revisar Documentos
+              </button>
+              <span *ngIf="p.status !== 'IN_REVIEW'"
+                style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">
+                Sin pendientes de revisión
+              </span>
+            </div>
+          </div>
+
+          <div *ngIf="getFilteredContractors().length === 0" style="text-align: center; padding: 30px; color: var(--text-muted); font-style: italic;">
+            No se encontraron contratistas en este estado.
+          </div>
+        </div>
+      </div>
+
+      <!-- Document Review Section -->
+      <div class="glass-panel review-pane" *ngIf="selectedProcessIdForReview && summary.steps[1].status === 'IN_REVIEW'" style="margin-top: 25px;">
+        <h4 class="font-display text-gradient" style="font-size: 1.2rem; font-weight: 700; margin-bottom: 10px;">Revisar Documentos de Contratista</h4>
+        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px;">
+          Por favor valida que el documento cargado concuerda con los datos personales del contratista legal.
+        </p>
+
+        <div style="display: flex; gap: 20px; align-items: start; margin-bottom: 25px;">
+          <div class="glass-panel review-details">
+            <h5 style="font-weight: 700; margin-bottom: 10px; color: var(--text-primary);">DATOS EXTRAÍDOS DEL DOCUMENTO:</h5>
+            <p>Nombres: {{ personalData.firstName || 'Juan' }}</p>
+            <p>Apellidos: {{ personalData.lastName || 'Pérez' }}</p>
+            <p>País: {{ personalData.country || 'España' }}</p>
+            <p>Tipo Documento: PASAPORTE_INTERNACIONAL</p>
+            <p style="margin-top: 15px; color: var(--accent-mint); text-decoration: underline; cursor: pointer;">
+              🔗 VER ARCHIVO EN CLOUDINARY (DOCUMENT_ID.PDF)
+            </p>
+          </div>
+
+          <div class="cyber-input-group" style="flex: 1; margin-bottom: 0;">
+            <label class="cyber-input-label">COMENTARIOS / FEEDBACK (SI SE RECHAZA)</label>
+            <textarea class="cyber-input" [(ngModel)]="reviewFeedback" rows="3"
+              placeholder="Ej. El pasaporte está borroso o incompleto..."></textarea>
+          </div>
+        </div>
+
+        <div class="review-actions">
+          <button class="cyber-btn reject-btn"
+            (click)="reviewContractorStep('DOCUMENT_UPLOAD', false)">
+            ❌ Solicitar Corrección (Rechazar)
+          </button>
+          <button class="cyber-btn cyber-btn-primary" style="padding: 8px 25px; border-radius: 8px;"
+            (click)="reviewContractorStep('DOCUMENT_UPLOAD', true)">
+            ✓ Aprobar Documento
+          </button>
+        </div>
+      </div>
+
+      <!-- Changes History / Audit log widget -->
+      <div class="glass-panel audit-log-card" style="margin-top: 25px;">
+        <h4 class="font-display text-gradient" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 15px;">Historial de Cambios / Registro de Auditoría</h4>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div *ngFor="let h of changeHistory; let first = first" class="audit-log-item" [style.border-left-color]="first ? 'var(--accent-cyan)' : 'var(--glass-border)'">
+            <span class="audit-dot" [style.background-color]="first ? 'var(--accent-cyan)' : 'var(--text-muted)'"></span>
+            <span style="color: var(--text-secondary); font-size: 0.85rem;">{{ h }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="glass-panel app-footer">
+    <span>&copy; 2026 NorthPay Global Payments & Compliance Inc.</span>
+  </footer>
+</div>
