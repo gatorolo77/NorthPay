@@ -36,14 +36,10 @@ interface OnboardingProcess {
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  // Views: 'welcome' | 'register' | 'onboarding' | 'operator'
   currentView: 'welcome' | 'register' | 'onboarding' | 'operator' = 'welcome';
-  
-  // Base URLs
   apiBaseUrl = 'http://localhost:8080/api';
-  isLocalMock = true; // Automatically detects if backend is reachable
+  isLocalMock = true;
 
-  // Auth / Invitation State
   invitationToken = '';
   invitationEmail = 'contractor@northpay.com';
   registerPassword = 'password123';
@@ -52,7 +48,6 @@ export class AppComponent implements OnInit {
   userId = 1;
   processId = 1;
 
-  // Active Onboarding Summary
   summary: OnboardingSummary = {
     status: 'CREATED',
     currentStep: 'PERSONAL_DATA',
@@ -68,7 +63,6 @@ export class AppComponent implements OnInit {
     blockingIssues: []
   };
 
-  // Forms data
   personalData = {
     firstName: '',
     lastName: '',
@@ -100,28 +94,25 @@ export class AppComponent implements OnInit {
   scanProgress = 0;
   scanSuccess = true;
 
-  // Operator panel state
   operatorProcesses: OnboardingProcess[] = [];
   selectedProcessIdForReview: number | null = null;
   selectedProcessSummary: OnboardingSummary | null = null;
   reviewFeedback = '';
-
-  // Notifications
   notifications: Notification[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   ngOnInit() {
     this.testBackendConnection();
   }
 
   testBackendConnection() {
-    // Attempt to connect to backend, fallback to fully interactive local simulation if offline
+
     this.http.get(`${this.apiBaseUrl}/onboarding/1/summary`).subscribe({
       next: () => {
         this.isLocalMock = false;
-        console.log('[NorthPay] Connected to Spring Boot backend server.');
-        this.addLocalNotification('Conectado al servidor de Spring Boot (Modo Producción)', 'SUCCESS');
+        console.log('[NorthPay] Connected to NorthPay server.');
+        this.addLocalNotification('Conectado al servidor de NorthPay', 'SUCCESS');
       },
       error: () => {
         this.isLocalMock = true;
@@ -132,7 +123,7 @@ export class AppComponent implements OnInit {
     });
   }
 
-  // Invitation creation (Operator simulation)
+
   generateInvitation() {
     if (this.isLocalMock) {
       this.invitationToken = 'NP_INV_' + Math.random().toString(36).substring(2, 10).toUpperCase();
@@ -153,12 +144,12 @@ export class AppComponent implements OnInit {
     }
   }
 
-  // Register with Token
+
   register() {
     if (this.isLocalMock) {
       this.userId = 100;
       this.processId = 500;
-      this.addLocalNotification('Usuario registrado con éxito (Simulación Local)', 'SUCCESS');
+      this.addLocalNotification('Usuario registrado con éxito (Local)', 'SUCCESS');
       this.summary.status = 'IN_PROGRESS';
       this.currentView = 'onboarding';
     } else {
@@ -202,7 +193,7 @@ export class AppComponent implements OnInit {
     });
   }
 
-  // STEP 1: Personal Data Submit
+
   submitPersonalData() {
     if (this.isLocalMock) {
       this.summary.steps[0].status = 'COMPLETED';
@@ -269,7 +260,7 @@ export class AppComponent implements OnInit {
     setTimeout(() => {
       this.isSigningContract = false;
       this.signedContractUrl = 'https://res.cloudinary.com/demo/contract/signed_contract_doe.pdf';
-      
+
       if (this.isLocalMock) {
         this.summary.steps[2].status = 'COMPLETED';
         this.summary.steps[3].status = 'IN_PROGRESS';
@@ -323,7 +314,7 @@ export class AppComponent implements OnInit {
       if (this.scanProgress >= 100) {
         clearInterval(interval);
         this.isScanningIdentity = false;
-        
+
         if (this.isLocalMock) {
           if (this.scanSuccess) {
             this.summary.steps[4].status = 'COMPLETED';
@@ -374,7 +365,8 @@ export class AppComponent implements OnInit {
   reviewContractorStep(stepType: string, approved: boolean) {
     const feedbackMsg = approved ? 'Documentación válida y certificada.' : this.reviewFeedback || 'Faltan firmas o nitidez.';
     const stepId = 2; // Simulated ID
-    
+    this.selectedProcessIdForReview = null;
+
     if (this.isLocalMock) {
       if (approved) {
         this.summary.steps[1].status = 'COMPLETED';
@@ -385,18 +377,17 @@ export class AppComponent implements OnInit {
         this.addLocalNotification('Paso 2 RECHAZADO: Se enviaron solicitudes de corrección.', 'ERROR');
       }
       this.reviewFeedback = '';
-      this.currentView = 'onboarding';
       this.refreshSummary();
+      this.loadOperatorPanel();
     } else {
-      // Find the step ID of DOCUMENT_UPLOAD for the process
       this.http.post(`${this.apiBaseUrl}/operator/steps/${stepId}/review?operatorId=1`, {
         approved: approved,
         feedback: feedbackMsg
       }).subscribe({
         next: () => {
           this.addLocalNotification(`Paso de documentos revisado con éxito.`, 'SUCCESS');
-          this.currentView = 'onboarding';
           this.refreshSummary();
+          this.loadOperatorPanel();
         },
         error: (err) => this.handleError(err)
       });
@@ -449,7 +440,7 @@ export class AppComponent implements OnInit {
     this.summary.currentStep = currentStep;
     this.summary.canProceed = canProceed;
     this.summary.blockingIssues = blockingIssues;
-    
+
     if (progress === 100) {
       this.summary.status = 'COMPLETED';
     } else {
@@ -490,7 +481,7 @@ export class AppComponent implements OnInit {
   loadNotifications() {
     this.http.get<Notification[]>(`${this.apiBaseUrl}/notifications?userId=${this.userId}`).subscribe({
       next: (notifs) => this.notifications = notifs,
-      error: () => {}
+      error: () => { }
     });
   }
 
