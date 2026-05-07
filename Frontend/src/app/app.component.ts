@@ -134,6 +134,10 @@ export class AppComponent implements OnInit {
     return this.mockContractors.filter(c => c.status === 'COMPLETED' || c.status === 'PAID').length;
   }
 
+  isContractorPaid(): boolean {
+    return this.mockContractors.find(c => c.id === 500)?.status === 'PAID';
+  }
+
   constructor(private http: HttpClient) { }
 
   ngOnInit() {

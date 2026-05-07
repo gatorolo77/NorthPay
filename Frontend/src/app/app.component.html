@@ -100,7 +100,7 @@
       </button>
     </section>
 
-    <div *ngIf="currentView === 'onboarding'" class="onboarding-grid">
+    <div *ngIf="currentView === 'onboarding' && summary.status !== 'COMPLETED'" class="onboarding-grid">
 
       <aside class="glass-panel sidebar">
 
@@ -423,6 +423,112 @@
           </div>
         </div>
       </section>
+    </div>
+
+    <!-- Premium Contractor Dashboard -->
+    <div *ngIf="currentView === 'onboarding' && summary.status === 'COMPLETED'" class="contractor-dashboard-container">
+      <div class="operator-header" style="margin-bottom: 25px;">
+        <div>
+          <h2 class="font-display text-mint-gradient" style="font-size: 1.8rem; font-weight: 800; margin-bottom: 5px;">
+            ¡Bienvenido, {{ personalData.firstName || 'Contratista' }}! 👋
+          </h2>
+          <p style="color: var(--text-secondary); font-size: 0.95rem;">Tu perfil de cobro y cumplimiento internacional se encuentra 100% activo y regulado.</p>
+        </div>
+        <div class="glass-panel status-badge" style="border-color: rgba(0, 255, 157, 0.2); color: var(--accent-mint); font-weight: 700; background: rgba(0, 255, 157, 0.05); padding: 8px 16px; border-radius: 8px; font-size: 0.85rem;">
+          ✓ CUENTA VERIFICADA & ACTIVA
+        </div>
+      </div>
+
+      <!-- Financial Cards Grid -->
+      <div class="metrics-grid" style="margin-bottom: 30px;">
+        <div class="glass-panel metric-card" style="border-color: rgba(0, 245, 230, 0.15); box-shadow: 0 0 15px rgba(0, 245, 230, 0.05);">
+          <span class="metric-icon">💰</span>
+          <div>
+            <p class="metric-label">Balance Disponible</p>
+            <h3 class="font-display metric-value" style="color: var(--accent-cyan); font-size: 1.8rem; font-weight: 800;">
+              {{ isContractorPaid() ? '$' + paymentAmount.toLocaleString('en-US', { minimumFractionDigits: 2 }) + ' USD' : '$0.00 USD' }}
+            </h3>
+          </div>
+        </div>
+        <div class="glass-panel metric-card">
+          <span class="metric-icon">📆</span>
+          <div>
+            <p class="metric-label">Próxima Nómina</p>
+            <h3 class="font-display metric-value">25 de Mayo, 2026</h3>
+          </div>
+        </div>
+        <div class="glass-panel metric-card">
+          <span class="metric-icon">💳</span>
+          <div>
+            <p class="metric-label">Método de Pago Activo</p>
+            <h3 class="font-display metric-value" style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-top: 5px;">
+              {{ paymentMethod.provider === 'BANK_TRANSFER' ? 'Transferencia Bancaria' : paymentMethod.provider === 'MERCADO_PAGO' ? 'Mercado Pago' : paymentMethod.provider === 'PAYONEER' ? 'Payoneer' : 'PayPal' }}
+            </h3>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">
+              {{ paymentMethod.provider === 'BANK_TRANSFER' ? paymentMethod.bankName : paymentMethod.provider === 'MERCADO_PAGO' ? paymentMethod.mpAliasOrCvu : paymentMethod.provider === 'PAYONEER' ? paymentMethod.accountNumber : paymentMethod.paypalEmail }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 25px; margin-bottom: 30px;">
+        <!-- Left: Transactions Table -->
+        <div class="glass-panel operator-card" style="padding: 25px;">
+          <h4 class="font-display text-gradient" style="font-size: 1.2rem; font-weight: 700; margin-bottom: 20px;">Historial de Recibos y Cobros</h4>
+          
+          <div *ngIf="!isContractorPaid()" style="text-align: center; padding: 40px; color: var(--text-muted); font-style: italic; border: 1px dashed var(--glass-border); border-radius: 8px;">
+            No se han procesado pagos para este período de liquidación aún.
+          </div>
+
+          <div *ngIf="isContractorPaid()" class="glass-panel contractor-row" style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border-color: rgba(0, 245, 230, 0.05);">
+            <div>
+              <h5 class="font-display" style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 3px;">Nómina Mensual - NorthPay Inc.</h5>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Fecha: 07/05/2026 | Ref: NP_PAY_83726</span>
+            </div>
+            <div style="text-align: right;">
+              <span style="display: block; font-weight: 800; color: var(--accent-mint); font-size: 1rem; margin-bottom: 5px;">
+                +${{ paymentAmount.toLocaleString('en-US', { minimumFractionDigits: 2 }) }} USD
+              </span>
+              <span class="glass-panel contractor-status-badge" style="font-size: 0.75rem; color: var(--accent-mint); border-color: rgba(0,255,157,0.2); padding: 2px 8px; border-radius: 12px; font-weight: 700;">
+                ✓ Recibido
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Compliance & Documents Box -->
+        <div class="glass-panel operator-card" style="padding: 25px; display: flex; flex-direction: column; gap: 15px;">
+          <h4 class="font-display text-gradient" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 10px;">Cumplimiento & Acuerdo Legal</h4>
+          
+          <div class="glass-panel" style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 12px; border-color: rgba(0, 245, 230, 0.05);">
+            <span style="font-size: 1.2rem;">📄</span>
+            <div>
+              <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">Contrato Digital Firmado</p>
+              <span style="font-size: 0.75rem; color: var(--accent-mint); font-weight: 600;">✓ Activo y Registrado</span>
+            </div>
+          </div>
+
+          <div class="glass-panel" style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 12px; border-color: rgba(0, 245, 230, 0.05);">
+            <span style="font-size: 1.2rem;">🛡️</span>
+            <div>
+              <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">Verificación KYC (Identificación)</p>
+              <span style="font-size: 0.75rem; color: var(--accent-mint); font-weight: 600;">✓ Documentos Aprobados</span>
+            </div>
+          </div>
+
+          <div class="glass-panel" style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 12px; border-color: rgba(0, 245, 230, 0.05);">
+            <span style="font-size: 1.2rem;">📷</span>
+            <div>
+              <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">Identificación Biométrica</p>
+              <span style="font-size: 0.75rem; color: var(--accent-mint); font-weight: 600;">✓ Certificado Facial Exitoso</span>
+            </div>
+          </div>
+
+          <button class="cyber-btn cyber-btn-secondary" style="width: 100%; padding: 10px; font-size: 0.85rem; border-radius: 8px; margin-top: 10px;">
+            📥 Descargar Contrato Firmado (PDF)
+          </button>
+        </div>
+      </div>
     </div>
 
     <div *ngIf="currentView === 'operator'" class="operator-view-container">

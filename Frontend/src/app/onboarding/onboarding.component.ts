@@ -84,6 +84,11 @@ export class OnboardingComponent implements OnInit {
   scanSuccess = true;
 
   notifications: Notification[] = [];
+  paymentAmount = 2500;
+
+  isContractorPaid(): boolean {
+    return this.summary.status === 'PAID';
+  }
 
   constructor(private http: HttpClient) { }
 
