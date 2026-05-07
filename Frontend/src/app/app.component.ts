@@ -100,6 +100,33 @@ export class AppComponent implements OnInit {
   reviewFeedback = '';
   notifications: Notification[] = [];
 
+  operatorFilter = 'ALL';
+  changeHistory: string[] = [
+    'Invitación de acceso generada para contractor@northpay.com',
+    'Perfil de contratista registrado con éxito.',
+    'Datos personales completados y validados.'
+  ];
+  mockContractors: any[] = [];
+
+  getFilteredContractors() {
+    if (this.operatorFilter === 'ALL') {
+      return this.mockContractors;
+    }
+    return this.mockContractors.filter(c => c.status === this.operatorFilter);
+  }
+
+  getPendingCount() {
+    return this.mockContractors.filter(c => c.status === 'IN_PROGRESS').length;
+  }
+
+  getInReviewCount() {
+    return this.mockContractors.filter(c => c.status === 'IN_REVIEW').length;
+  }
+
+  getCompletedCount() {
+    return this.mockContractors.filter(c => c.status === 'COMPLETED').length;
+  }
+
   constructor(private http: HttpClient) { }
 
   ngOnInit() {
@@ -341,12 +368,25 @@ export class AppComponent implements OnInit {
   // Operator Actions Simulator
   loadOperatorPanel() {
     this.currentView = 'operator';
+    
+    // Sync active contractor's progress and status dynamically
+    const currentName = this.personalData.firstName ? `${this.personalData.firstName} ${this.personalData.lastName} (Tú)` : 'Juan Pérez (Tú)';
+    const currentCountry = this.personalData.country || 'España';
+    const currentStatus = this.summary.steps[1].status === 'IN_REVIEW' ? 'IN_REVIEW' : this.summary.status;
+
+    this.mockContractors = [
+      { id: 500, name: currentName, country: currentCountry, email: this.invitationEmail, progress: this.summary.progress, status: currentStatus, date: '07/05/2026', currentStep: this.summary.currentStep || 'COMPLETED' },
+      { id: 501, name: 'María Gómez', country: 'Colombia', email: 'maria.gomez@gmail.com', progress: 100, status: 'COMPLETED', date: '05/05/2026', currentStep: 'COMPLETED' },
+      { id: 502, name: 'Pierre Dubois', country: 'Francia', email: 'pierre.dubois@yahoo.fr', progress: 20, status: 'IN_PROGRESS', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD' },
+      { id: 503, name: 'Yuki Tanaka', country: 'Japón', email: 'tanaka.yuki@gmail.com', progress: 40, status: 'IN_REVIEW', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD' }
+    ];
+
     if (this.isLocalMock) {
       this.operatorProcesses = [
         {
           id: 500,
           contractorUserId: 100,
-          status: this.summary.status,
+          status: currentStatus,
           currentStep: this.summary.currentStep || 'COMPLETED',
           progress: this.summary.progress,
           assignedOperatorId: 1,
