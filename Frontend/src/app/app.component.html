@@ -114,7 +114,7 @@
 
       <button class="cyber-btn cyber-btn-primary" style="width: 100%; margin-top: 15px; height: 50px;"
         (click)="register()">
-        Iniciar Mi Onboarding 🚀
+        Iniciar Mi Onboarding
       </button>
     </section>
 
@@ -152,7 +152,7 @@
             [style.opacity]="step.status === 'NOT_STARTED' ? '0.5' : '1'">
 
             <div style="display: flex; align-items: center; gap: 12px;">
-              <!-- Step Index Icon -->
+
               <div
                 style="width: 24px; height: 24px; border-radius: 50%; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-display);"
                 [style.background-color]="summary.currentStep === step.type ? 'var(--accent-cyan)' : 'var(--bg-light)'"
@@ -249,7 +249,7 @@
             <div class="cyber-input-group">
               <label class="cyber-input-label">TIPO DE DOCUMENTO</label>
               <select class="cyber-input" [(ngModel)]="selectedDocType">
-                <option value="PASSPORT">Pasaporte Oficial</option>
+                <option value="PASSPORT">Pasaporte o D.N.I</option>
                 <option value="TAX_FORM">Identificación Fiscal</option>
               </select>
             </div>
