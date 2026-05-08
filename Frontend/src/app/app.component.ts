@@ -116,6 +116,7 @@ export class AppComponent implements OnInit {
   reviewFeedback = '';
   notifications: Notification[] = [];
   showNotificationDropdown = false;
+  currentTheme: 'dark' | 'light' = 'dark';
 
   selectedProcessForPayment: any | null = null;
   paymentAmount = 2500;
@@ -159,6 +160,11 @@ export class AppComponent implements OnInit {
   constructor(private http: HttpClient) { }
 
   ngOnInit() {
+    const savedTheme = localStorage.getItem('northpay-theme') as 'dark' | 'light';
+    if (savedTheme) {
+      this.currentTheme = savedTheme;
+    }
+    this.applyTheme();
     this.testBackendConnection();
   }
 
@@ -654,6 +660,17 @@ export class AppComponent implements OnInit {
     this.notifications.forEach(n => n.isRead = true);
     this.notifications = [];
     this.showNotificationDropdown = false;
+  }
+
+  toggleTheme() {
+    this.currentTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('northpay-theme', this.currentTheme);
+    this.applyTheme();
+    this.addLocalNotification(`Modo ${this.currentTheme === 'dark' ? 'Oscuro' : 'Claro'} activado.`, 'INFO');
+  }
+
+  applyTheme() {
+    document.documentElement.setAttribute('data-theme', this.currentTheme);
   }
 
   loadNotifications() {

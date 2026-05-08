@@ -31,6 +31,10 @@
         Volver a Onboarding 👤
       </button>
 
+      <button class="cyber-btn theme-toggle-btn" (click)="toggleTheme()" style="padding: 8px 12px; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; background: var(--glass-bg); border-color: var(--glass-border); cursor: pointer; position: relative; margin-right: 5px;" title="Cambiar Tema">
+        {{ currentTheme === 'dark' ? '☀️' : '🌙' }}
+      </button>
+
       <div class="notification-trigger" (click)="showNotificationDropdown = !showNotificationDropdown">
         <div class="glass-panel bell-icon" style="cursor: pointer; position: relative;">
           🔔
