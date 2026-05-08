@@ -46,6 +46,7 @@ export class AdminDashboardComponent implements OnInit {
     'Datos personales completados y validados.'
   ];
   mockContractors: any[] = [];
+  paidContractorIds: number[] = [];
 
   // Reused personalData fallback for simulation details inside review box
   personalData = {
@@ -91,10 +92,10 @@ export class AdminDashboardComponent implements OnInit {
 
   loadOperatorPanel() {
     this.mockContractors = [
-      { id: 500, name: 'Juan Pérez', country: 'España', email: 'contractor@northpay.com', progress: this.summary.progress, status: this.summary.steps[1].status === 'IN_REVIEW' ? 'IN_REVIEW' : this.summary.status, date: '07/05/2026', currentStep: this.summary.currentStep || 'COMPLETED' },
-      { id: 501, name: 'María Gómez', country: 'Colombia', email: 'maria.gomez@gmail.com', progress: 100, status: 'COMPLETED', date: '05/05/2026', currentStep: 'COMPLETED' },
-      { id: 502, name: 'Pierre Dubois', country: 'Francia', email: 'pierre.dubois@yahoo.fr', progress: 20, status: 'IN_PROGRESS', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD' },
-      { id: 503, name: 'Yuki Tanaka', country: 'Japón', email: 'tanaka.yuki@gmail.com', progress: 40, status: 'IN_REVIEW', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD' }
+      { id: 500, name: 'Juan Pérez', country: 'España', email: 'contractor@northpay.com', progress: this.summary.progress, status: this.paidContractorIds.includes(500) ? 'PAID' : (this.summary.steps[1].status === 'IN_REVIEW' ? 'IN_REVIEW' : this.summary.status), date: '07/05/2026', currentStep: this.summary.currentStep || 'COMPLETED' },
+      { id: 501, name: 'María Gómez', country: 'Colombia', email: 'maria.gomez@gmail.com', progress: 100, status: this.paidContractorIds.includes(501) ? 'PAID' : 'COMPLETED', date: '05/05/2026', currentStep: 'COMPLETED' },
+      { id: 502, name: 'Pierre Dubois', country: 'Francia', email: 'pierre.dubois@yahoo.fr', progress: 20, status: this.paidContractorIds.includes(502) ? 'PAID' : 'IN_PROGRESS', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD' },
+      { id: 503, name: 'Yuki Tanaka', country: 'Japón', email: 'tanaka.yuki@gmail.com', progress: 40, status: this.paidContractorIds.includes(503) ? 'PAID' : 'IN_REVIEW', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD' }
     ];
 
     if (this.isLocalMock) {
@@ -181,6 +182,16 @@ export class AdminDashboardComponent implements OnInit {
       const c = this.selectedProcessForPayment;
       this.isProcessingPayment = false;
       this.selectedProcessForPayment = null;
+
+      // Update contractor state to PAID
+      if (!this.paidContractorIds.includes(c.id)) {
+        this.paidContractorIds.push(c.id);
+      }
+      const target = this.mockContractors.find(item => item.id === c.id);
+      if (target) {
+        target.status = 'PAID';
+        target.paid = true;
+      }
 
       this.changeHistory.unshift(`Pago de $${this.paymentAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD procesado y enviado a ${c.name} vía transferencia bancaria.`);
     }, 1500);

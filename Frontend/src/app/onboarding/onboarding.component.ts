@@ -28,6 +28,8 @@ export class OnboardingComponent implements OnInit {
   currentView: 'welcome' | 'register' | 'onboarding' = 'welcome';
   apiBaseUrl = 'http://localhost:8080/api';
   isLocalMock = true;
+  cloudinaryCloudName = 'northpay-demo';
+  cloudinaryUploadPreset = 'northpay_preset';
 
   invitationToken = '';
   invitationEmail = 'contractor@northpay.com';
@@ -39,9 +41,10 @@ export class OnboardingComponent implements OnInit {
 
   summary: OnboardingSummary = {
     status: 'CREATED',
-    currentStep: 'PERSONAL_DATA',
+    currentStep: 'WHATSAPP_VERIFY',
     progress: 0,
     steps: [
+      { type: 'WHATSAPP_VERIFY', status: 'IN_PROGRESS' },
       { type: 'PERSONAL_DATA', status: 'NOT_STARTED' },
       { type: 'DOCUMENT_UPLOAD', status: 'NOT_STARTED' },
       { type: 'CONTRACT_SIGN', status: 'NOT_STARTED' },
@@ -51,6 +54,12 @@ export class OnboardingComponent implements OnInit {
     canProceed: true,
     blockingIssues: []
   };
+
+  whatsappPhone = '';
+  whatsappCode = '';
+  isSendingWhatsapp = false;
+  isVerifyingWhatsapp = false;
+  whatsappVerified = false;
 
   personalData = {
     firstName: '',
@@ -164,8 +173,8 @@ export class OnboardingComponent implements OnInit {
 
   submitPersonalData() {
     if (this.isLocalMock) {
-      this.summary.steps[0].status = 'COMPLETED';
-      this.summary.steps[1].status = 'IN_PROGRESS';
+      this.summary.steps[1].status = 'COMPLETED';
+      this.summary.steps[2].status = 'IN_PROGRESS';
       this.addLocalNotification('Paso 1 Completado: Datos personales guardados.', 'SUCCESS');
       this.refreshSummary();
     } else {
@@ -180,40 +189,89 @@ export class OnboardingComponent implements OnInit {
   }
 
   onFileSelected(event: any) {
-    this.selectedFile = event.target.files[0];
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const maxSize = 6 * 1024 * 1024; // 6MB
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+
+    if (file.size > maxSize) {
+      this.addLocalNotification('El archivo excede el límite permitido de 6 MB.', 'ERROR');
+      event.target.value = '';
+      this.selectedFile = null;
+      return;
+    }
+
+    if (!allowedTypes.includes(file.type)) {
+      this.addLocalNotification('Formato de archivo no válido. Solo se admiten PDF, JPG, JPEG o PNG.', 'ERROR');
+      event.target.value = '';
+      this.selectedFile = null;
+      return;
+    }
+
+    this.selectedFile = file;
   }
 
   uploadDocument() {
     if (!this.selectedFile) return;
     this.isUploadingDoc = true;
 
-    setTimeout(() => {
-      this.isUploadingDoc = false;
-      const fakeUrl = 'https://res.cloudinary.com/demo/image/upload/sample_id.pdf';
-      this.uploadedDocs.push({
-        type: this.selectedDocType,
-        filename: this.selectedFile?.name || 'document.pdf',
-        fileUrl: fakeUrl
-      });
-      this.selectedFile = null;
+    if (this.isLocalMock) {
+      const formData = new FormData();
+      formData.append('file', this.selectedFile);
+      formData.append('upload_preset', this.cloudinaryUploadPreset);
 
-      if (this.isLocalMock) {
-        this.summary.steps[1].status = 'IN_REVIEW';
-        this.addLocalNotification('Documentos subidos a Cloudinary. Pendiente de aprobación legal.', 'INFO');
-        this.refreshSummary();
-      } else {
-        this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/documents`, {
-          documentType: this.selectedDocType,
-          fileUrl: fakeUrl
-        }).subscribe({
-          next: () => {
-            this.addLocalNotification('Documentos cargados. Pendiente de validación.', 'SUCCESS');
-            this.refreshSummary();
-          },
-          error: (err) => this.handleError(err)
-        });
-      }
-    }, 1500);
+      this.http.post(`https://api.cloudinary.com/v1_1/${this.cloudinaryCloudName}/image/upload`, formData).subscribe({
+        next: (res: any) => {
+          this.isUploadingDoc = false;
+          this.uploadedDocs.push({
+            type: this.selectedDocType,
+            filename: this.selectedFile ? this.selectedFile.name : 'document.pdf',
+            fileUrl: res.secure_url
+          });
+          this.summary.steps[2].status = 'IN_REVIEW';
+          this.addLocalNotification(`Documento '${this.selectedDocType}' subido con éxito a Cloudinary.`, 'SUCCESS');
+          this.selectedFile = null;
+          this.refreshSummary();
+        },
+        error: () => {
+          this.isUploadingDoc = false;
+          const filename = this.selectedFile ? this.selectedFile.name : 'document.pdf';
+          this.uploadedDocs.push({
+            type: this.selectedDocType,
+            filename: filename,
+            fileUrl: 'https://res.cloudinary.com/demo/image/upload/' + filename
+          });
+          this.summary.steps[2].status = 'IN_REVIEW';
+          this.addLocalNotification(`Documento '${this.selectedDocType}' subido (Simulación). Pendiente de validación.`, 'INFO');
+          this.selectedFile = null;
+          this.refreshSummary();
+        }
+      });
+    } else {
+      const formData = new FormData();
+      formData.append('type', this.selectedDocType);
+      formData.append('file', this.selectedFile);
+
+      this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/documents`, formData).subscribe({
+        next: (res: any) => {
+          this.isUploadingDoc = false;
+          this.uploadedDocs.push({
+            type: this.selectedDocType,
+            filename: this.selectedFile?.name || 'document.pdf',
+            fileUrl: res.fileUrl || 'https://res.cloudinary.com/demo/image/upload/' + this.selectedFile?.name
+          });
+          this.summary.steps[2].status = 'IN_REVIEW';
+          this.addLocalNotification('Documentos cargados con éxito.', 'SUCCESS');
+          this.selectedFile = null;
+          this.refreshSummary();
+        },
+        error: (err) => {
+          this.isUploadingDoc = false;
+          this.handleError(err);
+        }
+      });
+    }
   }
 
   signContract() {
@@ -223,8 +281,8 @@ export class OnboardingComponent implements OnInit {
       this.signedContractUrl = 'https://res.cloudinary.com/demo/contract/signed_contract_doe.pdf';
 
       if (this.isLocalMock) {
-        this.summary.steps[2].status = 'COMPLETED';
-        this.summary.steps[3].status = 'IN_PROGRESS';
+        this.summary.steps[3].status = 'COMPLETED';
+        this.summary.steps[4].status = 'IN_PROGRESS';
         this.addLocalNotification('Contrato firmado y certificado digitalmente.', 'SUCCESS');
         this.refreshSummary();
       } else {
@@ -243,8 +301,8 @@ export class OnboardingComponent implements OnInit {
 
   savePaymentMethod() {
     if (this.isLocalMock) {
-      this.summary.steps[3].status = 'COMPLETED';
-      this.summary.steps[4].status = 'IN_PROGRESS';
+      this.summary.steps[4].status = 'COMPLETED';
+      this.summary.steps[5].status = 'IN_PROGRESS';
       this.addLocalNotification('Método de pago configurado con éxito.', 'SUCCESS');
       this.refreshSummary();
     } else {
@@ -273,10 +331,10 @@ export class OnboardingComponent implements OnInit {
 
         if (this.isLocalMock) {
           if (this.scanSuccess) {
-            this.summary.steps[4].status = 'COMPLETED';
+            this.summary.steps[5].status = 'COMPLETED';
             this.addLocalNotification('Verificación biométrica certificada con éxito.', 'SUCCESS');
           } else {
-            this.summary.steps[4].status = 'REJECTED';
+            this.summary.steps[5].status = 'REJECTED';
             this.addLocalNotification('Autenticación fallida. El rostro no coincide.', 'ERROR');
           }
           this.refreshSummary();
@@ -293,42 +351,78 @@ export class OnboardingComponent implements OnInit {
     }, 300);
   }
 
+  sendWhatsappCode() {
+    this.isSendingWhatsapp = true;
+    setTimeout(() => {
+      this.isSendingWhatsapp = false;
+      this.addLocalNotification('Redirigiendo a WhatsApp real...', 'INFO');
+      this.whatsappCode = '123456';
+
+      const cleanPhone = this.whatsappPhone.replace(/[^0-9]/g, '');
+      const text = `¡Hola NorthPay! Confirmo mi identidad para el proceso de Onboarding. Mi código de activación de prueba es: 123456`;
+      const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
+
+      window.open(url, '_blank');
+      this.addLocalNotification('Código de activación listo: escribe 123456 en pantalla.', 'SUCCESS');
+    }, 1200);
+  }
+
+  verifyWhatsappCode() {
+    this.isVerifyingWhatsapp = true;
+    setTimeout(() => {
+      this.isVerifyingWhatsapp = false;
+      if (this.whatsappCode === '123456') {
+        this.whatsappVerified = true;
+        this.summary.steps[0].status = 'COMPLETED';
+        this.summary.steps[1].status = 'IN_PROGRESS';
+        this.addLocalNotification('WhatsApp verificado correctamente. ¡Onboarding desbloqueado!', 'SUCCESS');
+        this.refreshSummary();
+      } else {
+        this.addLocalNotification('Código incorrecto. Intenta de nuevo.', 'ERROR');
+      }
+    }, 1200);
+  }
+
   resolveLocalState() {
     let progress = 0;
-    let currentStep: string | null = 'PERSONAL_DATA';
+    let currentStep: string | null = 'WHATSAPP_VERIFY';
     const blockingIssues: string[] = [];
     let canProceed = true;
 
-    const s0 = this.summary.steps[0].status;
-    const s1 = this.summary.steps[1].status;
-    const s2 = this.summary.steps[2].status;
-    const s3 = this.summary.steps[3].status;
-    const s4 = this.summary.steps[4].status;
+    const s0 = this.summary.steps[0].status; // WHATSAPP_VERIFY
+    const s1 = this.summary.steps[1].status; // PERSONAL_DATA
+    const s2 = this.summary.steps[2].status; // DOCUMENT_UPLOAD
+    const s3 = this.summary.steps[3].status; // CONTRACT_SIGN
+    const s4 = this.summary.steps[4].status; // PAYMENT_METHOD
+    const s5 = this.summary.steps[5].status; // IDENTITY_VERIFICATION
 
-    if (s0 === 'COMPLETED') progress += 20;
-    if (s1 === 'COMPLETED') progress += 20;
-    if (s2 === 'COMPLETED') progress += 20;
-    if (s3 === 'COMPLETED') progress += 20;
-    if (s4 === 'COMPLETED') progress += 20;
+    if (s0 === 'COMPLETED') progress += 16;
+    if (s1 === 'COMPLETED') progress += 16;
+    if (s2 === 'COMPLETED') progress += 17;
+    if (s3 === 'COMPLETED') progress += 17;
+    if (s4 === 'COMPLETED') progress += 17;
+    if (s5 === 'COMPLETED') progress += 17;
 
-    if (s0 === 'NOT_STARTED' || s0 === 'IN_PROGRESS') {
+    if (s0 !== 'COMPLETED') {
+      currentStep = 'WHATSAPP_VERIFY';
+    } else if (s1 !== 'COMPLETED') {
       currentStep = 'PERSONAL_DATA';
-    } else if (s1 === 'NOT_STARTED' || s1 === 'IN_PROGRESS' || s1 === 'IN_REVIEW' || s1 === 'REJECTED') {
+    } else if (s2 !== 'COMPLETED') {
       currentStep = 'DOCUMENT_UPLOAD';
-      if (s1 === 'IN_REVIEW') {
+      if (s2 === 'IN_REVIEW') {
         canProceed = false;
         blockingIssues.push('Tu pasaporte e identificación fiscal están siendo validados por operaciones.');
-      } else if (s1 === 'REJECTED') {
+      } else if (s2 === 'REJECTED') {
         canProceed = false;
         blockingIssues.push('Tus documentos fueron rechazados por nitidez. Sube una copia a color.');
       }
-    } else if (s2 === 'NOT_STARTED' || s2 === 'IN_PROGRESS') {
+    } else if (s3 !== 'COMPLETED') {
       currentStep = 'CONTRACT_SIGN';
-    } else if (s3 === 'NOT_STARTED' || s3 === 'IN_PROGRESS') {
+    } else if (s4 !== 'COMPLETED') {
       currentStep = 'PAYMENT_METHOD';
-    } else if (s4 === 'NOT_STARTED' || s4 === 'IN_PROGRESS' || s4 === 'REJECTED') {
+    } else if (s5 !== 'COMPLETED') {
       currentStep = 'IDENTITY_VERIFICATION';
-      if (s4 === 'REJECTED') {
+      if (s5 === 'REJECTED') {
         canProceed = false;
         blockingIssues.push('Error biométrico. Vuelve a escanear tu rostro con mejor iluminación.');
       }

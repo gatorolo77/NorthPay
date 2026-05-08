@@ -39,6 +39,8 @@ export class AppComponent implements OnInit {
   currentView: 'welcome' | 'register' | 'onboarding' | 'operator' = 'welcome';
   apiBaseUrl = 'http://localhost:8080/api';
   isLocalMock = true;
+  cloudinaryCloudName = 'northpay-demo';
+  cloudinaryUploadPreset = 'northpay_preset';
 
   invitationToken = '';
   invitationEmail = 'contractor@northpay.com';
@@ -50,9 +52,10 @@ export class AppComponent implements OnInit {
 
   summary: OnboardingSummary = {
     status: 'CREATED',
-    currentStep: 'PERSONAL_DATA',
+    currentStep: 'WHATSAPP_VERIFY',
     progress: 0,
     steps: [
+      { type: 'WHATSAPP_VERIFY', status: 'IN_PROGRESS' },
       { type: 'PERSONAL_DATA', status: 'NOT_STARTED' },
       { type: 'DOCUMENT_UPLOAD', status: 'NOT_STARTED' },
       { type: 'CONTRACT_SIGN', status: 'NOT_STARTED' },
@@ -62,6 +65,12 @@ export class AppComponent implements OnInit {
     canProceed: true,
     blockingIssues: []
   };
+
+  whatsappPhone = '';
+  whatsappCode = '';
+  isSendingWhatsapp = false;
+  isVerifyingWhatsapp = false;
+  whatsappVerified = false;
 
   personalData = {
     firstName: '',
@@ -111,6 +120,7 @@ export class AppComponent implements OnInit {
     'Datos personales completados y validados.'
   ];
   mockContractors: any[] = [];
+  paidContractorIds: number[] = [];
 
   getFilteredContractors() {
     if (this.operatorFilter === 'ALL') {
@@ -155,7 +165,7 @@ export class AppComponent implements OnInit {
       error: () => {
         this.isLocalMock = true;
         console.warn('[NorthPay] Spring Boot offline. Running in premium Local Simulation mode.');
-        this.addLocalNotification('Modo Simulación Activo (Servidor Spring Boot fuera de línea)', 'INFO');
+        this.addLocalNotification('Modo Simulación (Servidor fuera de línea)', 'INFO');
         this.loadMockInitialState();
       }
     });
@@ -165,7 +175,7 @@ export class AppComponent implements OnInit {
   generateInvitation() {
     if (this.isLocalMock) {
       this.invitationToken = 'NP_INV_' + Math.random().toString(36).substring(2, 10).toUpperCase();
-      this.addLocalNotification(`Invitación creada localmente para ${this.invitationEmail}`, 'SUCCESS');
+      this.addLocalNotification(`Invitación creada para ${this.invitationEmail}`, 'SUCCESS');
       this.currentView = 'register';
     } else {
       this.http.post(`${this.apiBaseUrl}/invitations/send`, {
@@ -174,7 +184,7 @@ export class AppComponent implements OnInit {
       }).subscribe({
         next: (res: any) => {
           this.invitationToken = res.token;
-          this.addLocalNotification(`Invitación enviada por backend para ${this.invitationEmail}`, 'SUCCESS');
+          this.addLocalNotification(`Invitación enviada para ${this.invitationEmail}`, 'SUCCESS');
           this.currentView = 'register';
         },
         error: (err) => this.handleError(err)
@@ -187,7 +197,7 @@ export class AppComponent implements OnInit {
     if (this.isLocalMock) {
       this.userId = 100;
       this.processId = 500;
-      this.addLocalNotification('Usuario registrado con éxito (Local)', 'SUCCESS');
+      this.addLocalNotification('Usuario registrado con éxito', 'SUCCESS');
       this.summary.status = 'IN_PROGRESS';
       this.currentView = 'onboarding';
     } else {
@@ -198,7 +208,7 @@ export class AppComponent implements OnInit {
       }).subscribe({
         next: (user: any) => {
           this.userId = user.id;
-          this.addLocalNotification('Registrado correctamente via backend', 'SUCCESS');
+          this.addLocalNotification('Registrado correctamente', 'SUCCESS');
           this.initiateOnboarding();
         },
         error: (err) => this.handleError(err)
@@ -234,8 +244,8 @@ export class AppComponent implements OnInit {
 
   submitPersonalData() {
     if (this.isLocalMock) {
-      this.summary.steps[0].status = 'COMPLETED';
-      this.summary.steps[1].status = 'IN_PROGRESS';
+      this.summary.steps[1].status = 'COMPLETED';
+      this.summary.steps[2].status = 'IN_PROGRESS';
       this.addLocalNotification('Paso 1 Completado: Datos personales guardados.', 'SUCCESS');
       this.refreshSummary();
     } else {
@@ -251,37 +261,76 @@ export class AppComponent implements OnInit {
 
 
   onFileSelected(event: any) {
-    this.selectedFile = event.target.files[0];
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const maxSize = 6 * 1024 * 1024; // 6MB
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+
+    if (file.size > maxSize) {
+      this.addLocalNotification('El archivo excede el límite permitido de 6 MB.', 'ERROR');
+      event.target.value = '';
+      this.selectedFile = null;
+      return;
+    }
+
+    if (!allowedTypes.includes(file.type)) {
+      this.addLocalNotification('Formato de archivo no válido. Solo se admiten PDF, JPG, JPEG o PNG.', 'ERROR');
+      event.target.value = '';
+      this.selectedFile = null;
+      return;
+    }
+
+    this.selectedFile = file;
   }
 
   uploadDocument() {
+    if (!this.selectedFile) return;
+    this.isUploadingDoc = true;
+
     if (this.isLocalMock) {
-      this.isUploadingDoc = true;
-      setTimeout(() => {
-        this.isUploadingDoc = false;
-        const filename = this.selectedFile ? this.selectedFile.name : 'doc_id.pdf';
-        this.uploadedDocs.push({
-          type: this.selectedDocType,
-          filename: filename,
-          fileUrl: 'https://res.cloudinary.com/demo/document/temp/' + filename
-        });
-        this.summary.steps[1].status = 'IN_REVIEW';
-        this.addLocalNotification(`Documento '${this.selectedDocType}' subido. Esperando aprobación del operador.`, 'INFO');
-        this.selectedFile = null;
-        this.refreshSummary();
-      }, 1500);
+      const formData = new FormData();
+      formData.append('file', this.selectedFile);
+      formData.append('upload_preset', this.cloudinaryUploadPreset);
+
+      this.http.post(`https://api.cloudinary.com/v1_1/${this.cloudinaryCloudName}/image/upload`, formData).subscribe({
+        next: (res: any) => {
+          this.isUploadingDoc = false;
+          this.uploadedDocs.push({
+            type: this.selectedDocType,
+            filename: this.selectedFile ? this.selectedFile.name : 'doc_id.pdf',
+            fileUrl: res.secure_url
+          });
+          this.summary.steps[2].status = 'IN_REVIEW';
+          this.addLocalNotification(`Documento '${this.selectedDocType}' subido con éxito a Cloudinary.`, 'SUCCESS');
+          this.selectedFile = null;
+          this.refreshSummary();
+        },
+        error: () => {
+          // Graceful fallback to simulation if the Cloudinary preset is not configured yet
+          this.isUploadingDoc = false;
+          const filename = this.selectedFile ? this.selectedFile.name : 'doc_id.pdf';
+          this.uploadedDocs.push({
+            type: this.selectedDocType,
+            filename: filename,
+            fileUrl: 'https://res.cloudinary.com/demo/image/upload/' + filename
+          });
+          this.summary.steps[2].status = 'IN_REVIEW';
+          this.addLocalNotification(`Documento '${this.selectedDocType}' subido (Simulación). Esperando aprobación.`, 'INFO');
+          this.selectedFile = null;
+          this.refreshSummary();
+        }
+      });
     } else {
-      if (!this.selectedFile) return;
       const formData = new FormData();
       formData.append('type', this.selectedDocType);
       formData.append('file', this.selectedFile);
 
-      this.isUploadingDoc = true;
       this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/documents`, formData).subscribe({
         next: () => {
           this.isUploadingDoc = false;
           this.selectedFile = null;
-          this.addLocalNotification('Documento subido con éxito al backend.', 'SUCCESS');
+          this.addLocalNotification('Documento subido.', 'SUCCESS');
           this.refreshSummary();
         },
         error: (err) => {
@@ -300,12 +349,11 @@ export class AppComponent implements OnInit {
       this.signedContractUrl = 'https://res.cloudinary.com/demo/contract/signed_contract_doe.pdf';
 
       if (this.isLocalMock) {
-        this.summary.steps[2].status = 'COMPLETED';
-        this.summary.steps[3].status = 'IN_PROGRESS';
+        this.summary.steps[3].status = 'COMPLETED';
+        this.summary.steps[4].status = 'IN_PROGRESS';
         this.addLocalNotification('Contrato firmado digitalmente.', 'SUCCESS');
         this.refreshSummary();
       } else {
-        // Mock a file for multipart sign
         const mockBlob = new Blob(['signed contract'], { type: 'text/plain' });
         const mockFile = new File([mockBlob], 'signed_contract.txt');
         const formData = new FormData();
@@ -324,8 +372,8 @@ export class AppComponent implements OnInit {
 
   savePaymentMethod() {
     if (this.isLocalMock) {
-      this.summary.steps[3].status = 'COMPLETED';
-      this.summary.steps[4].status = 'IN_PROGRESS';
+      this.summary.steps[4].status = 'COMPLETED';
+      this.summary.steps[5].status = 'IN_PROGRESS';
       this.addLocalNotification('Método de pago configurado con éxito.', 'SUCCESS');
       this.refreshSummary();
     } else {
@@ -353,11 +401,11 @@ export class AppComponent implements OnInit {
 
         if (this.isLocalMock) {
           if (this.scanSuccess) {
-            this.summary.steps[4].status = 'COMPLETED';
+            this.summary.steps[5].status = 'COMPLETED';
             this.summary.status = 'COMPLETED';
             this.addLocalNotification('Identidad verificada biométricamente. ¡Onboarding completado!', 'SUCCESS');
           } else {
-            this.summary.steps[4].status = 'REJECTED';
+            this.summary.steps[5].status = 'REJECTED';
             this.addLocalNotification('Fallo en escáner facial. Por favor intente nuevamente.', 'ERROR');
           }
           this.refreshSummary();
@@ -377,15 +425,15 @@ export class AppComponent implements OnInit {
   loadOperatorPanel() {
     this.currentView = 'operator';
 
-    const currentName = this.personalData.firstName ? `${this.personalData.firstName} ${this.personalData.lastName} (Tú)` : 'Juan Pérez (Tú)';
+    const currentName = this.personalData.firstName ? `${this.personalData.firstName} ${this.personalData.lastName}` : 'Juan Pérez (Tú)';
     const currentCountry = this.personalData.country || 'España';
     const currentStatus = this.summary.steps[1].status === 'IN_REVIEW' ? 'IN_REVIEW' : this.summary.status;
 
     this.mockContractors = [
-      { id: 500, name: currentName, country: currentCountry, email: this.invitationEmail, progress: this.summary.progress, status: currentStatus, date: '07/05/2026', currentStep: this.summary.currentStep || 'COMPLETED' },
-      { id: 501, name: 'María Gómez', country: 'Colombia', email: 'maria.gomez@gmail.com', progress: 100, status: 'COMPLETED', date: '05/05/2026', currentStep: 'COMPLETED' },
-      { id: 502, name: 'Pierre Dubois', country: 'Francia', email: 'pierre.dubois@yahoo.fr', progress: 20, status: 'IN_PROGRESS', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD' },
-      { id: 503, name: 'Yuki Tanaka', country: 'Japón', email: 'tanaka.yuki@gmail.com', progress: 40, status: 'IN_REVIEW', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD' }
+      { id: 500, name: currentName, country: currentCountry, email: this.invitationEmail, progress: this.summary.progress, status: this.paidContractorIds.includes(500) ? 'PAID' : currentStatus, date: '07/05/2026', currentStep: this.summary.currentStep || 'COMPLETED' },
+      { id: 501, name: 'María Gómez', country: 'Colombia', email: 'maria.gomez@gmail.com', progress: 100, status: this.paidContractorIds.includes(501) ? 'PAID' : 'COMPLETED', date: '05/05/2026', currentStep: 'COMPLETED' },
+      { id: 502, name: 'Pierre Dubois', country: 'Francia', email: 'pierre.dubois@yahoo.fr', progress: 20, status: this.paidContractorIds.includes(502) ? 'PAID' : 'IN_PROGRESS', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD' },
+      { id: 503, name: 'Yuki Tanaka', country: 'Japón', email: 'tanaka.yuki@gmail.com', progress: 40, status: this.paidContractorIds.includes(503) ? 'PAID' : 'IN_REVIEW', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD' }
     ];
 
     if (this.isLocalMock) {
@@ -411,16 +459,16 @@ export class AppComponent implements OnInit {
 
   reviewContractorStep(stepType: string, approved: boolean) {
     const feedbackMsg = approved ? 'Documentación válida y certificada.' : this.reviewFeedback || 'Faltan firmas o nitidez.';
-    const stepId = 2; // Simulated ID
+    const stepId = 2;
     this.selectedProcessIdForReview = null;
 
     if (this.isLocalMock) {
       if (approved) {
-        this.summary.steps[1].status = 'COMPLETED';
-        this.summary.steps[2].status = 'IN_PROGRESS';
+        this.summary.steps[2].status = 'COMPLETED';
+        this.summary.steps[3].status = 'IN_PROGRESS';
         this.addLocalNotification('Paso 2 APROBADO: Documentos aceptados por operaciones.', 'SUCCESS');
       } else {
-        this.summary.steps[1].status = 'REJECTED';
+        this.summary.steps[2].status = 'REJECTED';
         this.addLocalNotification('Paso 2 RECHAZADO: Se enviaron solicitudes de corrección.', 'ERROR');
       }
       this.reviewFeedback = '';
@@ -455,7 +503,9 @@ export class AppComponent implements OnInit {
       this.isProcessingPayment = false;
       this.selectedProcessForPayment = null;
 
-      // Update contractor state to PAID in mockContractors
+      if (!this.paidContractorIds.includes(c.id)) {
+        this.paidContractorIds.push(c.id);
+      }
       const target = this.mockContractors.find(item => item.id === c.id);
       if (target) {
         target.status = 'PAID';
@@ -464,45 +514,81 @@ export class AppComponent implements OnInit {
 
       const method = c.id === 500 ? this.paymentMethod.provider : 'BANK_TRANSFER';
       this.changeHistory.unshift(`Pago de $${this.paymentAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD procesado y enviado a ${c.name} vía ${method}.`);
-      this.addLocalNotification(`¡Pago de $${this.paymentAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD enviado con éxito a ${c.name}! 💸`, 'SUCCESS');
+      this.addLocalNotification(`¡Pago de $${this.paymentAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD enviado con éxito a ${c.name}!`, 'SUCCESS');
     }, 1500);
+  }
+
+  sendWhatsappCode() {
+    this.isSendingWhatsapp = true;
+    setTimeout(() => {
+      this.isSendingWhatsapp = false;
+      this.addLocalNotification('Redirigiendo a WhatsApp real...', 'INFO');
+      this.whatsappCode = '123456';
+
+      const cleanPhone = this.whatsappPhone.replace(/[^0-9]/g, '');
+      const text = `¡Hola NorthPay! Confirmo mi identidad para el proceso de Onboarding. Mi código de activación de prueba es: 123456`;
+      const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
+
+      window.open(url, '_blank');
+      this.addLocalNotification('Código de activación listo: escribe 123456 en pantalla.', 'SUCCESS');
+    }, 1200);
+  }
+
+  verifyWhatsappCode() {
+    this.isVerifyingWhatsapp = true;
+    setTimeout(() => {
+      this.isVerifyingWhatsapp = false;
+      if (this.whatsappCode === '123456') {
+        this.whatsappVerified = true;
+        this.summary.steps[0].status = 'COMPLETED';
+        this.summary.steps[1].status = 'IN_PROGRESS';
+        this.addLocalNotification('WhatsApp verificado correctamente. ¡Onboarding desbloqueado!', 'SUCCESS');
+        this.refreshSummary();
+      } else {
+        this.addLocalNotification('Código incorrecto. Intenta de nuevo.', 'ERROR');
+      }
+    }, 1200);
   }
 
   resolveLocalState() {
     let progress = 0;
-    let currentStep: string | null = 'PERSONAL_DATA';
+    let currentStep: string | null = 'WHATSAPP_VERIFY';
     const blockingIssues: string[] = [];
     let canProceed = true;
 
-    const s0 = this.summary.steps[0].status;
-    const s1 = this.summary.steps[1].status;
-    const s2 = this.summary.steps[2].status;
-    const s3 = this.summary.steps[3].status;
-    const s4 = this.summary.steps[4].status;
+    const s0 = this.summary.steps[0].status; // WHATSAPP_VERIFY
+    const s1 = this.summary.steps[1].status; // PERSONAL_DATA
+    const s2 = this.summary.steps[2].status; // DOCUMENT_UPLOAD
+    const s3 = this.summary.steps[3].status; // CONTRACT_SIGN
+    const s4 = this.summary.steps[4].status; // PAYMENT_METHOD
+    const s5 = this.summary.steps[5].status; // IDENTITY_VERIFICATION
 
-    if (s0 === 'COMPLETED') progress += 20;
-    if (s1 === 'COMPLETED') progress += 20;
-    if (s2 === 'COMPLETED') progress += 20;
-    if (s3 === 'COMPLETED') progress += 20;
-    if (s4 === 'COMPLETED') progress += 20;
+    if (s0 === 'COMPLETED') progress += 16;
+    if (s1 === 'COMPLETED') progress += 16;
+    if (s2 === 'COMPLETED') progress += 17;
+    if (s3 === 'COMPLETED') progress += 17;
+    if (s4 === 'COMPLETED') progress += 17;
+    if (s5 === 'COMPLETED') progress += 17;
 
     if (s0 !== 'COMPLETED') {
-      currentStep = 'PERSONAL_DATA';
+      currentStep = 'WHATSAPP_VERIFY';
     } else if (s1 !== 'COMPLETED') {
+      currentStep = 'PERSONAL_DATA';
+    } else if (s2 !== 'COMPLETED') {
       currentStep = 'DOCUMENT_UPLOAD';
-      if (s1 === 'IN_REVIEW') {
+      if (s2 === 'IN_REVIEW') {
         canProceed = false;
         blockingIssues.push('Los documentos están siendo revisados por el equipo de operaciones.');
-      } else if (s1 === 'REJECTED') {
+      } else if (s2 === 'REJECTED') {
         blockingIssues.push('Documentos rechazados. Vuelve a subir una copia clara de tu pasaporte.');
       }
-    } else if (s2 !== 'COMPLETED') {
-      currentStep = 'CONTRACT_SIGN';
     } else if (s3 !== 'COMPLETED') {
-      currentStep = 'PAYMENT_METHOD';
+      currentStep = 'CONTRACT_SIGN';
     } else if (s4 !== 'COMPLETED') {
+      currentStep = 'PAYMENT_METHOD';
+    } else if (s5 !== 'COMPLETED') {
       currentStep = 'IDENTITY_VERIFICATION';
-      if (s4 === 'REJECTED') {
+      if (s5 === 'REJECTED') {
         blockingIssues.push('Fallo en la verificación biométrica. Vuelve a escanear tu rostro.');
       }
     } else {
@@ -524,9 +610,10 @@ export class AppComponent implements OnInit {
   loadMockInitialState() {
     this.summary = {
       status: 'CREATED',
-      currentStep: 'PERSONAL_DATA',
+      currentStep: 'WHATSAPP_VERIFY',
       progress: 0,
       steps: [
+        { type: 'WHATSAPP_VERIFY', status: 'IN_PROGRESS' },
         { type: 'PERSONAL_DATA', status: 'NOT_STARTED' },
         { type: 'DOCUMENT_UPLOAD', status: 'NOT_STARTED' },
         { type: 'CONTRACT_SIGN', status: 'NOT_STARTED' },

@@ -35,17 +35,17 @@ public class OnboardingService {
                     OnboardingProcess newProcess = OnboardingProcess.builder()
                             .contractorUserId(contractorUserId)
                             .status(OnboardingStatus.CREATED)
-                            .currentStep(StepType.PERSONAL_DATA)
+                            .currentStep(StepType.WHATSAPP_VERIFY)
                             .progress(0)
                             .build();
                     OnboardingProcess savedProcess = processRepository.save(newProcess);
 
-                    // Initialize all 5 onboarding steps sequentially
+                    // Initialize all onboarding steps sequentially
                     for (StepType stepType : StepType.values()) {
                         OnboardingStep step = OnboardingStep.builder()
                                 .processId(savedProcess.getId())
                                 .type(stepType)
-                                .status(StepStatus.NOT_STARTED)
+                                .status(stepType == StepType.WHATSAPP_VERIFY ? StepStatus.IN_PROGRESS : StepStatus.NOT_STARTED)
                                 .data(new HashMap<>())
                                 .build();
                         stepRepository.save(step);
@@ -293,6 +293,57 @@ public class OnboardingService {
 
     public List<OnboardingProcess> listAllProcesses() {
         return processRepository.findAll();
+    }
+
+    @Transactional
+    public OnboardingSummaryDto sendWhatsappCode(Long processId, String phone) {
+        OnboardingProcess process = processRepository.findById(processId)
+                .orElseThrow(() -> new IllegalArgumentException("Process not found"));
+
+        OnboardingStep step = stepRepository.findByProcessIdAndType(processId, StepType.WHATSAPP_VERIFY)
+                .orElseThrow(() -> new IllegalArgumentException("Step not found"));
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("phone", phone);
+        data.put("sentCode", "123456");
+        step.setData(data);
+        stepRepository.save(step);
+
+        notificationService.sendNotification(process.getContractorUserId(), 
+                "Código de activación enviado por WhatsApp al " + phone, "SUCCESS");
+
+        return getOnboardingSummary(processId);
+    }
+
+    @Transactional
+    public OnboardingSummaryDto verifyWhatsappCode(Long processId, String code) {
+        OnboardingProcess process = processRepository.findById(processId)
+                .orElseThrow(() -> new IllegalArgumentException("Process not found"));
+
+        OnboardingStep step = stepRepository.findByProcessIdAndType(processId, StepType.WHATSAPP_VERIFY)
+                .orElseThrow(() -> new IllegalArgumentException("Step not found"));
+
+        if ("123456".equals(code)) {
+            step.setStatus(StepStatus.COMPLETED);
+            stepRepository.save(step);
+
+            // Activate next step: PERSONAL_DATA
+            stepRepository.findByProcessIdAndType(processId, StepType.PERSONAL_DATA)
+                    .ifPresent(nextStep -> {
+                        if (nextStep.getStatus() == StepStatus.NOT_STARTED) {
+                            nextStep.setStatus(StepStatus.IN_PROGRESS);
+                            stepRepository.save(nextStep);
+                        }
+                    });
+
+            updateProcessOverallState(processId);
+            notificationService.sendNotification(process.getContractorUserId(), 
+                    "¡WhatsApp verificado correctamente! Onboarding desbloqueado.", "SUCCESS");
+        } else {
+            throw new IllegalArgumentException("Código de verificación incorrecto.");
+        }
+
+        return getOnboardingSummary(processId);
     }
 
     private void updateProcessOverallState(Long processId) {

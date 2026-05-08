@@ -44,7 +44,9 @@
   <main class="main-content">
     <section *ngIf="currentView === 'welcome'" class="glass-panel welcome-card">
       <div class="envelope-wrapper">
-        <span style="font-size: 2.2rem;">✉️</span>
+        <div class="logo-icon" style="width: 45px; height: 45px; border-radius: 10px;">
+          <span class="logo-letter" style="font-size: 1.5rem;">N</span>
+        </div>
       </div>
       <h2 class="font-display text-gradient welcome-title">Portal de Onboarding</h2>
       <p class="welcome-text">
@@ -58,7 +60,7 @@
       </div>
 
       <button class="cyber-btn cyber-btn-primary full-width-btn" (click)="generateInvitation()">
-        Generar Invitación de Acceso ⚡
+        Generar Invitación de Acceso
       </button>
     </section>
 
@@ -97,6 +99,7 @@
               [style.transform]="'rotate(' + (summary.progress * 3.6) + 'deg)'"
               [style.box-shadow]="'0 0 15px var(--accent-cyan-glow)'">
             </div>
+            <div class="progress-circle-logo-bg">N</div>
             <span class="font-display progress-percent">
               {{ summary.progress }}%
             </span>
@@ -121,7 +124,8 @@
               <div>
                 <span class="step-name"
                   [style.color]="summary.currentStep === step.type ? 'var(--accent-cyan)' : 'var(--text-primary)'">
-                  {{ step.type === 'PERSONAL_DATA' ? 'Datos Personales' :
+                  {{ step.type === 'WHATSAPP_VERIFY' ? 'Verificar WhatsApp' :
+                  step.type === 'PERSONAL_DATA' ? 'Datos Personales' :
                   step.type === 'DOCUMENT_UPLOAD' ? 'Documentación' :
                   step.type === 'CONTRACT_SIGN' ? 'Firma de Contrato' :
                   step.type === 'PAYMENT_METHOD' ? 'Método de Pago' : 'Identidad Biométrica' }}
@@ -136,10 +140,10 @@
               </div>
             </div>
 
-            <span class="step-status-icon">
-              {{ step.status === 'COMPLETED' ? '🟢' :
-              step.status === 'IN_REVIEW' ? '⏳' :
-              step.status === 'REJECTED' ? '⚠️' : '⚪' }}
+            <span class="step-status-icon" style="font-size: 0.8rem; font-weight: bold;">
+              {{ step.status === 'COMPLETED' ? '✓' :
+              step.status === 'IN_REVIEW' ? '...' :
+              step.status === 'REJECTED' ? '!' : '-' }}
             </span>
           </div>
         </div>
@@ -147,6 +151,33 @@
 
       <section class="glass-panel viewport-card">
         <div class="corner-glow"></div>
+
+        <div *ngIf="summary.currentStep === 'WHATSAPP_VERIFY'" class="step-form-container">
+          <h3 class="font-display text-gradient step-form-title">Paso 0: Verificación de WhatsApp</h3>
+          <p class="step-form-desc">
+            Para iniciar tu progreso de activación, ingresa tu número de WhatsApp para certificar tu identidad y desbloquear el onboarding. ¡El envío por nuestro canal corporativo es gratuito!
+          </p>
+
+          <div class="cyber-input-group">
+            <label class="cyber-input-label">NÚMERO DE WHATSAPP</label>
+            <input type="text" class="cyber-input" [(ngModel)]="whatsappPhone" placeholder="Ej. +34 600 000 000">
+          </div>
+
+          <button class="cyber-btn cyber-btn-primary submit-action-btn" style="margin-bottom: 20px;"
+            [disabled]="isSendingWhatsapp || !whatsappPhone" (click)="sendWhatsappCode()">
+            {{ isSendingWhatsapp ? 'Enviando WhatsApp...' : 'Enviar Código de Verificación' }}
+          </button>
+
+          <div *ngIf="whatsappPhone" class="cyber-input-group" style="margin-top: 15px;">
+            <label class="cyber-input-label">INGRESAR CÓDIGO (6 DÍGITOS)</label>
+            <input type="text" class="cyber-input" [(ngModel)]="whatsappCode" placeholder="Ingresa 123456" style="text-align: center; letter-spacing: 5px; font-size: 1.2rem;">
+          </div>
+
+          <button *ngIf="whatsappPhone" class="cyber-btn cyber-btn-primary submit-action-btn" style="margin-top: 10px;"
+            [disabled]="isVerifyingWhatsapp || !whatsappCode" (click)="verifyWhatsappCode()">
+            {{ isVerifyingWhatsapp ? 'Verificando Código...' : 'Verificar y Desbloquear Onboarding' }}
+          </button>
+        </div>
 
         <div *ngIf="summary.currentStep === 'PERSONAL_DATA'" class="step-form-container">
           <h3 class="font-display text-gradient step-form-title">Paso 1: Información Personal</h3>
@@ -183,7 +214,7 @@
           </div>
 
           <button class="cyber-btn cyber-btn-primary submit-action-btn" (click)="submitPersonalData()">
-            Guardar y Siguiente Paso ➡️
+            Guardar y Siguiente Paso
           </button>
         </div>
 
@@ -205,7 +236,7 @@
             <div class="cyber-input-group" style="flex: 1;">
               <label class="cyber-input-label">SELECCIONAR ARCHIVO</label>
               <div class="upload-dropzone">
-                <span class="dropzone-icon">📁</span>
+                <span class="dropzone-icon"></span>
                 <input type="file" (change)="onFileSelected($event)" id="fileInput" style="display: none;">
                 <label for="fileInput" class="cyber-btn cyber-btn-secondary dropzone-btn">
                   Buscar archivo local
@@ -220,14 +251,14 @@
           <div class="uploaded-list" *ngIf="uploadedDocs.length > 0">
             <h5 class="uploaded-list-title">Archivos Subidos</h5>
             <div *ngFor="let doc of uploadedDocs" class="glass-panel uploaded-item">
-              <span>📄 {{ doc.type }}: <strong>{{ doc.filename }}</strong></span>
+              <span>{{ doc.type }}: <strong>{{ doc.filename }}</strong></span>
               <span style="color: var(--accent-amber); font-weight: 600;">EN REVISIÓN</span>
             </div>
           </div>
 
           <button class="cyber-btn cyber-btn-primary submit-action-btn"
             [disabled]="isUploadingDoc || !selectedFile" (click)="uploadDocument()">
-            {{ isUploadingDoc ? 'Subiendo archivo...' : 'Enviar para Revisión Legal ⚡' }}
+            {{ isUploadingDoc ? 'Subiendo archivo...' : 'Enviar para Revisión Legal' }}
           </button>
         </div>
 
@@ -260,7 +291,7 @@
 
           <button class="cyber-btn cyber-btn-primary submit-action-btn"
             [disabled]="isSigningContract" (click)="signContract()">
-            {{ isSigningContract ? 'Procesando firma...' : 'Firmar Acuerdo Legal de Forma Segura ✍️' }}
+            {{ isSigningContract ? 'Procesando firma...' : 'Firmar Acuerdo Legal de Forma Segura' }}
           </button>
         </div>
 
@@ -274,7 +305,7 @@
             <div class="glass-panel payment-card"
               [class.glass-panel-active]="paymentMethod.provider === 'BANK_TRANSFER'"
               (click)="paymentMethod.provider = 'BANK_TRANSFER'">
-              <span class="payment-card-icon">🏦</span>
+              <span class="payment-card-icon"></span>
               <h4 class="font-display payment-card-title">Transferencia</h4>
               <span class="payment-card-desc">SWIFT / IBAN local</span>
             </div>
@@ -282,7 +313,7 @@
             <div class="glass-panel payment-card"
               [class.glass-panel-active]="paymentMethod.provider === 'PAYONEER'"
               (click)="paymentMethod.provider = 'PAYONEER'">
-              <span class="payment-card-icon">💳</span>
+              <span class="payment-card-icon"></span>
               <h4 class="font-display payment-card-title">Payoneer</h4>
               <span class="payment-card-desc">Retiro global</span>
             </div>
@@ -290,7 +321,7 @@
             <div class="glass-panel payment-card"
               [class.glass-panel-active]="paymentMethod.provider === 'MERCADO_PAGO'"
               (click)="paymentMethod.provider = 'MERCADO_PAGO'">
-              <span class="payment-card-icon">💙</span>
+              <span class="payment-card-icon"></span>
               <h4 class="font-display payment-card-title">Mercado Pago</h4>
               <span class="payment-card-desc">Alias, CVU local</span>
             </div>
@@ -298,7 +329,7 @@
             <div class="glass-panel payment-card"
               [class.glass-panel-active]="paymentMethod.provider === 'PAYPAL'"
               (click)="paymentMethod.provider = 'PAYPAL'">
-              <span class="payment-card-icon">🌐</span>
+              <span class="payment-card-icon"></span>
               <h4 class="font-display payment-card-title">PayPal</h4>
               <span class="payment-card-desc">Billetera global</span>
             </div>
@@ -351,7 +382,7 @@
           </div>
 
           <button class="cyber-btn cyber-btn-primary submit-action-btn" (click)="savePaymentMethod()">
-            Guardar y Configurar Pago ⚡
+            Guardar y Configurar Pago
           </button>
         </div>
 
@@ -365,7 +396,7 @@
             <div *ngIf="isScanningIdentity" class="scanner-line"></div>
             <div class="scanner-grid"></div>
             <div class="scanner-oval" [style.border-color]="isScanningIdentity ? 'var(--accent-cyan)' : 'rgba(0, 245, 230, 0.3)'">
-              <span class="scanner-icon">👤</span>
+              <span class="scanner-icon"></span>
             </div>
             <div *ngIf="isScanningIdentity" class="scanner-progress-badge">
               ESCANEO ACTIVO: {{ scanProgress }}%
@@ -379,13 +410,13 @@
 
           <button class="cyber-btn cyber-btn-primary submit-action-btn"
             [disabled]="isScanningIdentity" (click)="startIdentityScanning()">
-            {{ isScanningIdentity ? 'Escaneando rostro...' : 'Iniciar Escaneo Biométrico de Identidad 📷' }}
+            {{ isScanningIdentity ? 'Escaneando rostro...' : 'Iniciar Escaneo Biométrico de Identidad' }}
           </button>
         </div>
 
         <div class="congrats-card" *ngIf="summary.status === 'COMPLETED'">
           <div class="medal-wrapper">
-            <span class="medal-icon">🏆</span>
+            <span class="medal-icon"></span>
           </div>
           <h3 class="font-display text-mint-gradient" style="font-size: 1.8rem; font-weight: 800; margin-bottom: 15px;">
             ¡Cuenta Totalmente Activada!</h3>
@@ -399,7 +430,7 @@
         </div>
 
         <div *ngIf="summary.blockingIssues.length > 0 && summary.status !== 'COMPLETED'" class="glass-panel blocking-card">
-          <span style="font-size: 1.4rem;">⚠️</span>
+          <span style="font-size: 1.4rem;"></span>
           <div>
             <h5 style="font-size: 0.85rem; font-weight: 700; color: var(--accent-coral);">PASO BLOQUEADO POR REVISIÓN</h5>
             <p *ngFor="let issue of summary.blockingIssues" class="blocking-text">
@@ -415,7 +446,7 @@
       <div class="operator-header" style="margin-bottom: 25px;">
         <div>
           <h2 class="font-display text-mint-gradient" style="font-size: 1.8rem; font-weight: 800; margin-bottom: 5px;">
-            ¡Bienvenido, {{ personalData.firstName || 'Contratista' }}! 👋
+            ¡Bienvenido, {{ personalData.firstName || 'Contratista' }}!
           </h2>
           <p style="color: var(--text-secondary); font-size: 0.95rem;">Tu perfil de cobro y cumplimiento internacional se encuentra 100% activo y regulado.</p>
         </div>
@@ -427,7 +458,7 @@
       <!-- Financial Cards Grid -->
       <div class="metrics-grid" style="margin-bottom: 30px;">
         <div class="glass-panel metric-card" style="border-color: rgba(0, 245, 230, 0.15); box-shadow: 0 0 15px rgba(0, 245, 230, 0.05);">
-          <span class="metric-icon">💰</span>
+          <span class="metric-icon"></span>
           <div>
             <p class="metric-label">Balance Disponible</p>
             <h3 class="font-display metric-value" style="color: var(--accent-cyan); font-size: 1.8rem; font-weight: 800;">
@@ -436,14 +467,14 @@
           </div>
         </div>
         <div class="glass-panel metric-card">
-          <span class="metric-icon">📆</span>
+          <span class="metric-icon"></span>
           <div>
             <p class="metric-label">Próxima Nómina</p>
             <h3 class="font-display metric-value">25 de Mayo, 2026</h3>
           </div>
         </div>
         <div class="glass-panel metric-card">
-          <span class="metric-icon">💳</span>
+          <span class="metric-icon"></span>
           <div>
             <p class="metric-label">Método de Pago Activo</p>
             <h3 class="font-display metric-value" style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-top: 5px;">
@@ -486,7 +517,7 @@
           <h4 class="font-display text-gradient" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 10px;">Cumplimiento & Acuerdo Legal</h4>
           
           <div class="glass-panel" style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 12px; border-color: rgba(0, 245, 230, 0.05);">
-            <span style="font-size: 1.2rem;">📄</span>
+            <span style="font-size: 1.2rem;"></span>
             <div>
               <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">Contrato Digital Firmado</p>
               <span style="font-size: 0.75rem; color: var(--accent-mint); font-weight: 600;">✓ Activo y Registrado</span>
@@ -494,7 +525,7 @@
           </div>
 
           <div class="glass-panel" style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 12px; border-color: rgba(0, 245, 230, 0.05);">
-            <span style="font-size: 1.2rem;">🛡️</span>
+            <span style="font-size: 1.2rem;"></span>
             <div>
               <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">Verificación KYC (Identificación)</p>
               <span style="font-size: 0.75rem; color: var(--accent-mint); font-weight: 600;">✓ Documentos Aprobados</span>
@@ -502,7 +533,7 @@
           </div>
 
           <div class="glass-panel" style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 12px; border-color: rgba(0, 245, 230, 0.05);">
-            <span style="font-size: 1.2rem;">📷</span>
+            <span style="font-size: 1.2rem;"></span>
             <div>
               <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">Identificación Biométrica</p>
               <span style="font-size: 0.75rem; color: var(--accent-mint); font-weight: 600;">✓ Certificado Facial Exitoso</span>
@@ -510,7 +541,7 @@
           </div>
 
           <button class="cyber-btn cyber-btn-secondary" style="width: 100%; padding: 10px; font-size: 0.85rem; border-radius: 8px; margin-top: 10px;">
-            📥 Descargar Contrato Firmado (PDF)
+            Descargar Contrato Firmado (PDF)
           </button>
         </div>
       </div>

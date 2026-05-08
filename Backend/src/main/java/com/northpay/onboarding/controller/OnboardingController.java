@@ -82,6 +82,30 @@ public class OnboardingController {
         }
     }
 
+    @PostMapping("/{id}/whatsapp/send")
+    public ResponseEntity<?> sendWhatsappCode(
+            @PathVariable("id") Long processId,
+            @RequestParam("phone") String phone) {
+        try {
+            OnboardingSummaryDto summary = onboardingService.sendWhatsappCode(processId, phone);
+            return ResponseEntity.ok(summary);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/whatsapp/verify")
+    public ResponseEntity<?> verifyWhatsappCode(
+            @PathVariable("id") Long processId,
+            @RequestParam("code") String code) {
+        try {
+            OnboardingSummaryDto summary = onboardingService.verifyWhatsappCode(processId, code);
+            return ResponseEntity.ok(summary);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @PostMapping("/{id}/identity-verification")
     public ResponseEntity<?> completeIdentityVerification(
             @PathVariable("id") Long processId,
