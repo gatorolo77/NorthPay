@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 interface OnboardingSummary {
@@ -75,6 +75,13 @@ export class OnboardingComponent implements OnInit {
 
   signedContractUrl = '';
   isSigningContract = false;
+  docusealEmbedSrc = 'https://www.docuseal.com/d/demo';
+
+  @HostListener('document:docuseal:completed', ['$event'])
+  onDocuSealCompleted(event: any) {
+    this.addLocalNotification('Firma detectada con éxito vía DocuSeal.', 'SUCCESS');
+    this.signContract();
+  }
 
   paymentMethod = {
     provider: 'BANK_TRANSFER',

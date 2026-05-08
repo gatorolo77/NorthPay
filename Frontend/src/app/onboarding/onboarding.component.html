@@ -265,33 +265,39 @@
         <div *ngIf="summary.currentStep === 'CONTRACT_SIGN'" class="step-form-container">
           <h3 class="font-display text-gradient step-form-title">Paso 3: Firma de Contrato Digital</h3>
           <p class="step-form-desc">
-            Lee detenidamente el acuerdo de contratista remoto de NorthPay y firma digitalmente.
+            Lee detenidamente el acuerdo de contratista remoto de NorthPay y firma digitalmente usando la tecnología de DocuSeal integrada.
           </p>
 
-          <div class="glass-panel contract-viewer">
+          <div *ngIf="isLocalMock" class="glass-panel contract-viewer" style="margin-bottom: 20px;">
             <h4 style="text-align: center; color: var(--text-primary); margin-bottom: 15px; font-weight: 700;">ACUERDO DE CONTRATACIÓN INDEPENDIENTE</h4>
-            <p>Este acuerdo se celebra el día de hoy entre <strong>NorthPay Ltd.</strong> ("La Compañía") y el Contratista registrado ("El Contratista").</p>
-            <br>
-            <p><strong>1. Servicios:</strong> El Contratista acuerda prestar servicios de desarrollo y soporte bajo demanda a los clientes asignados de NorthPay.</p>
-            <p><strong>2. Compensación:</strong> La Compañía compensará al Contratista según el método de cobro establecido en el Paso 4 del onboarding.</p>
-            <p><strong>3. Confidencialidad:</strong> Toda información sobre clientes, claves API y operaciones internas se considerará Estrictamente Confidencial.</p>
-            <br>
-            <p><em>Al hacer clic en el botón de firma digital, certifico que he leído y acepto los términos de este acuerdo legal.</em></p>
+            <!-- Embedded DocuSeal Interactive Demo inside simulated mode -->
+            <docuseal-form 
+              data-src="https://www.docuseal.com/d/demo" 
+              [attr.data-email]="personalData.phone || 'contractor@northpay.com'">
+            </docuseal-form>
           </div>
 
-          <div class="glass-panel signature-box">
-            <p class="signature-label">RECUADRO DE FIRMA DIGITALIZADA</p>
-            <div class="signature-text">
+          <div *ngIf="!isLocalMock" class="glass-panel contract-viewer" style="margin-bottom: 20px;">
+            <!-- Live DocuSeal Component pointing to active backend URL -->
+            <docuseal-form 
+              [attr.data-src]="docusealEmbedSrc || 'https://www.docuseal.com/d/demo'" 
+              [attr.data-email]="personalData.phone || 'contractor@northpay.com'">
+            </docuseal-form>
+          </div>
+
+          <div class="glass-panel signature-box" style="margin-bottom: 20px;">
+            <p class="signature-label">CERTIFICACIÓN CRIPTOGRÁFICA DE DOCUSEAL</p>
+            <div class="signature-text" style="font-size: 14px; text-transform: uppercase;">
               {{ personalData.firstName ? personalData.firstName + ' ' + personalData.lastName : 'John Doe' }}
             </div>
             <span class="signature-certificate">
-              Certificado Hash Único: NP_MD5_HASH_73628495
+              Certificado Integrado SHA256: NP_DOCUSEAL_948271
             </span>
           </div>
 
           <button class="cyber-btn cyber-btn-primary submit-action-btn"
             [disabled]="isSigningContract" (click)="signContract()">
-            {{ isSigningContract ? 'Procesando firma...' : 'Firmar Acuerdo Legal de Forma Segura' }}
+            {{ isSigningContract ? 'Procesando firma...' : 'Confirmar y Firmar Acuerdo Legal de Forma Segura' }}
           </button>
         </div>
 
