@@ -270,11 +270,22 @@
 
           <div *ngIf="isLocalMock" class="glass-panel contract-viewer" style="margin-bottom: 20px;">
             <h4 style="text-align: center; color: var(--text-primary); margin-bottom: 15px; font-weight: 700;">ACUERDO DE CONTRATACIÓN INDEPENDIENTE</h4>
-            <!-- Embedded DocuSeal Interactive Demo inside simulated mode -->
-            <docuseal-form 
-              data-src="https://www.docuseal.com/d/demo" 
-              [attr.data-email]="personalData.phone || 'contractor@northpay.com'">
-            </docuseal-form>
+            <p>Este acuerdo se celebra el día de hoy entre <strong>NorthPay Ltd.</strong> ("La Compañía") y el Contratista registrado ("El Contratista").</p>
+            <br>
+            <p><strong>1. Servicios:</strong> El Contratista acuerda prestar servicios de desarrollo y soporte bajo demanda a los clientes asignados de NorthPay.</p>
+            <p><strong>2. Compensación:</strong> La Compañía compensará al Contratista según el método de cobro establecido en el Paso 4 del onboarding.</p>
+            <p><strong>3. Confidencialidad:</strong> Toda información sobre clientes, claves API y operaciones internas se considerará Estrictamente Confidencial.</p>
+            <br>
+            <p style="margin-bottom: 20px;"><em>Al hacer clic en el botón de firma digital, certifico que he leído y acepto los términos de este acuerdo legal.</em></p>
+
+            <div style="border-top: 1px dashed var(--glass-border); padding-top: 20px; margin-top: 20px;">
+              <p style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 700; margin-bottom: 10px; letter-spacing: 0.5px;">DEMOSTRACIÓN INTERACTIVA DE DOCUSEAL:</p>
+              <!-- Embedded DocuSeal Interactive Demo inside simulated mode -->
+              <docuseal-form 
+                data-src="https://www.docuseal.com/d/demo" 
+                [attr.data-email]="personalData.phone || 'contractor@northpay.com'">
+              </docuseal-form>
+            </div>
           </div>
 
           <div *ngIf="!isLocalMock" class="glass-panel contract-viewer" style="margin-bottom: 20px;">
