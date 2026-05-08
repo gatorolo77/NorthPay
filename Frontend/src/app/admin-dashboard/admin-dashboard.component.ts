@@ -60,8 +60,9 @@ export class AdminDashboardComponent implements OnInit {
   summary: OnboardingSummary = {
     status: 'IN_PROGRESS',
     currentStep: 'DOCUMENT_UPLOAD',
-    progress: 20,
+    progress: 32,
     steps: [
+      { type: 'WHATSAPP_VERIFY', status: 'COMPLETED' },
       { type: 'PERSONAL_DATA', status: 'COMPLETED' },
       { type: 'DOCUMENT_UPLOAD', status: 'IN_REVIEW' },
       { type: 'CONTRACT_SIGN', status: 'NOT_STARTED' },
@@ -92,7 +93,7 @@ export class AdminDashboardComponent implements OnInit {
 
   loadOperatorPanel() {
     this.mockContractors = [
-      { id: 500, name: 'Juan Pérez', country: 'España', email: 'contractor@northpay.com', progress: this.summary.progress, status: this.paidContractorIds.includes(500) ? 'PAID' : (this.summary.steps[1].status === 'IN_REVIEW' ? 'IN_REVIEW' : this.summary.status), date: '07/05/2026', currentStep: this.summary.currentStep || 'COMPLETED' },
+      { id: 500, name: 'Juan Pérez', country: 'España', email: 'contractor@northpay.com', progress: this.summary.progress, status: this.paidContractorIds.includes(500) ? 'PAID' : (this.summary.steps[2].status === 'IN_REVIEW' ? 'IN_REVIEW' : this.summary.status), date: '07/05/2026', currentStep: this.summary.currentStep || 'COMPLETED' },
       { id: 501, name: 'María Gómez', country: 'Colombia', email: 'maria.gomez@gmail.com', progress: 100, status: this.paidContractorIds.includes(501) ? 'PAID' : 'COMPLETED', date: '05/05/2026', currentStep: 'COMPLETED' },
       { id: 502, name: 'Pierre Dubois', country: 'Francia', email: 'pierre.dubois@yahoo.fr', progress: 20, status: this.paidContractorIds.includes(502) ? 'PAID' : 'IN_PROGRESS', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD' },
       { id: 503, name: 'Yuki Tanaka', country: 'Japón', email: 'tanaka.yuki@gmail.com', progress: 40, status: this.paidContractorIds.includes(503) ? 'PAID' : 'IN_REVIEW', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD' }
@@ -103,7 +104,7 @@ export class AdminDashboardComponent implements OnInit {
         {
           id: 500,
           contractorUserId: 100,
-          status: this.summary.steps[1].status === 'IN_REVIEW' ? 'IN_REVIEW' : this.summary.status,
+          status: this.summary.steps[2].status === 'IN_REVIEW' ? 'IN_REVIEW' : this.summary.status,
           currentStep: this.summary.currentStep || 'COMPLETED',
           progress: this.summary.progress,
           assignedOperatorId: 1,
@@ -145,13 +146,13 @@ export class AdminDashboardComponent implements OnInit {
 
     if (this.isLocalMock) {
       if (approved) {
-        this.summary.steps[1].status = 'COMPLETED';
-        this.summary.steps[2].status = 'IN_PROGRESS';
-        this.summary.progress = 40;
+        this.summary.steps[2].status = 'COMPLETED';
+        this.summary.steps[3].status = 'IN_PROGRESS';
+        this.summary.progress = 49;
         this.summary.currentStep = 'CONTRACT_SIGN';
         this.changeHistory.unshift('Paso 2 APROBADO: Documentos aceptados por operaciones.');
       } else {
-        this.summary.steps[1].status = 'REJECTED';
+        this.summary.steps[2].status = 'REJECTED';
         this.changeHistory.unshift('Paso 2 RECHAZADO: Solicitud de corrección enviada.');
       }
       this.reviewFeedback = '';

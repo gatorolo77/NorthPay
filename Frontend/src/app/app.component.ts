@@ -427,7 +427,7 @@ export class AppComponent implements OnInit {
 
     const currentName = this.personalData.firstName ? `${this.personalData.firstName} ${this.personalData.lastName}` : 'Juan Pérez (Tú)';
     const currentCountry = this.personalData.country || 'España';
-    const currentStatus = this.summary.steps[1].status === 'IN_REVIEW' ? 'IN_REVIEW' : this.summary.status;
+    const currentStatus = this.summary.steps[2].status === 'IN_REVIEW' ? 'IN_REVIEW' : this.summary.status;
 
     this.mockContractors = [
       { id: 500, name: currentName, country: currentCountry, email: this.invitationEmail, progress: this.summary.progress, status: this.paidContractorIds.includes(500) ? 'PAID' : currentStatus, date: '07/05/2026', currentStep: this.summary.currentStep || 'COMPLETED' },
