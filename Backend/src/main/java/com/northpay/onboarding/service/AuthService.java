@@ -19,6 +19,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final InvitationRepository invitationRepository;
+    private final EmailService emailService;
 
     @Transactional
     public Invitation createInvitation(String email, Long createdBy) {
@@ -36,7 +37,12 @@ public class AuthService {
                 .expiresAt(LocalDateTime.now().plusDays(3)) // 3-day activation timeframe limit
                 .build();
 
-        return invitationRepository.save(invitation);
+        Invitation saved = invitationRepository.save(invitation);
+
+        // Send email asynchronously or catch exceptions to prevent crash if SMTP is not configured yet
+        emailService.sendInvitationEmail(email, saved.getToken());
+
+        return saved;
     }
 
     @Transactional
