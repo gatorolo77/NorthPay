@@ -131,6 +131,10 @@ body {
   -webkit-text-fill-color: transparent;
 }
 
+[data-theme="light"] .text-gradient {
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-cyan) 100%);
+}
+
 .text-mint-gradient {
   background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-mint) 100%);
   -webkit-background-clip: text;
