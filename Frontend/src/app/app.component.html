@@ -31,10 +31,30 @@
         Volver a Onboarding 👤
       </button>
 
-      <div class="notification-trigger" *ngIf="notifications.length > 0">
-        <div class="glass-panel bell-icon">
+      <div class="notification-trigger" (click)="showNotificationDropdown = !showNotificationDropdown">
+        <div class="glass-panel bell-icon" style="cursor: pointer; position: relative;">
           🔔
-          <span class="bell-dot"></span>
+          <span class="bell-dot" *ngIf="getUnreadNotificationsCount() > 0"></span>
+        </div>
+
+        <!-- Dropdown Menu -->
+        <div class="glass-panel notifications-dropdown" *ngIf="showNotificationDropdown" (click)="$event.stopPropagation()">
+          <div class="dropdown-header">
+            <h5 class="font-display">Mensajes Internos</h5>
+            <button class="mark-all-read" (click)="markAllNotificationsAsRead($event)">Limpiar</button>
+          </div>
+          <div class="dropdown-body">
+            <div *ngFor="let n of notifications" class="dropdown-item" [class.unread]="!n.isRead">
+              <span class="item-icon">{{ n.type === 'SUCCESS' ? '✅' : n.type === 'ERROR' ? '❌' : 'ℹ️' }}</span>
+              <div class="item-content">
+                <p class="item-message" style="margin: 0; line-height: 1.3;">{{ n.message }}</p>
+                <span class="item-time" style="display: block; margin-top: 3px;">{{ n.createdAt }}</span>
+              </div>
+            </div>
+            <div *ngIf="notifications.length === 0" class="empty-dropdown">
+              Sin novedades de onboarding.
+            </div>
+          </div>
         </div>
       </div>
     </div>

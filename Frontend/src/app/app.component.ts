@@ -115,6 +115,7 @@ export class AppComponent implements OnInit {
   selectedProcessSummary: OnboardingSummary | null = null;
   reviewFeedback = '';
   notifications: Notification[] = [];
+  showNotificationDropdown = false;
 
   selectedProcessForPayment: any | null = null;
   paymentAmount = 2500;
@@ -642,6 +643,17 @@ export class AppComponent implements OnInit {
       createdAt: new Date().toLocaleTimeString()
     };
     this.notifications.unshift(newNotif);
+  }
+
+  getUnreadNotificationsCount() {
+    return this.notifications.filter(n => !n.isRead).length;
+  }
+
+  markAllNotificationsAsRead(event: Event) {
+    event.stopPropagation();
+    this.notifications.forEach(n => n.isRead = true);
+    this.notifications = [];
+    this.showNotificationDropdown = false;
   }
 
   loadNotifications() {
