@@ -182,7 +182,6 @@ export class AppComponent implements OnInit {
       error: () => {
         this.isLocalMock = true;
         console.warn('[NorthPay] Spring Boot offline. Running in premium Local Simulation mode.');
-        this.addLocalNotification('Modo Simulación (Servidor fuera de línea)', 'INFO');
         this.loadMockInitialState();
       }
     });
