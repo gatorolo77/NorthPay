@@ -110,21 +110,21 @@
 
 .alerts-container {
   position: fixed;
-  bottom: 25px;
+  top: 25px;
   right: 25px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   pointer-events: none;
   z-index: 1000;
   width: calc(100% - 50px);
-  max-width: 380px;
+  max-width: 250px;
 }
 
 .alert-panel {
-  padding: 12px 20px;
+  padding: 8px 14px;
   border-radius: 8px;
-  border-left: 4px solid;
+  border-left: 3px solid;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -135,8 +135,8 @@
 .alert-content {
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 0.85rem;
+  gap: 8px;
+  font-size: 0.78rem;
 }
 
 .alert-close {
