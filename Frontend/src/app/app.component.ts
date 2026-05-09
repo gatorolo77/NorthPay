@@ -121,6 +121,69 @@ export class AppComponent implements OnInit {
   preloadStatus = 'Iniciando servicios seguros...';
   selectedLang = 'es';
 
+  translations: Record<string, Record<string, string>> = {
+    es: {
+      logoSubtitle: "PORTAL DE BIENVENIDA",
+      heroTitle: "Tu Pasarela de Pagos Globales",
+      heroDesc: "Únete a la plataforma de nóminas internacional líder para contratistas remotos. Activa tu perfil, firma acuerdos de forma segura y gestiona tus retiros globales en segundos.",
+      propTitle1: "Retiros Flexibles",
+      propDesc1: "Recibe tus cobros en USD, EUR o moneda local a través de transferencias bancarias o Mercado Pago.",
+      propTitle2: "Firma Digital",
+      propDesc2: "Firma tu acuerdo de contratista legal de forma instantánea usando el Web Component de DocuSeal.",
+      propTitle3: "Biometría KYC",
+      propDesc3: "Comprobación de identidad de última generación respaldada por motores biométricos avanzados.",
+      btnOperator: "⚙️ Panel de Operaciones (Demo)",
+      btnActivate: "Iniciar Activación 👤",
+      preloading: "Precargando recursos...",
+      statusReady: "Portal NorthPay listo para operar ⚡"
+    },
+    en: {
+      logoSubtitle: "WELCOME PORTAL",
+      heroTitle: "Your Global Payroll Gateway",
+      heroDesc: "Join the leading international payroll platform for remote contractors. Activate your profile, sign agreements securely, and manage your global withdrawals in seconds.",
+      propTitle1: "Flexible Payouts",
+      propDesc1: "Receive your payouts in USD, EUR, or local currency via bank transfers or Mercado Pago.",
+      propTitle2: "Digital Signature",
+      propDesc2: "Sign your legal contractor agreement instantly using the DocuSeal Web Component.",
+      propTitle3: "KYC Biometrics",
+      propDesc3: "Next-generation identity verification powered by advanced biometric engines.",
+      btnOperator: "⚙️ Operator Panel (Demo)",
+      btnActivate: "Start Activation 👤",
+      preloading: "Preloading resources...",
+      statusReady: "NorthPay Portal ready to operate ⚡"
+    },
+    fr: {
+      logoSubtitle: "PORTAIL DE BIENVENUE",
+      heroTitle: "Votre Passerelle de Paiement Globale",
+      heroDesc: "Rejoignez la première plateforme internationale de paie pour les sous-traitants à distance. Activez votre profil, signez des contrats en toute sécurité et gérez vos retraits globaux en quelques secondes.",
+      propTitle1: "Retraits Flexibles",
+      propDesc1: "Recevez vos paiements en USD, EUR ou devise locale via virements bancaires ou Mercado Pago.",
+      propTitle2: "Signature Numérique",
+      propDesc2: "Signez instantanément votre contrat de sous-traitant à l'aide du composant Web DocuSeal.",
+      propTitle3: "Biométrie KYC",
+      propDesc3: "Vérification d'identité de pointe optimisée par des moteurs biométriques avancés.",
+      btnOperator: "⚙️ Panneau Opérateur (Démo)",
+      btnActivate: "Lancer l'activation 👤",
+      preloading: "Préchargement des ressources...",
+      statusReady: "Portail NorthPay prêt à fonctionner ⚡"
+    },
+    pt: {
+      logoSubtitle: "PORTAL DE BOAS-VINDAS",
+      heroTitle: "Seu Portal de Pagamentos Globais",
+      heroDesc: "Junte-se à principal plataforma internacional de folha de pagamento para contratados remotos. Ative seu perfil, assine contratos com segurança e gerencie seus saques globais em segundos.",
+      propTitle1: "Saques Flexíveis",
+      propDesc1: "Receba seus pagamentos em USD, EUR ou moeda local por meio de transferências bancarias ou Mercado Pago.",
+      propTitle2: "Assinatura Digital",
+      propDesc2: "Assine seu contrato de prestação de serviços instantaneamente usando o DocuSeal Web Component.",
+      propTitle3: "Biometria KYC",
+      propDesc3: "Verificação de identidade de última geração com suporte de motores biométricos avançados.",
+      btnOperator: "⚙️ Painel do Operador (Demo)",
+      btnActivate: "Iniciar Ativação 👤",
+      preloading: "Pré-carregando recursos...",
+      statusReady: "Portal NorthPay pronto para operar ⚡"
+    }
+  };
+
   selectedProcessForPayment: any | null = null;
   paymentAmount = 2500;
   isProcessingPayment = false;
@@ -677,24 +740,49 @@ export class AppComponent implements OnInit {
   }
 
   startPreloadingSimulation() {
-    const statuses = [
-      'Iniciando servicios seguros...',
-      'Cargando firma digital DocuSeal...',
-      'Estableciendo enlace de WhatsApp...',
-      'Cargando motor biométrico KYC...',
-      'Portal NorthPay listo para operar'
-    ];
+    const statusesMap: Record<string, string[]> = {
+      es: [
+        'Iniciando servicios seguros...',
+        'Cargando firma digital DocuSeal...',
+        'Estableciendo enlace de WhatsApp...',
+        'Cargando motor biométrico KYC...',
+        'Portal NorthPay listo para operar ⚡'
+      ],
+      en: [
+        'Starting secure services...',
+        'Loading DocuSeal digital signature...',
+        'Establishing WhatsApp link...',
+        'Loading KYC biometric engine...',
+        'NorthPay Portal ready to operate ⚡'
+      ],
+      fr: [
+        'Démarrage des services sécurisés...',
+        'Chargement de la signature DocuSeal...',
+        'Établissement du lien WhatsApp...',
+        'Chargement du moteur biométrique...',
+        'Portail NorthPay prêt à fonctionner ⚡'
+      ],
+      pt: [
+        'Iniciando serviços seguros...',
+        'Carregando assinatura DocuSeal...',
+        'Estabelecendo link do WhatsApp...',
+        'Carregando motor biométrico KYC...',
+        'Portal NorthPay pronto para operar ⚡'
+      ]
+    };
+
     let step = 0;
     this.preloadProgress = 0;
     const interval = setInterval(() => {
       this.preloadProgress += 4;
-      if (this.preloadProgress % 20 === 0 && step < statuses.length - 1) {
+      const currentList = statusesMap[this.selectedLang] || statusesMap['es'];
+      if (this.preloadProgress % 20 === 0 && step < currentList.length - 1) {
         step++;
-        this.preloadStatus = statuses[step];
+        this.preloadStatus = currentList[step];
       }
       if (this.preloadProgress >= 100) {
         this.preloadProgress = 100;
-        this.preloadStatus = 'Portal NorthPay listo para operar ⚡';
+        this.preloadStatus = currentList[currentList.length - 1];
         clearInterval(interval);
       }
     }, 100);
