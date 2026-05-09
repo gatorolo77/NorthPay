@@ -1,4 +1,4 @@
-<div class="main-container">
+<div class="main-container" [style.overflow]="currentView === 'landing' ? 'hidden' : 'auto'" [style.max-height]="currentView === 'landing' ? '100vh' : 'none'">
   <header class="glass-panel app-header" *ngIf="currentView !== 'landing'">
     <div class="logo-container">
       <div class="logo-icon">
