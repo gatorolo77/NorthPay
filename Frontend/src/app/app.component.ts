@@ -119,6 +119,7 @@ export class AppComponent implements OnInit {
   currentTheme: 'dark' | 'light' = 'dark';
   preloadProgress = 0;
   preloadStatus = 'Iniciando servicios seguros...';
+  selectedLang = 'es';
 
   selectedProcessForPayment: any | null = null;
   paymentAmount = 2500;
@@ -697,6 +698,17 @@ export class AppComponent implements OnInit {
         clearInterval(interval);
       }
     }, 100);
+  }
+
+  changeLanguage(lang: string) {
+    this.selectedLang = lang;
+    const langNames: Record<string, string> = {
+      en: 'English',
+      es: 'Español',
+      fr: 'Français',
+      pt: 'Português'
+    };
+    this.addLocalNotification(`Idioma cambiado a ${langNames[lang]} (Simulación)`, 'SUCCESS');
   }
 
   loadNotifications() {
