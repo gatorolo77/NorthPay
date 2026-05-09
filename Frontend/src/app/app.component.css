@@ -109,11 +109,16 @@
 }
 
 .alerts-container {
-  margin: 0 20px;
+  position: fixed;
+  top: 20px;
+  right: 20px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   pointer-events: none;
+  z-index: 1000;
+  width: calc(100% - 40px);
+  max-width: 380px;
 }
 
 .alert-panel {
