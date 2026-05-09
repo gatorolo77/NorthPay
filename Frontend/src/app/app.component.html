@@ -166,19 +166,18 @@
           <span class="logo-letter" style="font-size: 1.5rem;">N</span>
         </div>
       </div>
-      <h2 class="font-display text-gradient welcome-title">Portal de Onboarding</h2>
+      <h2 class="font-display text-gradient welcome-title">{{ translations[selectedLang]['onboardingPortalTitle'] }}</h2>
       <p class="welcome-text">
-        Bienvenido a NorthPay. Para iniciar el proceso de activación de tu cuenta de contratista remoto, ingresa el
-        correo de invitación proporcionado por tu operador.
+        {{ translations[selectedLang]['onboardingWelcomeText'] }}
       </p>
 
       <div class="cyber-input-group input-left">
-        <label class="cyber-input-label">CORREO ELECTRÓNICO DEL CONTRATISTA</label>
-        <input type="email" class="cyber-input" [(ngModel)]="invitationEmail" placeholder="ejemplo@correo.com">
+        <label class="cyber-input-label">{{ translations[selectedLang]['contractorEmailLabel'] }}</label>
+        <input type="email" class="cyber-input" [(ngModel)]="invitationEmail" placeholder="example@email.com">
       </div>
 
       <button class="cyber-btn cyber-btn-primary full-width-btn" (click)="generateInvitation()">
-        Generar Invitación de Acceso
+        {{ translations[selectedLang]['generateInvitationBtn'] }}
       </button>
     </section>
 

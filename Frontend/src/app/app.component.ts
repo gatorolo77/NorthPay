@@ -135,7 +135,11 @@ export class AppComponent implements OnInit {
       btnOperator: "⚙️ Panel de Operaciones (Demo)",
       btnActivate: "Iniciar Activación 👤",
       preloading: "Precargando recursos...",
-      statusReady: "Portal NorthPay listo para operar ⚡"
+      statusReady: "Portal NorthPay listo para operar ⚡",
+      onboardingPortalTitle: "Portal de Onboarding",
+      onboardingWelcomeText: "Bienvenido a NorthPay. Para iniciar el proceso de activación de tu cuenta de contratista remoto, ingresa el correo de invitación proporcionado por tu operador.",
+      contractorEmailLabel: "CORREO ELECTRÓNICO DEL CONTRATISTA",
+      generateInvitationBtn: "Generar Invitación de Acceso"
     },
     en: {
       logoSubtitle: "WELCOME PORTAL",
@@ -150,7 +154,11 @@ export class AppComponent implements OnInit {
       btnOperator: "⚙️ Operator Panel (Demo)",
       btnActivate: "Start Activation 👤",
       preloading: "Preloading resources...",
-      statusReady: "NorthPay Portal ready to operate ⚡"
+      statusReady: "NorthPay Portal ready to operate ⚡",
+      onboardingPortalTitle: "Onboarding Portal",
+      onboardingWelcomeText: "Welcome to NorthPay. To start the activation process for your remote contractor account, enter the invitation email provided by your operator.",
+      contractorEmailLabel: "CONTRACTOR EMAIL ADDRESS",
+      generateInvitationBtn: "Generate Access Invitation"
     },
     fr: {
       logoSubtitle: "PORTAIL DE BIENVENUE",
@@ -165,7 +173,11 @@ export class AppComponent implements OnInit {
       btnOperator: "⚙️ Panneau Opérateur (Démo)",
       btnActivate: "Lancer l'activation 👤",
       preloading: "Préchargement des ressources...",
-      statusReady: "Portail NorthPay prêt à fonctionner ⚡"
+      statusReady: "Portail NorthPay prêt à fonctionner ⚡",
+      onboardingPortalTitle: "Portail d'Intégration",
+      onboardingWelcomeText: "Bienvenue sur NorthPay. Pour lancer le processus d'activation de votre compte de sous-traitant, saisissez l'e-mail d'invitation fourni par votre opérateur.",
+      contractorEmailLabel: "ADRESSE E-MAIL DU SOUS-TRAITANT",
+      generateInvitationBtn: "Générer l'Invitation d'Accès"
     },
     pt: {
       logoSubtitle: "PORTAL DE BOAS-VINDAS",
@@ -180,7 +192,11 @@ export class AppComponent implements OnInit {
       btnOperator: "⚙️ Painel do Operador (Demo)",
       btnActivate: "Iniciar Ativação 👤",
       preloading: "Pré-carregando recursos...",
-      statusReady: "Portal NorthPay pronto para operar ⚡"
+      statusReady: "Portal NorthPay pronto para operar ⚡",
+      onboardingPortalTitle: "Portal de Integração",
+      onboardingWelcomeText: "Bem-vindo ao NorthPay. Para iniciar el proceso de ativação da sua conta de contratado, insira o e-mail de convite fornecido pelo seu operador.",
+      contractorEmailLabel: "E-MAIL DO PRESTADOR DE SERVIÇOS",
+      generateInvitationBtn: "Gerar Convite de Acesso"
     },
     zh: {
       logoSubtitle: "欢迎门户",
@@ -195,7 +211,11 @@ export class AppComponent implements OnInit {
       btnOperator: "⚙️ 运营商面板 (演示)",
       btnActivate: "开始激活 👤",
       preloading: "正在预载资源...",
-      statusReady: "NorthPay 门户已准备就绪 ⚡"
+      statusReady: "NorthPay 门户已准备就绪 ⚡",
+      onboardingPortalTitle: "入职门户",
+      onboardingWelcomeText: "欢迎来到 NorthPay。要开始远程承包商账户的激活流程，请输入您的运营商提供的邀请电子邮件。",
+      contractorEmailLabel: "承包商电子邮件地址",
+      generateInvitationBtn: "生成访问邀请"
     }
   };
 
