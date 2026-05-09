@@ -537,7 +537,13 @@ export class AppComponent implements OnInit {
     }, 300);
   }
 
+  startOnboarding() {
+    this.notifications = []; // Remove residual toasts from the landing page
+    this.currentView = 'welcome';
+  }
+
   loadOperatorPanel() {
+    this.notifications = []; // Clear alerts for cleaner operator interface
     this.currentView = 'operator';
 
     const currentName = this.personalData.firstName ? `${this.personalData.firstName} ${this.personalData.lastName}` : 'Juan Pérez (Tú)';
@@ -890,6 +896,10 @@ export class AppComponent implements OnInit {
       zh: '语言已切换为中文'
     };
 
+    const msg = toastMsgs[lang] || toastMsgs['es'];
+    if (this.currentView === 'landing') {
+      this.addLocalNotification(msg, 'SUCCESS');
+    }
   }
 
   loadNotifications() {

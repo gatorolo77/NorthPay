@@ -115,10 +115,10 @@
 
         <!-- Call to Actions -->
         <div style="display: flex; justify-content: center; gap: 15px;">
-          <button class="cyber-btn cyber-btn-secondary" style="padding: 10px 25px; font-size: 0.85rem; font-weight: 700; border-radius: 8px; cursor: pointer;" (click)="currentView = 'operator'">
+          <button class="cyber-btn cyber-btn-secondary" style="padding: 10px 25px; font-size: 0.85rem; font-weight: 700; border-radius: 8px; cursor: pointer;" (click)="loadOperatorPanel()">
             {{ translations[selectedLang]['btnOperator'] }}
           </button>
-          <button class="cyber-btn cyber-btn-primary" style="padding: 10px 30px; font-size: 0.85rem; font-weight: 800; border-radius: 8px; background: linear-gradient(135deg, var(--accent-mint), #00b0ff); color: var(--bg-darker); box-shadow: 0 0 15px rgba(0, 255, 157, 0.35); cursor: pointer;" (click)="currentView = 'welcome'">
+          <button class="cyber-btn cyber-btn-primary" style="padding: 10px 30px; font-size: 0.85rem; font-weight: 800; border-radius: 8px; background: linear-gradient(135deg, var(--accent-mint), #00b0ff); color: var(--bg-darker); box-shadow: 0 0 15px rgba(0, 255, 157, 0.35); cursor: pointer;" (click)="startOnboarding()">
             {{ translations[selectedLang]['btnActivate'] }}
           </button>
         </div>
