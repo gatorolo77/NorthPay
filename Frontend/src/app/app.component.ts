@@ -181,6 +181,21 @@ export class AppComponent implements OnInit {
       btnActivate: "Iniciar Ativação 👤",
       preloading: "Pré-carregando recursos...",
       statusReady: "Portal NorthPay pronto para operar ⚡"
+    },
+    zh: {
+      logoSubtitle: "欢迎门户",
+      heroTitle: "您的全球薪酬网关",
+      heroDesc: "加入面向远程承包商的领先国际薪酬平台。在几秒钟内激活您的个人资料、安全签署协议并管理您的全球提款。",
+      propTitle1: "灵活提款",
+      propDesc1: "通过银行转账或 Mercado Pago 以美元、欧元或本地货币接收付款。",
+      propTitle2: "电子签名",
+      propDesc2: "使用 DocuSeal Web 组件即时签署您的法律承包商协议。",
+      propTitle3: "KYC 生物识别",
+      propDesc3: "由先进 of 生物识别引擎支持的新一代身份验证。",
+      btnOperator: "⚙️ 运营商面板 (演示)",
+      btnActivate: "开始激活 👤",
+      preloading: "正在预载资源...",
+      statusReady: "NorthPay 门户已准备就绪 ⚡"
     }
   };
 
@@ -768,6 +783,13 @@ export class AppComponent implements OnInit {
         'Estabelecendo link do WhatsApp...',
         'Carregando motor biométrico KYC...',
         'Portal NorthPay pronto para operar ⚡'
+      ],
+      zh: [
+        '正在启动安全服务...',
+        '正在加载 DocuSeal 数字签名...',
+        '正在建立 WhatsApp 链接...',
+        '正在加载 KYC 生物识别引擎...',
+        'NorthPay 门户已准备就绪 ⚡'
       ]
     };
 
@@ -794,7 +816,8 @@ export class AppComponent implements OnInit {
       en: 'English',
       es: 'Español',
       fr: 'Français',
-      pt: 'Português'
+      pt: 'Português',
+      zh: '中文'
     };
 
     const statusesMap: Record<string, string[]> = {
@@ -825,6 +848,13 @@ export class AppComponent implements OnInit {
         'Estabelecendo link do WhatsApp...',
         'Carregando motor biométrico KYC...',
         'Portal NorthPay pronto para operar ⚡'
+      ],
+      zh: [
+        '正在启动安全服务...',
+        '正在加载 DocuSeal 数字签名...',
+        '正在建立 WhatsApp 链接...',
+        '正在加载 KYC 生物识别引擎...',
+        'NorthPay 门户已准备就绪 ⚡'
       ]
     };
 
@@ -836,7 +866,8 @@ export class AppComponent implements OnInit {
       es: 'Idioma cambiado a Español (Simulación)',
       en: 'Language changed to English (Simulation)',
       fr: 'Langue changée en Français (Simulation)',
-      pt: 'Idioma alterado para Português (Simulação)'
+      pt: 'Idioma alterado para Português (Simulação)',
+      zh: '语言已切换为中文 (模拟)'
     };
 
     const msg = toastMsgs[lang] || toastMsgs['es'];

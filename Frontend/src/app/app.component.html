@@ -153,6 +153,10 @@
           <img src="https://flagcdn.com/pt.svg" alt="Portugal Flag" style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
           <span class="font-display" style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">Português</span>
         </button>
+        <button (click)="changeLanguage('zh')" class="glass-panel lang-btn" [style.border-color]="selectedLang === 'zh' ? 'var(--accent-cyan)' : 'var(--glass-border)'" style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+          <img src="https://flagcdn.com/cn.svg" alt="China Flag" style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
+          <span class="font-display" style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">中文</span>
+        </button>
       </div>
     </div>
 
