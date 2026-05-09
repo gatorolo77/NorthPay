@@ -11,7 +11,7 @@
     </div>
 
     <div class="header-nav">
-      <div class="glass-panel status-badge">
+      <div class="glass-panel status-badge" *ngIf="currentView !== 'register'">
         <span class="status-bullet"
           [style.background-color]="isLocalMock ? 'var(--accent-amber)' : 'var(--accent-mint)'"
           [style.color]="isLocalMock ? 'var(--accent-amber)' : 'var(--accent-mint)'">
