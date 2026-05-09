@@ -117,6 +117,8 @@ export class AppComponent implements OnInit {
   notifications: Notification[] = [];
   showNotificationDropdown = false;
   currentTheme: 'dark' | 'light' = 'dark';
+  preloadProgress = 0;
+  preloadStatus = 'Iniciando servicios seguros...';
 
   selectedProcessForPayment: any | null = null;
   paymentAmount = 2500;
@@ -166,6 +168,7 @@ export class AppComponent implements OnInit {
     }
     this.applyTheme();
     this.testBackendConnection();
+    this.startPreloadingSimulation();
   }
 
   testBackendConnection() {
@@ -671,6 +674,30 @@ export class AppComponent implements OnInit {
 
   applyTheme() {
     document.documentElement.setAttribute('data-theme', this.currentTheme);
+  }
+
+  startPreloadingSimulation() {
+    const statuses = [
+      'Iniciando servicios seguros...',
+      'Cargando firma digital DocuSeal...',
+      'Estableciendo enlace de WhatsApp...',
+      'Cargando motor biométrico KYC...',
+      'Portal NorthPay listo para operar'
+    ];
+    let step = 0;
+    this.preloadProgress = 0;
+    const interval = setInterval(() => {
+      this.preloadProgress += 4;
+      if (this.preloadProgress % 20 === 0 && step < statuses.length - 1) {
+        step++;
+        this.preloadStatus = statuses[step];
+      }
+      if (this.preloadProgress >= 100) {
+        this.preloadProgress = 100;
+        this.preloadStatus = 'Portal NorthPay listo para operar ⚡';
+        clearInterval(interval);
+      }
+    }, 100);
   }
 
   loadNotifications() {
