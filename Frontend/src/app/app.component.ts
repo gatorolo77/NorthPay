@@ -832,7 +832,15 @@ export class AppComponent implements OnInit {
     const list = statusesMap[lang] || statusesMap['es'];
     this.preloadStatus = list[stepIndex];
 
-    this.addLocalNotification(`Idioma cambiado a ${langNames[lang]} (Simulación)`, 'SUCCESS');
+    const toastMsgs: Record<string, string> = {
+      es: 'Idioma cambiado a Español (Simulación)',
+      en: 'Language changed to English (Simulation)',
+      fr: 'Langue changée en Français (Simulation)',
+      pt: 'Idioma alterado para Português (Simulação)'
+    };
+
+    const msg = toastMsgs[lang] || toastMsgs['es'];
+    this.addLocalNotification(msg, 'SUCCESS');
   }
 
   loadNotifications() {
