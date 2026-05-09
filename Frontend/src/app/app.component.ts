@@ -863,11 +863,11 @@ export class AppComponent implements OnInit {
     this.preloadStatus = list[stepIndex];
 
     const toastMsgs: Record<string, string> = {
-      es: 'Idioma cambiado a Español (Simulación)',
-      en: 'Language changed to English (Simulation)',
-      fr: 'Langue changée en Français (Simulation)',
-      pt: 'Idioma alterado para Português (Simulação)',
-      zh: '语言已切换为中文 (模拟)'
+      es: 'Idioma cambiado a Español',
+      en: 'Language changed to English',
+      fr: 'Langue changée en Français',
+      pt: 'Idioma alterado para Português',
+      zh: '语言已切换为中文'
     };
 
     const msg = toastMsgs[lang] || toastMsgs['es'];

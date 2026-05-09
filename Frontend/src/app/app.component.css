@@ -110,14 +110,14 @@
 
 .alerts-container {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  bottom: 25px;
+  right: 25px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   pointer-events: none;
   z-index: 1000;
-  width: calc(100% - 40px);
+  width: calc(100% - 50px);
   max-width: 380px;
 }
 
