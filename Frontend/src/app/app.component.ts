@@ -890,10 +890,6 @@ export class AppComponent implements OnInit {
       zh: '语言已切换为中文'
     };
 
-    const msg = toastMsgs[lang] || toastMsgs['es'];
-    if (this.currentView === 'landing') {
-      this.addLocalNotification(msg, 'SUCCESS');
-    }
   }
 
   loadNotifications() {
