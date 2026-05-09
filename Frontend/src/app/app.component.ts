@@ -36,7 +36,7 @@ interface OnboardingProcess {
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  currentView: 'welcome' | 'register' | 'onboarding' | 'operator' = 'welcome';
+  currentView: 'landing' | 'welcome' | 'register' | 'onboarding' | 'operator' = 'landing';
   apiBaseUrl = 'http://localhost:8080/api';
   isLocalMock = true;
   cloudinaryCloudName = 'northpay-demo';
