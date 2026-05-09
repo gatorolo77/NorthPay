@@ -891,7 +891,9 @@ export class AppComponent implements OnInit {
     };
 
     const msg = toastMsgs[lang] || toastMsgs['es'];
-    this.addLocalNotification(msg, 'SUCCESS');
+    if (this.currentView === 'landing') {
+      this.addLocalNotification(msg, 'SUCCESS');
+    }
   }
 
   loadNotifications() {
