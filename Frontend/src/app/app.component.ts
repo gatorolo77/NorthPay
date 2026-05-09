@@ -796,6 +796,42 @@ export class AppComponent implements OnInit {
       fr: 'Français',
       pt: 'Português'
     };
+
+    const statusesMap: Record<string, string[]> = {
+      es: [
+        'Iniciando servicios seguros...',
+        'Cargando firma digital DocuSeal...',
+        'Estableciendo enlace de WhatsApp...',
+        'Cargando motor biométrico KYC...',
+        'Portal NorthPay listo para operar ⚡'
+      ],
+      en: [
+        'Starting secure services...',
+        'Loading DocuSeal digital signature...',
+        'Establishing WhatsApp link...',
+        'Loading KYC biometric engine...',
+        'NorthPay Portal ready to operate ⚡'
+      ],
+      fr: [
+        'Démarrage des services sécurisés...',
+        'Chargement de la signature DocuSeal...',
+        'Établissement du lien WhatsApp...',
+        'Chargement du moteur biométrique...',
+        'Portail NorthPay prêt à fonctionner ⚡'
+      ],
+      pt: [
+        'Iniciando serviços seguros...',
+        'Carregando assinatura DocuSeal...',
+        'Estabelecendo link do WhatsApp...',
+        'Carregando motor biométrico KYC...',
+        'Portal NorthPay pronto para operar ⚡'
+      ]
+    };
+
+    const stepIndex = Math.min(Math.floor(this.preloadProgress / 20), 4);
+    const list = statusesMap[lang] || statusesMap['es'];
+    this.preloadStatus = list[stepIndex];
+
     this.addLocalNotification(`Idioma cambiado a ${langNames[lang]} (Simulación)`, 'SUCCESS');
   }
 
