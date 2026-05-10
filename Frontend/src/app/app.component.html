@@ -196,7 +196,7 @@
 
 
     <section *ngIf="currentView === 'register'" class="glass-panel register-card">
-      <h2 class="font-display text-mint-gradient register-title">Completar Registro</h2>
+      <h2 class="font-display text-mint-gradient register-title">{{ translations[selectedLang]['registerTitle'] }}</h2>
       <p class="register-text">
         Se ha detectado un token de invitación válido para registrar tu perfil de contratista.
       </p>
@@ -238,7 +238,7 @@
             </span>
           </div>
           <div>
-            <h4 class="font-display progress-title">Progreso de Activación</h4>
+            <h4 class="font-display progress-title">{{ translations[selectedLang]['sidebarTitle'] }}</h4>
             <span class="progress-notice">TIEMPO PROMEDIO: &lt; 3 DÍAS</span>
           </div>
         </div>
@@ -257,18 +257,18 @@
               <div>
                 <span class="step-name"
                   [style.color]="summary.currentStep === step.type ? 'var(--accent-cyan)' : 'var(--text-primary)'">
-                  {{ step.type === 'WHATSAPP_VERIFY' ? 'Verificar WhatsApp' :
-                  step.type === 'PERSONAL_DATA' ? 'Datos Personales' :
-                  step.type === 'DOCUMENT_UPLOAD' ? 'Documentación' :
-                  step.type === 'CONTRACT_SIGN' ? 'Firma de Contrato' :
-                  step.type === 'PAYMENT_METHOD' ? 'Método de Pago' : 'Identidad Biométrica' }}
+                  {{ step.type === 'WHATSAPP_VERIFY' ? translations[selectedLang]['step0'] :
+                  step.type === 'PERSONAL_DATA' ? translations[selectedLang]['step1'] :
+                  step.type === 'DOCUMENT_UPLOAD' ? translations[selectedLang]['step2'] :
+                  step.type === 'CONTRACT_SIGN' ? translations[selectedLang]['step3'] :
+                  step.type === 'PAYMENT_METHOD' ? translations[selectedLang]['step4'] : translations[selectedLang]['step5'] }}
                 </span>
                 <span class="step-status-text"
                   [style.color]="step.status === 'COMPLETED' ? 'var(--accent-mint)' : step.status === 'IN_REVIEW' ? 'var(--accent-amber)' : step.status === 'REJECTED' ? 'var(--accent-coral)' : 'var(--text-muted)'">
-                  {{ step.status === 'NOT_STARTED' ? 'Pendiente' :
-                  step.status === 'IN_PROGRESS' ? 'En Progreso' :
-                  step.status === 'IN_REVIEW' ? 'En Revisión' :
-                  step.status === 'REJECTED' ? 'Requiere Ajustes' : 'Completado' }}
+                  {{ step.status === 'NOT_STARTED' ? translations[selectedLang]['statusPending'] :
+                  step.status === 'IN_PROGRESS' ? translations[selectedLang]['statusInProgress'] :
+                  step.status === 'IN_REVIEW' ? translations[selectedLang]['statusInReview'] :
+                  step.status === 'REJECTED' ? translations[selectedLang]['statusRejected'] : translations[selectedLang]['statusCompleted'] }}
                 </span>
               </div>
             </div>
@@ -287,7 +287,7 @@
         <div class="corner-glow"></div>
 
         <div *ngIf="summary.currentStep === 'WHATSAPP_VERIFY'" class="step-form-container">
-          <h3 class="font-display text-gradient step-form-title">Paso 0: Verificación de WhatsApp</h3>
+          <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 0: {{ translations[selectedLang]['step0'] }}</h3>
           <p class="step-form-desc">
             Para iniciar tu progreso de activación, ingresa tu número de WhatsApp para certificar tu identidad y desbloquear el onboarding. ¡El envío por nuestro canal corporativo es gratuito!
           </p>
@@ -314,7 +314,7 @@
         </div>
 
         <div *ngIf="summary.currentStep === 'PERSONAL_DATA'" class="step-form-container">
-          <h3 class="font-display text-gradient step-form-title">Paso 1: Información Personal</h3>
+          <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 1: {{ translations[selectedLang]['step1'] }}</h3>
           <p class="step-form-desc">
             Por favor, completa tus datos básicos fiscales. Esto nos permite generar de forma automatizada tu contrato legal.
           </p>
@@ -353,7 +353,7 @@
         </div>
 
         <div *ngIf="summary.currentStep === 'DOCUMENT_UPLOAD'" class="step-form-container">
-          <h3 class="font-display text-gradient step-form-title">Paso 2: Subir Documentación</h3>
+          <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 2: {{ translations[selectedLang]['step2'] }}</h3>
           <p class="step-form-desc">
             Sube un documento oficial de identificación para que nuestro departamento legal lo valide. Los formatos permitidos son PDF o imágenes claras.
           </p>
@@ -397,7 +397,7 @@
         </div>
 
         <div *ngIf="summary.currentStep === 'CONTRACT_SIGN'" class="step-form-container">
-          <h3 class="font-display text-gradient step-form-title">Paso 3: Firma de Contrato Digital</h3>
+          <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 3: {{ translations[selectedLang]['step3'] }}</h3>
           <p class="step-form-desc">
             Lee detenidamente el acuerdo de contratista remoto de NorthPay y firma digitalmente usando la tecnología de DocuSeal integrada.
           </p>
@@ -447,7 +447,7 @@
         </div>
 
         <div *ngIf="summary.currentStep === 'PAYMENT_METHOD'" class="step-form-container">
-          <h3 class="font-display text-gradient step-form-title">Paso 4: Configuración de Método de Pago</h3>
+          <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 4: {{ translations[selectedLang]['step4'] }}</h3>
           <p class="step-form-desc">
             Indícanos dónde deseas recibir tus honorarios mensuales. Soportamos transferencias bancarias, Payoneer, Mercado Pago y PayPal.
           </p>
@@ -538,7 +538,7 @@
         </div>
 
         <div *ngIf="summary.currentStep === 'IDENTITY_VERIFICATION'" class="step-form-container">
-          <h3 class="font-display text-gradient step-form-title">Paso 5: Verificación de Identidad Biométrica</h3>
+          <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 5: {{ translations[selectedLang]['step5'] }}</h3>
           <p class="step-form-desc">
             Para prevenir fraudes y asegurar el cumplimiento, utilizaremos la webcam de tu dispositivo para realizar una autenticación facial rápida.
           </p>
