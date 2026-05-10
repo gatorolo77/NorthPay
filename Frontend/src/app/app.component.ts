@@ -120,6 +120,10 @@ export class AppComponent implements OnInit {
   preloadProgress = 0;
   preloadStatus = 'Iniciando servicios seguros...';
   selectedLang = 'es';
+  
+  currentAudio: HTMLAudioElement | null = null;
+  audioVolume = 75; 
+  isMuted = false;
 
   translations: Record<string, Record<string, string>> = {
     es: {
@@ -577,7 +581,15 @@ export class AppComponent implements OnInit {
     const audio = new Audio();
     const currentFormat = formats[index];
     audio.src = `assets/audio/greeting_${this.selectedLang}.${currentFormat}`;
-    audio.volume = 0.75;
+    
+    // Apply global master settings from the topbar controls!
+    audio.volume = this.audioVolume / 100;
+    audio.muted = this.isMuted;
+
+    // Clean reference completely upon track completion
+    audio.onended = () => {
+      this.currentAudio = null;
+    };
 
     // Hook into errors (file not found or format unsupported) to advance the chain
     audio.onerror = () => {
@@ -586,6 +598,7 @@ export class AppComponent implements OnInit {
 
     // Hook into successfully loaded metadata/buffers to start playback immediately
     audio.oncanplaythrough = () => {
+      this.currentAudio = audio; // Register globally as actively playing
       audio.play().catch(e => {
          // In case play fails, suppress and continue scanning fallback chain
          this.playFallbackAudio(formats, index + 1);
@@ -595,6 +608,26 @@ export class AppComponent implements OnInit {
     };
 
     audio.load(); // Fire up the network load
+  }
+
+  toggleMute() {
+    this.isMuted = !this.isMuted;
+    if (this.currentAudio) {
+      this.currentAudio.muted = this.isMuted;
+    }
+  }
+
+  updateAudioVolume(event: any) {
+    const inputVal = event.target.value;
+    this.audioVolume = inputVal;
+    if (this.currentAudio) {
+      this.currentAudio.volume = this.audioVolume / 100;
+      // Automatically unmute if user adjusts volume to give great immediate feedback
+      if (this.isMuted && this.audioVolume > 0) {
+        this.isMuted = false;
+        this.currentAudio.muted = false;
+      }
+    }
   }
 
   loadOperatorPanel() {

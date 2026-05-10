@@ -31,6 +31,15 @@
         Volver a Onboarding 👤
       </button>
 
+      <!-- Dynamic Audio Mixer Control -->
+      <div class="glass-panel audio-control-wrapper" *ngIf="currentAudio !== null || currentView === 'welcome'" style="display: flex; align-items: center; gap: 10px; padding: 6px 12px; border-radius: 20px; margin-right: 10px; background: var(--glass-bg); border: 1px solid var(--glass-border); animation: fadeIn 0.5s ease;">
+        <button (click)="toggleMute()" style="background: none; border: none; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; padding: 0; transition: transform 0.2s; width: 24px;" title="Silenciar">
+          {{ isMuted || audioVolume === 0 ? '🔇' : (audioVolume < 50 ? '🔉' : '🔊') }}
+        </button>
+        <input type="range" min="0" max="100" [value]="audioVolume" (input)="updateAudioVolume($event)" 
+          style="width: 65px; cursor: pointer; accent-color: var(--accent-mint); height: 4px; border-radius: 2px; outline: none; filter: drop-shadow(0 0 2px var(--accent-mint));" title="Volumen">
+      </div>
+
       <button class="cyber-btn theme-toggle-btn" *ngIf="currentView !== 'welcome' && currentView !== 'register'" (click)="toggleTheme()" style="padding: 8px 12px; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; background: var(--glass-bg); border-color: var(--glass-border); cursor: pointer; position: relative; margin-right: 5px;" title="Cambiar Tema">
         {{ currentTheme === 'dark' ? '☀️' : '🌙' }}
       </button>
