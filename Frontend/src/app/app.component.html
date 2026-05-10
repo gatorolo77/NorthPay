@@ -289,27 +289,27 @@
         <div *ngIf="summary.currentStep === 'WHATSAPP_VERIFY'" class="step-form-container">
           <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 0: {{ translations[selectedLang]['step0'] }}</h3>
           <p class="step-form-desc">
-            Para iniciar tu progreso de activación, ingresa tu número de WhatsApp para certificar tu identidad y desbloquear el onboarding. ¡El envío por nuestro canal corporativo es gratuito!
+            {{ translations[selectedLang]['wsDesc'] }}
           </p>
 
           <div class="cyber-input-group">
-            <label class="cyber-input-label">NÚMERO DE WHATSAPP</label>
+            <label class="cyber-input-label">{{ translations[selectedLang]['wsLabel'] }}</label>
             <input type="text" class="cyber-input" [(ngModel)]="whatsappPhone" placeholder="Ej. +34 600 000 000">
           </div>
 
           <button class="cyber-btn cyber-btn-primary submit-action-btn" style="margin-bottom: 20px;"
             [disabled]="isSendingWhatsapp || !whatsappPhone" (click)="sendWhatsappCode()">
-            {{ isSendingWhatsapp ? 'Enviando WhatsApp...' : 'Enviar Código de Verificación' }}
+            {{ isSendingWhatsapp ? translations[selectedLang]['wsBtnSending'] : translations[selectedLang]['wsBtnSend'] }}
           </button>
 
           <div *ngIf="whatsappPhone" class="cyber-input-group" style="margin-top: 15px;">
-            <label class="cyber-input-label">INGRESAR CÓDIGO (6 DÍGITOS)</label>
+            <label class="cyber-input-label">{{ translations[selectedLang]['wsLabelCode'] }}</label>
             <input type="text" class="cyber-input" [(ngModel)]="whatsappCode" placeholder="Ingresa 123456" style="text-align: center; letter-spacing: 5px; font-size: 1.2rem;">
           </div>
 
           <button *ngIf="whatsappPhone" class="cyber-btn cyber-btn-primary submit-action-btn" style="margin-top: 10px;"
             [disabled]="isVerifyingWhatsapp || !whatsappCode" (click)="verifyWhatsappCode()">
-            {{ isVerifyingWhatsapp ? 'Verificando Código...' : 'Verificar y Desbloquear Onboarding' }}
+            {{ isVerifyingWhatsapp ? translations[selectedLang]['wsBtnVerifying'] : translations[selectedLang]['wsBtnVerify'] }}
           </button>
         </div>
 

@@ -157,7 +157,14 @@ export class AppComponent implements OnInit {
       step2: "Documentación",
       step3: "Firma de Contrato",
       step4: "Método de Pago",
-      step5: "Identidad Biométrica"
+      step5: "Identidad Biométrica",
+      wsDesc: "Para iniciar tu progreso de activación, ingresa tu número de WhatsApp para certificar tu identidad y desbloquear el onboarding. ¡El envío por nuestro canal corporativo es gratuito!",
+      wsLabel: "NÚMERO DE WHATSAPP",
+      wsBtnSend: "Enviar Código de Verificación",
+      wsBtnSending: "Enviando WhatsApp...",
+      wsLabelCode: "INGRESAR CÓDIGO (6 DÍGITOS)",
+      wsBtnVerify: "Verificar y Desbloquear Onboarding",
+      wsBtnVerifying: "Verificando Código..."
     },
     en: {
       logoSubtitle: "WELCOME PORTAL",
@@ -190,7 +197,14 @@ export class AppComponent implements OnInit {
       step2: "Documentation",
       step3: "Sign Contract",
       step4: "Payment Method",
-      step5: "Biometric Identity"
+      step5: "Biometric Identity",
+      wsDesc: "To start your activation progress, enter your WhatsApp number to certify your identity and unlock the onboarding. Shipping via our corporate channel is free!",
+      wsLabel: "WHATSAPP NUMBER",
+      wsBtnSend: "Send Verification Code",
+      wsBtnSending: "Sending WhatsApp...",
+      wsLabelCode: "ENTER CODE (6 DIGITS)",
+      wsBtnVerify: "Verify and Unlock Onboarding",
+      wsBtnVerifying: "Verifying Code..."
     },
     fr: {
       logoSubtitle: "PORTAIL DE BIENVENUE",
@@ -223,7 +237,14 @@ export class AppComponent implements OnInit {
       step2: "Documentation",
       step3: "Signature Contrat",
       step4: "Mode de Paiement",
-      step5: "Identité Biométrique"
+      step5: "Identité Biométrique",
+      wsDesc: "Pour lancer votre processus d'activation, saisissez votre numéro WhatsApp afin de certifier votre identité et débloquer l'intégration. L'envoi par notre canal d'entreprise est gratuit !",
+      wsLabel: "NUMÉRO WHATSAPP",
+      wsBtnSend: "Envoyer le code de vérification",
+      wsBtnSending: "Envoi sur WhatsApp...",
+      wsLabelCode: "ENTRER LE CODE (6 CHIFFRES)",
+      wsBtnVerify: "Vérifier et Débloquer l'Intégration",
+      wsBtnVerifying: "Vérification du Code..."
     },
     pt: {
       logoSubtitle: "PORTAL DE BOAS-VINDAS",
@@ -256,7 +277,14 @@ export class AppComponent implements OnInit {
       step2: "Documentação",
       step3: "Assinatura do Contrato",
       step4: "Forma de Pagamento",
-      step5: "Identidade Biométrica"
+      step5: "Identidade Biométrica",
+      wsDesc: "Para iniciar o seu progresso de ativação, insira o seu número de WhatsApp para certificar a sua identidade e desbloquear a integração. O envio pelo nosso canal corporativo é gratuito!",
+      wsLabel: "NÚMERO DO WHATSAPP",
+      wsBtnSend: "Enviar Código de Verificación",
+      wsBtnSending: "Enviando WhatsApp...",
+      wsLabelCode: "DIGITAR CÓDIGO (6 DÍGITOS)",
+      wsBtnVerify: "Verificar e Desbloquear Integração",
+      wsBtnVerifying: "Verificando Código..."
     },
     zh: {
       logoSubtitle: "欢迎门户",
@@ -289,7 +317,14 @@ export class AppComponent implements OnInit {
       step2: "文档",
       step3: "合同签署",
       step4: "支付方式",
-      step5: "生物识别身份"
+      step5: "生物识别身份",
+      wsDesc: "要开始您的激活进度，请输入您的 WhatsApp 号码以验证您的身份并解锁入职流程。通过我们的企业渠道发送是免费的！",
+      wsLabel: "WHATSAPP 号码",
+      wsBtnSend: "发送验证码",
+      wsBtnSending: "正在发送 WhatsApp...",
+      wsLabelCode: "输入代码 (6 位数字)",
+      wsBtnVerify: "验证并解锁入职",
+      wsBtnVerifying: "正在验证代码..."
     },
     it: {
       logoSubtitle: "PORTALE DI BENVENUTO",
@@ -322,7 +357,14 @@ export class AppComponent implements OnInit {
       step2: "Documentazione",
       step3: "Firma del Contratto",
       step4: "Metodo di Pagamento",
-      step5: "Identità Biometrica"
+      step5: "Identità Biometrica",
+      wsDesc: "Per avviare il tuo progresso di attivazione, inserisci il tuo numero WhatsApp per certificare la tua identità e sbloccare l'onboarding. L'invio tramite il nostro canale aziendale è gratuito!",
+      wsLabel: "NUMERO WHATSAPP",
+      wsBtnSend: "Invia Codice di Verifica",
+      wsBtnSending: "Invio WhatsApp...",
+      wsLabelCode: "INSERISCI CODICE (6 CIFRE)",
+      wsBtnVerify: "Verifica e Sblocca Onboarding",
+      wsBtnVerifying: "Verifica Codice..."
     }
   };
 
