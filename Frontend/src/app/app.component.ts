@@ -559,6 +559,20 @@ export class AppComponent implements OnInit {
   startOnboarding() {
     this.notifications = []; // Remove residual toasts from the landing page
     this.currentView = 'welcome';
+    this.playGreetingAudio(); // Activate localized greeting audio
+  }
+
+  playGreetingAudio() {
+    // Create new audio instance mapped to assets/audio/greeting_[lang].mp3
+    const audio = new Audio();
+    audio.src = `assets/audio/greeting_${this.selectedLang}.mp3`;
+    audio.volume = 0.75; // Comfortable premium volume level
+    audio.load();
+    
+    // Browser allows play() here because this was triggered by a direct user click interaction
+    audio.play().catch(error => {
+      console.log('[NorthPay Audio] Waiting for asset arrival:', `assets/audio/greeting_${this.selectedLang}.mp3`, error);
+    });
   }
 
   loadOperatorPanel() {
