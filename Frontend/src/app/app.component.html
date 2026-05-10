@@ -73,7 +73,7 @@
     </div>
   </header>
 
-  <div class="alerts-container" *ngIf="notifications.length > 0">
+  <div class="alerts-container" *ngIf="notifications.length > 0" [style.top]="(currentView === 'register' || currentView === 'onboarding') ? '6%' : '3%'">
     <div *ngFor="let n of notifications.slice(0, 1)" class="glass-panel alert-panel"
       [style.border-left-color]="n.type === 'SUCCESS' ? 'var(--accent-mint)' : n.type === 'ERROR' ? 'var(--accent-coral)' : 'var(--accent-cyan)'">
       <div class="alert-content">
