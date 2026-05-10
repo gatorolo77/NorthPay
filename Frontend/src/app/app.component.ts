@@ -216,6 +216,25 @@ export class AppComponent implements OnInit {
       onboardingWelcomeText: "欢迎来到 NorthPay。要开始远程承包商账户的激活流程，请输入您的运营商提供的邀请电子邮件。",
       contractorEmailLabel: "承包商电子邮件地址",
       generateInvitationBtn: "生成访问邀请"
+    },
+    it: {
+      logoSubtitle: "PORTALE DI BENVENUTO",
+      heroTitle: "Il Tuo Gateway di Pagamento Globale",
+      heroDesc: "Unisciti alla piattaforma di payroll internazionale leader per i collaboratori da remoto. Attiva il tuo profilo, firma contratti in sicurezza e gestisci i tuoi prelievi globali in pochi secondi.",
+      propTitle1: "Prelievi Flessibili",
+      propDesc1: "Ricevi i tuoi pagamenti in USD, EUR o valuta locale tramite bonifici bancari o Mercado Pago.",
+      propTitle2: "Firma Digitale",
+      propDesc2: "Firma istantaneamente il tuo contratto legale utilizzando il Web Component di DocuSeal.",
+      propTitle3: "Biometria KYC",
+      propDesc3: "Verifica dell'identità di nuova generazione supportata da motori biometrici avanzati.",
+      btnOperator: "⚙️ Pannello Operazioni (Demo)",
+      btnActivate: "Avvia Attivazione 👤",
+      preloading: "Precaricamento risorse...",
+      statusReady: "Portale NorthPay pronto a operare ⚡",
+      onboardingPortalTitle: "Portale di Onboarding",
+      onboardingWelcomeText: "Benvenuto in NorthPay. Per avviare il processo di attivazione del tuo account collaboratore da remoto, inserisci l'e-mail di invito fornita dal tuo operatore.",
+      contractorEmailLabel: "INDIRIZZO E-MAIL DEL COLLABORATORE",
+      generateInvitationBtn: "Genera Invito di Accesso"
     }
   };
 
@@ -881,6 +900,13 @@ export class AppComponent implements OnInit {
         '正在建立 WhatsApp 链接...',
         '正在加载 KYC 生物识别引擎...',
         'NorthPay 门户已准备就绪 ⚡'
+      ],
+      it: [
+        'Avvio dei servizi sicuri...',
+        'Caricamento firma digital DocuSeal...',
+        'Stabilendo collegamento WhatsApp...',
+        'Caricamento motore biometrico KYC...',
+        'Portale NorthPay pronto a operare ⚡'
       ]
     };
 
@@ -893,7 +919,8 @@ export class AppComponent implements OnInit {
       en: 'Language changed to English',
       fr: 'Langue changée en Français',
       pt: 'Idioma alterado para Português',
-      zh: '语言已切换为中文'
+      zh: '语言已切换为中文',
+      it: 'Lingua cambiata in Italiano'
     };
 
     const msg = toastMsgs[lang] || toastMsgs['es'];
