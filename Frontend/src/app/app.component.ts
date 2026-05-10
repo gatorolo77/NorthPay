@@ -164,7 +164,12 @@ export class AppComponent implements OnInit {
       wsBtnSending: "Enviando WhatsApp...",
       wsLabelCode: "INGRESAR CÓDIGO (6 DÍGITOS)",
       wsBtnVerify: "Verificar y Desbloquear Onboarding",
-      wsBtnVerifying: "Verificando Código..."
+      wsBtnVerifying: "Verificando Código...",
+      regDesc: "Se ha detectado un token de invitación válido para registrar tu perfil de contratista.",
+      regAssocEmail: "CORREO ASOCIADO",
+      regTokenLabel: "TOKEN DE INVITACIÓN",
+      regPassLabel: "CONFIGURAR CONTRASEÑA",
+      regBtnStart: "Iniciar Mi Onboarding"
     },
     en: {
       logoSubtitle: "WELCOME PORTAL",
@@ -204,7 +209,12 @@ export class AppComponent implements OnInit {
       wsBtnSending: "Sending WhatsApp...",
       wsLabelCode: "ENTER CODE (6 DIGITS)",
       wsBtnVerify: "Verify and Unlock Onboarding",
-      wsBtnVerifying: "Verifying Code..."
+      wsBtnVerifying: "Verifying Code...",
+      regDesc: "A valid invitation token has been detected to register your contractor profile.",
+      regAssocEmail: "ASSOCIATED EMAIL",
+      regTokenLabel: "INVITATION TOKEN",
+      regPassLabel: "SET PASSWORD",
+      regBtnStart: "Start My Onboarding"
     },
     fr: {
       logoSubtitle: "PORTAIL DE BIENVENUE",
@@ -244,7 +254,12 @@ export class AppComponent implements OnInit {
       wsBtnSending: "Envoi sur WhatsApp...",
       wsLabelCode: "ENTRER LE CODE (6 CHIFFRES)",
       wsBtnVerify: "Vérifier et Débloquer l'Intégration",
-      wsBtnVerifying: "Vérification du Code..."
+      wsBtnVerifying: "Vérification du Code...",
+      regDesc: "Un jeton d'invitation valide a été détecté pour enregistrer votre profil de sous-traitant.",
+      regAssocEmail: "E-MAIL ASSOCIÉ",
+      regTokenLabel: "JETON D'INVITATION",
+      regPassLabel: "CONFIGURER LE MOT DE PASSE",
+      regBtnStart: "Lancer Mon Intégration"
     },
     pt: {
       logoSubtitle: "PORTAL DE BOAS-VINDAS",
@@ -284,7 +299,12 @@ export class AppComponent implements OnInit {
       wsBtnSending: "Enviando WhatsApp...",
       wsLabelCode: "DIGITAR CÓDIGO (6 DÍGITOS)",
       wsBtnVerify: "Verificar e Desbloquear Integração",
-      wsBtnVerifying: "Verificando Código..."
+      wsBtnVerifying: "Verificando Código...",
+      regDesc: "Um token de convite válido foi detectado para registrar o seu perfil de contratado.",
+      regAssocEmail: "E-MAIL ASSOCIADO",
+      regTokenLabel: "TOKEN DE CONVITE",
+      regPassLabel: "CONFIGURAR SENHA",
+      regBtnStart: "Iniciar Minha Integração"
     },
     zh: {
       logoSubtitle: "欢迎门户",
@@ -324,7 +344,12 @@ export class AppComponent implements OnInit {
       wsBtnSending: "正在发送 WhatsApp...",
       wsLabelCode: "输入代码 (6 位数字)",
       wsBtnVerify: "验证并解锁入职",
-      wsBtnVerifying: "正在验证代码..."
+      wsBtnVerifying: "正在验证代码...",
+      regDesc: "已检测到有效的邀请令牌以注册您的承包商个人资料。",
+      regAssocEmail: "相关电子邮件",
+      regTokenLabel: "邀请令牌",
+      regPassLabel: "设置密码",
+      regBtnStart: "开始我的入职"
     },
     it: {
       logoSubtitle: "PORTALE DI BENVENUTO",
@@ -364,7 +389,12 @@ export class AppComponent implements OnInit {
       wsBtnSending: "Invio WhatsApp...",
       wsLabelCode: "INSERISCI CODICE (6 CIFRE)",
       wsBtnVerify: "Verifica e Sblocca Onboarding",
-      wsBtnVerifying: "Verifica Codice..."
+      wsBtnVerifying: "Verifica Codice...",
+      regDesc: "È stato rilevato un token di invito valido per registrare il tuo profilo collaboratore.",
+      regAssocEmail: "E-MAIL ASSOCIATA",
+      regTokenLabel: "TOKEN DI INVITO",
+      regPassLabel: "IMPOSTA PASSWORD",
+      regBtnStart: "Avvia Il Mio Onboarding"
     }
   };
 

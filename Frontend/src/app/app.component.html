@@ -198,27 +198,27 @@
     <section *ngIf="currentView === 'register'" class="glass-panel register-card">
       <h2 class="font-display text-mint-gradient register-title">{{ translations[selectedLang]['registerTitle'] }}</h2>
       <p class="register-text">
-        Se ha detectado un token de invitación válido para registrar tu perfil de contratista.
+        {{ translations[selectedLang]['regDesc'] }}
       </p>
 
       <div class="cyber-input-group">
-        <label class="cyber-input-label">CORREO ASOCIADO</label>
+        <label class="cyber-input-label">{{ translations[selectedLang]['regAssocEmail'] }}</label>
         <input type="email" class="cyber-input" [(ngModel)]="invitationEmail" disabled>
       </div>
 
       <div class="cyber-input-group">
-        <label class="cyber-input-label">TOKEN DE INVITACIÓN</label>
+        <label class="cyber-input-label">{{ translations[selectedLang]['regTokenLabel'] }}</label>
         <input type="text" class="cyber-input" [(ngModel)]="invitationToken" disabled class="cyber-input token-code">
       </div>
 
       <div class="cyber-input-group">
-        <label class="cyber-input-label">CONFIGURAR CONTRASEÑA</label>
+        <label class="cyber-input-label">{{ translations[selectedLang]['regPassLabel'] }}</label>
         <input type="password" class="cyber-input" [(ngModel)]="registerPassword" placeholder="••••••••">
       </div>
 
       <button class="cyber-btn cyber-btn-primary register-submit-btn"
         (click)="register()">
-        Iniciar Mi Onboarding
+        {{ translations[selectedLang]['regBtnStart'] }}
       </button>
     </section>
 
