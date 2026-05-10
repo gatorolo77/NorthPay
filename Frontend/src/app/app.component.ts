@@ -563,15 +563,15 @@ export class AppComponent implements OnInit {
   }
 
   playGreetingAudio() {
-    // Create new audio instance mapped to assets/audio/greeting_[lang].mp3
+    // Create new audio instance mapped to assets/audio/greeting_[lang].ogg
     const audio = new Audio();
-    audio.src = `assets/audio/greeting_${this.selectedLang}.mp3`;
+    audio.src = `assets/audio/greeting_${this.selectedLang}.ogg`;
     audio.volume = 0.75; // Comfortable premium volume level
     audio.load();
     
     // Browser allows play() here because this was triggered by a direct user click interaction
     audio.play().catch(error => {
-      console.log('[NorthPay Audio] Waiting for asset arrival:', `assets/audio/greeting_${this.selectedLang}.mp3`, error);
+      console.log('[NorthPay Audio] Waiting for asset arrival:', `assets/audio/greeting_${this.selectedLang}.ogg`, error);
     });
   }
 
