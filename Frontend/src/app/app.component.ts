@@ -563,16 +563,38 @@ export class AppComponent implements OnInit {
   }
 
   playGreetingAudio() {
-    // Create new audio instance mapped to assets/audio/greeting_[lang].ogg
+    // Resilient format chain: scan sequentially for modern OGG, raw WAV, or universal MP3
+    const formats = ['ogg', 'wav', 'mp3'];
+    this.playFallbackAudio(formats, 0);
+  }
+
+  private playFallbackAudio(formats: string[], index: number) {
+    if (index >= formats.length) {
+      console.log(`[NorthPay Audio] End of fallback chain for ${this.selectedLang}. No supported asset responded.`);
+      return;
+    }
+
     const audio = new Audio();
-    audio.src = `assets/audio/greeting_${this.selectedLang}.ogg`;
-    audio.volume = 0.75; // Comfortable premium volume level
-    audio.load();
-    
-    // Browser allows play() here because this was triggered by a direct user click interaction
-    audio.play().catch(error => {
-      console.log('[NorthPay Audio] Waiting for asset arrival:', `assets/audio/greeting_${this.selectedLang}.ogg`, error);
-    });
+    const currentFormat = formats[index];
+    audio.src = `assets/audio/greeting_${this.selectedLang}.${currentFormat}`;
+    audio.volume = 0.75;
+
+    // Hook into errors (file not found or format unsupported) to advance the chain
+    audio.onerror = () => {
+      this.playFallbackAudio(formats, index + 1);
+    };
+
+    // Hook into successfully loaded metadata/buffers to start playback immediately
+    audio.oncanplaythrough = () => {
+      audio.play().catch(e => {
+         // In case play fails, suppress and continue scanning fallback chain
+         this.playFallbackAudio(formats, index + 1);
+      });
+      // Remove listener once successfully fired to prevent double trigger re-entry
+      audio.oncanplaythrough = null; 
+    };
+
+    audio.load(); // Fire up the network load
   }
 
   loadOperatorPanel() {
