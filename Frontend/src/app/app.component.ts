@@ -169,7 +169,13 @@ export class AppComponent implements OnInit {
       regAssocEmail: "CORREO ASOCIADO",
       regTokenLabel: "TOKEN DE INVITACIÓN",
       regPassLabel: "CONFIGURAR CONTRASEÑA",
-      regBtnStart: "Iniciar Mi Onboarding"
+      regBtnStart: "Iniciar Mi Onboarding",
+      persDesc: "Por favor, completa tus datos básicos fiscales. Esto nos permite generar de forma automatizada tu contrato legal.",
+      persFirst: "NOMBRES",
+      persLast: "APELLIDOS",
+      persPhone: "NÚMERO DE TELÉFONO",
+      persCountry: "PAÍS DE RESIDENCIA FISCAL",
+      persBtnSave: "Guardar y Siguiente Paso"
     },
     en: {
       logoSubtitle: "WELCOME PORTAL",
@@ -214,7 +220,13 @@ export class AppComponent implements OnInit {
       regAssocEmail: "ASSOCIATED EMAIL",
       regTokenLabel: "INVITATION TOKEN",
       regPassLabel: "SET PASSWORD",
-      regBtnStart: "Start My Onboarding"
+      regBtnStart: "Start My Onboarding",
+      persDesc: "Please complete your basic tax information. This allows us to automatically generate your legal contract.",
+      persFirst: "FIRST NAMES",
+      persLast: "LAST NAMES",
+      persPhone: "PHONE NUMBER",
+      persCountry: "TAX RESIDENCE COUNTRY",
+      persBtnSave: "Save and Next Step"
     },
     fr: {
       logoSubtitle: "PORTAIL DE BIENVENUE",
@@ -259,7 +271,13 @@ export class AppComponent implements OnInit {
       regAssocEmail: "E-MAIL ASSOCIÉ",
       regTokenLabel: "JETON D'INVITATION",
       regPassLabel: "CONFIGURER LE MOT DE PASSE",
-      regBtnStart: "Lancer Mon Intégration"
+      regBtnStart: "Lancer Mon Intégration",
+      persDesc: "Veuillez compléter vos informations fiscales de base. Cela nous permet de générer automatiquement votre contrat légal.",
+      persFirst: "PRÉNOMS",
+      persLast: "NOMS DE FAMILLE",
+      persPhone: "NUMÉRO DE TÉLÉPHONE",
+      persCountry: "PAYS DE RÉSIDENCE FISCALE",
+      persBtnSave: "Enregistrer et Étape Suivante"
     },
     pt: {
       logoSubtitle: "PORTAL DE BOAS-VINDAS",
@@ -304,7 +322,13 @@ export class AppComponent implements OnInit {
       regAssocEmail: "E-MAIL ASSOCIADO",
       regTokenLabel: "TOKEN DE CONVITE",
       regPassLabel: "CONFIGURAR SENHA",
-      regBtnStart: "Iniciar Minha Integração"
+      regBtnStart: "Iniciar Minha Integração",
+      persDesc: "Por favor, complete seus dados fiscais básicos. Isso nos permite gerar automaticamente seu contrato legal.",
+      persFirst: "NOMES",
+      persLast: "SOBRENOMES",
+      persPhone: "NÚMERO DE TELEFONE",
+      persCountry: "PAÍS DE RESIDÊNCIA FISCAL",
+      persBtnSave: "Salvar e Próxima Etapa"
     },
     zh: {
       logoSubtitle: "欢迎门户",
@@ -349,7 +373,13 @@ export class AppComponent implements OnInit {
       regAssocEmail: "相关电子邮件",
       regTokenLabel: "邀请令牌",
       regPassLabel: "设置密码",
-      regBtnStart: "开始我的入职"
+      regBtnStart: "开始我的入职",
+      persDesc: "请填写您的基本税务信息。这使我们能够自动生成您的法律合同。",
+      persFirst: "名字",
+      persLast: "姓氏",
+      persPhone: "电话号码",
+      persCountry: "税务居留国",
+      persBtnSave: "保存并下一步"
     },
     it: {
       logoSubtitle: "PORTALE DI BENVENUTO",
@@ -394,7 +424,13 @@ export class AppComponent implements OnInit {
       regAssocEmail: "E-MAIL ASSOCIATA",
       regTokenLabel: "TOKEN DI INVITO",
       regPassLabel: "IMPOSTA PASSWORD",
-      regBtnStart: "Avvia Il Mio Onboarding"
+      regBtnStart: "Avvia Il Mio Onboarding",
+      persDesc: "Per favore, completa i tuoi dati fiscali di base. Questo ci permette di generare automaticamente il tuo contratto legale.",
+      persFirst: "NOMI",
+      persLast: "COGNOMI",
+      persPhone: "NUMERO DI TELEFONO",
+      persCountry: "PAESE DI RESIDENZA FISCALE",
+      persBtnSave: "Salva e Prossimo Passo"
     }
   };
 

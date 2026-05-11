@@ -316,27 +316,27 @@
         <div *ngIf="summary.currentStep === 'PERSONAL_DATA'" class="step-form-container">
           <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 1: {{ translations[selectedLang]['step1'] }}</h3>
           <p class="step-form-desc">
-            Por favor, completa tus datos básicos fiscales. Esto nos permite generar de forma automatizada tu contrato legal.
+            {{ translations[selectedLang]['persDesc'] }}
           </p>
 
           <div class="input-grid-2">
             <div class="cyber-input-group">
-              <label class="cyber-input-label">NOMBRES</label>
+              <label class="cyber-input-label">{{ translations[selectedLang]['persFirst'] }}</label>
               <input type="text" class="cyber-input" [(ngModel)]="personalData.firstName" placeholder="Ej. Juan">
             </div>
             <div class="cyber-input-group">
-              <label class="cyber-input-label">APELLIDOS</label>
+              <label class="cyber-input-label">{{ translations[selectedLang]['persLast'] }}</label>
               <input type="text" class="cyber-input" [(ngModel)]="personalData.lastName" placeholder="Ej. Pérez">
             </div>
           </div>
 
           <div class="cyber-input-group">
-            <label class="cyber-input-label">NÚMERO DE TELÉFONO</label>
+            <label class="cyber-input-label">{{ translations[selectedLang]['persPhone'] }}</label>
             <input type="text" class="cyber-input" [(ngModel)]="personalData.phone" placeholder="Ej. +34 600 000 000">
           </div>
 
           <div class="cyber-input-group">
-            <label class="cyber-input-label">PAÍS DE RESIDENCIA FISCAL</label>
+            <label class="cyber-input-label">{{ translations[selectedLang]['persCountry'] }}</label>
             <select class="cyber-input" [(ngModel)]="personalData.country">
               <option value="Spain">España</option>
               <option value="Mexico">México</option>
@@ -348,7 +348,7 @@
           </div>
 
           <button class="cyber-btn cyber-btn-primary submit-action-btn" (click)="submitPersonalData()">
-            Guardar y Siguiente Paso
+            {{ translations[selectedLang]['persBtnSave'] }}
           </button>
         </div>
 
