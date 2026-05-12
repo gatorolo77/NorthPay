@@ -37,6 +37,7 @@ interface OnboardingProcess {
 })
 export class AppComponent implements OnInit {
   currentView: 'landing' | 'welcome' | 'register' | 'onboarding' | 'operator' = 'landing';
+  previousView: 'landing' | 'welcome' | 'register' | 'onboarding' = 'landing';
   apiBaseUrl = 'http://localhost:8080/api';
   isLocalMock = true;
   cloudinaryCloudName = 'northpay-demo';
@@ -187,8 +188,8 @@ export class AppComponent implements OnInit {
       propDesc2: "Sign your legal contractor agreement instantly using the DocuSeal Web Component.",
       propTitle3: "KYC Biometrics",
       propDesc3: "Next-generation identity verification powered by advanced biometric engines.",
-      btnOperator: "⚙️ Operator Panel (Demo)",
-      btnActivate: "Start Activation 👤",
+      btnOperator: "Operator Panel (Demo)",
+      btnActivate: "Start Activation",
       preloading: "Preloading resources...",
       statusReady: "NorthPay Portal ready to operate ⚡",
       onboardingPortalTitle: "Onboarding Portal",
@@ -238,8 +239,8 @@ export class AppComponent implements OnInit {
       propDesc2: "Signez instantanément votre contrat de sous-traitant à l'aide du composant Web DocuSeal.",
       propTitle3: "Biométrie KYC",
       propDesc3: "Vérification d'identité de pointe optimisée par des moteurs biométriques avancés.",
-      btnOperator: "⚙️ Panneau Opérateur (Démo)",
-      btnActivate: "Lancer l'activation 👤",
+      btnOperator: "Panneau Opérateur (Démo)",
+      btnActivate: "Lancer l'activation ",
       preloading: "Préchargement des ressources...",
       statusReady: "Portail NorthPay prêt à fonctionner ⚡",
       onboardingPortalTitle: "Portail d'Intégration",
@@ -289,8 +290,8 @@ export class AppComponent implements OnInit {
       propDesc2: "Assine seu contrato de prestação de serviços instantaneamente usando o DocuSeal Web Component.",
       propTitle3: "Biometria KYC",
       propDesc3: "Verificação de identidade de última geração com suporte de motores biométricos avançados.",
-      btnOperator: "⚙️ Painel do Operador (Demo)",
-      btnActivate: "Iniciar Ativação 👤",
+      btnOperator: "Painel do Operador (Demo)",
+      btnActivate: "Iniciar Ativação ",
       preloading: "Pré-carregando recursos...",
       statusReady: "Portal NorthPay pronto para operar ⚡",
       onboardingPortalTitle: "Portal de Integração",
@@ -340,8 +341,8 @@ export class AppComponent implements OnInit {
       propDesc2: "使用 DocuSeal Web 组件即时签署您的法律承包商协议。",
       propTitle3: "KYC 生物识别",
       propDesc3: "由先进 of 生物识别引擎支持的新一代身份验证。",
-      btnOperator: "⚙️ 运营商面板 (演示)",
-      btnActivate: "开始激活 👤",
+      btnOperator: "运营商面板 (演示)",
+      btnActivate: "开始激活",
       preloading: "正在预载资源...",
       statusReady: "NorthPay 门户已准备就绪 ⚡",
       onboardingPortalTitle: "入职门户",
@@ -391,8 +392,8 @@ export class AppComponent implements OnInit {
       propDesc2: "Firma istantaneamente il tuo contratto legale utilizzando il Web Component di DocuSeal.",
       propTitle3: "Biometria KYC",
       propDesc3: "Verifica dell'identità di nuova generazione supportata da motori biometrici avanzati.",
-      btnOperator: "⚙️ Pannello Operazioni (Demo)",
-      btnActivate: "Avvia Attivazione 👤",
+      btnOperator: "Pannello Operazioni (Demo)",
+      btnActivate: "Avvia Attivazione",
       preloading: "Precaricamento risorse...",
       statusReady: "Portale NorthPay pronto a operare ⚡",
       onboardingPortalTitle: "Portale di Onboarding",
@@ -824,6 +825,7 @@ export class AppComponent implements OnInit {
 
   loadOperatorPanel() {
     this.notifications = []; // Clear alerts for cleaner operator interface
+    this.previousView = this.currentView as any;
     this.currentView = 'operator';
 
     const currentName = this.personalData.firstName ? `${this.personalData.firstName} ${this.personalData.lastName}` : 'Juan Pérez (Tú)';
@@ -856,6 +858,10 @@ export class AppComponent implements OnInit {
         error: (err) => this.handleError(err)
       });
     }
+  }
+
+  exitOperatorPanel() {
+    this.currentView = this.previousView as any;
   }
 
   reviewContractorStep(stepType: string, approved: boolean) {

@@ -28,9 +28,10 @@
       </button>
 
       <button class="cyber-btn cyber-btn-primary header-btn" *ngIf="currentView === 'operator'"
-        (click)="currentView = 'landing'">
-        Volver al Inicio
+        (click)="exitOperatorPanel()">
+        {{ previousView === 'onboarding' ? 'Volver a Onboarding' : 'Volver al Inicio' }}
       </button>
+
 
       <div class="glass-panel audio-control-wrapper" *ngIf="currentAudio !== null || currentView === 'welcome'"
         style="display: flex; align-items: center; gap: 10px; padding: 6px 12px; border-radius: 20px; margin-right: 10px; background: var(--glass-bg); border: 1px solid var(--glass-border); animation: fadeIn 0.5s ease;">
@@ -819,7 +820,9 @@
     </div>
 
     <!-- Dynamic Encapsulated Operator Dashboard -->
-    <app-admin-dashboard *ngIf="currentView === 'operator'"></app-admin-dashboard>
+    <app-admin-dashboard *ngIf="currentView === 'operator'" [summary]="summary" [personalData]="personalData" [isLocalMock]="isLocalMock" (reviewCompleted)="refreshSummary()"></app-admin-dashboard>
+
+
 
 
   </main>

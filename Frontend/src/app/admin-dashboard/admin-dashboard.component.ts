@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 interface OnboardingSummary {
@@ -28,7 +28,7 @@ interface OnboardingProcess {
 })
 export class AdminDashboardComponent implements OnInit {
   apiBaseUrl = 'http://localhost:8080/api';
-  isLocalMock = true;
+  @Input() isLocalMock = true;
 
   operatorProcesses: OnboardingProcess[] = [];
   selectedProcessIdForReview: number | null = null;
@@ -48,8 +48,11 @@ export class AdminDashboardComponent implements OnInit {
   mockContractors: any[] = [];
   paidContractorIds: number[] = [];
 
+  @Output() reviewCompleted = new EventEmitter<void>();
+
+
   // Reused personalData fallback for simulation details inside review box
-  personalData = {
+  @Input() personalData = {
     firstName: 'Juan',
     lastName: 'Pérez',
     phone: '+34 600 000 000',
@@ -57,7 +60,7 @@ export class AdminDashboardComponent implements OnInit {
   };
 
   // Reused local state fallback
-  summary: OnboardingSummary = {
+  @Input() summary: OnboardingSummary = {
     status: 'IN_PROGRESS',
     currentStep: 'DOCUMENT_UPLOAD',
     progress: 32,
@@ -157,6 +160,7 @@ export class AdminDashboardComponent implements OnInit {
       }
       this.reviewFeedback = '';
       this.loadOperatorPanel();
+      this.reviewCompleted.emit();
     } else {
       this.http.post(`${this.apiBaseUrl}/operator/steps/${stepId}/review?operatorId=1`, {
         approved: approved,
@@ -164,10 +168,12 @@ export class AdminDashboardComponent implements OnInit {
       }).subscribe({
         next: () => {
           this.loadOperatorPanel();
+          this.reviewCompleted.emit();
         },
         error: (err) => console.error(err)
       });
     }
+
   }
 
   openPaymentModal(contractor: any) {

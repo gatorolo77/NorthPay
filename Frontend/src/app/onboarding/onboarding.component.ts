@@ -396,12 +396,12 @@ export class OnboardingComponent implements OnInit {
     const blockingIssues: string[] = [];
     let canProceed = true;
 
-    const s0 = this.summary.steps[0].status; // WHATSAPP_VERIFY
-    const s1 = this.summary.steps[1].status; // PERSONAL_DATA
-    const s2 = this.summary.steps[2].status; // DOCUMENT_UPLOAD
-    const s3 = this.summary.steps[3].status; // CONTRACT_SIGN
-    const s4 = this.summary.steps[4].status; // PAYMENT_METHOD
-    const s5 = this.summary.steps[5].status; // IDENTITY_VERIFICATION
+    const s0 = this.summary.steps[0].status;
+    const s1 = this.summary.steps[1].status;
+    const s2 = this.summary.steps[2].status;
+    const s3 = this.summary.steps[3].status;
+    const s4 = this.summary.steps[4].status;
+    const s5 = this.summary.steps[5].status;
 
     if (s0 === 'COMPLETED') progress += 16;
     if (s1 === 'COMPLETED') progress += 16;

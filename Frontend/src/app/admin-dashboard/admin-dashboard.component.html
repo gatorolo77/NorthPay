@@ -1,17 +1,17 @@
 <div class="main-container">
-  <!-- Unified header provided by parent AppComponent -->
-  
+
   <main class="main-content">
 
     <div class="operator-view-container">
       <div class="operator-header">
         <div>
-          <h2 class="font-display text-gradient" style="font-size: 1.8rem; font-weight: 700;">Panel de Operaciones de NorthPay</h2>
-          <p style="color: var(--text-secondary); font-size: 0.9rem;">Monitoreo en tiempo real de los procesos de activación de contratistas internacionales.</p>
+          <h2 class="font-display text-gradient" style="font-size: 1.8rem; font-weight: 700;">Panel de Operaciones de
+            NorthPay</h2>
+          <p style="color: var(--text-secondary); font-size: 0.9rem;">Monitoreo en tiempo real de los procesos de
+            activación de contratistas internacionales.</p>
         </div>
       </div>
 
-      <!-- Quick Metrics Grid -->
       <div class="metrics-grid">
         <div class="glass-panel metric-card">
           <span class="metric-icon"></span>
@@ -43,16 +43,19 @@
         </div>
       </div>
 
-      <!-- Filters and Contractors list -->
       <div class="glass-panel operator-card">
         <div class="dashboard-list-header">
           <h4 class="font-display" style="font-size: 1.1rem; font-weight: 600;">Procesos de Onboarding</h4>
-          
+
           <div class="filter-buttons">
-            <button class="filter-btn" [class.active]="operatorFilter === 'ALL'" (click)="operatorFilter = 'ALL'">Todos</button>
-            <button class="filter-btn" [class.active]="operatorFilter === 'IN_PROGRESS'" (click)="operatorFilter = 'IN_PROGRESS'">En Progreso</button>
-            <button class="filter-btn" [class.active]="operatorFilter === 'IN_REVIEW'" (click)="operatorFilter = 'IN_REVIEW'">En Revisión</button>
-            <button class="filter-btn" [class.active]="operatorFilter === 'COMPLETED'" (click)="operatorFilter = 'COMPLETED'">Completados</button>
+            <button class="filter-btn" [class.active]="operatorFilter === 'ALL'"
+              (click)="operatorFilter = 'ALL'">Todos</button>
+            <button class="filter-btn" [class.active]="operatorFilter === 'IN_PROGRESS'"
+              (click)="operatorFilter = 'IN_PROGRESS'">En Progreso</button>
+            <button class="filter-btn" [class.active]="operatorFilter === 'IN_REVIEW'"
+              (click)="operatorFilter = 'IN_REVIEW'">En Revisión</button>
+            <button class="filter-btn" [class.active]="operatorFilter === 'COMPLETED'"
+              (click)="operatorFilter = 'COMPLETED'">Completados</button>
           </div>
         </div>
 
@@ -81,14 +84,15 @@
               <span class="glass-panel contractor-status-badge"
                 [style.color]="p.status === 'PAID' ? 'var(--accent-cyan)' : p.status === 'COMPLETED' ? 'var(--accent-mint)' : p.status === 'IN_REVIEW' ? 'var(--accent-amber)' : 'var(--accent-cyan)'"
                 [style.border-color]="p.status === 'PAID' ? 'rgba(0,245,230,0.2)' : p.status === 'COMPLETED' ? 'rgba(0,255,157,0.2)' : p.status === 'IN_REVIEW' ? 'rgba(255,193,7,0.2)' : 'rgba(0,245,230,0.2)'">
-                {{ p.status === 'PAID' ? 'Pagado' : p.status === 'COMPLETED' ? 'Completado' : p.status === 'IN_REVIEW' ? 'En Revisión' : 'En Progreso' }}
+                {{ p.status === 'PAID' ? 'Pagado' : p.status === 'COMPLETED' ? 'Completado' : p.status === 'IN_REVIEW' ?
+                'En Revisión' : 'En Progreso' }}
               </span>
             </div>
 
             <div style="display: flex; gap: 10px; align-items: center;">
               <button class="cyber-btn cyber-btn-secondary"
-                style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px;"
-                *ngIf="p.status === 'IN_REVIEW'" (click)="selectedProcessIdForReview = p.id">
+                style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px;" *ngIf="p.status === 'IN_REVIEW'"
+                (click)="selectedProcessIdForReview = p.id">
                 Revisar Documentos
               </button>
               <button class="cyber-btn cyber-btn-primary"
@@ -107,22 +111,26 @@
             </div>
           </div>
 
-          <div *ngIf="getFilteredContractors().length === 0" style="text-align: center; padding: 30px; color: var(--text-muted); font-style: italic;">
+          <div *ngIf="getFilteredContractors().length === 0"
+            style="text-align: center; padding: 30px; color: var(--text-muted); font-style: italic;">
             No se encontraron contratistas en este estado.
           </div>
         </div>
       </div>
 
       <!-- Document Review Section -->
-      <div class="glass-panel review-pane" *ngIf="selectedProcessIdForReview && summary.steps[2].status === 'IN_REVIEW'" style="margin-top: 25px;">
-        <h4 class="font-display text-gradient" style="font-size: 1.2rem; font-weight: 700; margin-bottom: 10px;">Revisar Documentos de Contratista</h4>
+      <div class="glass-panel review-pane" *ngIf="selectedProcessIdForReview && summary.steps[2].status === 'IN_REVIEW'"
+        style="margin-top: 25px;">
+        <h4 class="font-display text-gradient" style="font-size: 1.2rem; font-weight: 700; margin-bottom: 10px;">Revisar
+          Documentos de Contratista</h4>
         <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px;">
           Por favor valida que el documento cargado concuerda con los datos personales del contratista legal.
         </p>
 
         <div style="display: flex; gap: 20px; align-items: start; margin-bottom: 25px;">
           <div class="glass-panel review-details">
-            <h5 style="font-weight: 700; margin-bottom: 10px; color: var(--text-primary);">DATOS EXTRAÍDOS DEL DOCUMENTO:</h5>
+            <h5 style="font-weight: 700; margin-bottom: 10px; color: var(--text-primary);">DATOS EXTRAÍDOS DEL
+              DOCUMENTO:</h5>
             <p>Nombres: {{ personalData.firstName || 'Juan' }}</p>
             <p>Apellidos: {{ personalData.lastName || 'Pérez' }}</p>
             <p>País: {{ personalData.country || 'España' }}</p>
@@ -140,8 +148,7 @@
         </div>
 
         <div class="review-actions">
-          <button class="cyber-btn reject-btn"
-            (click)="reviewContractorStep('DOCUMENT_UPLOAD', false)">
+          <button class="cyber-btn reject-btn" (click)="reviewContractorStep('DOCUMENT_UPLOAD', false)">
             Solicitar Corrección (Rechazar)
           </button>
           <button class="cyber-btn cyber-btn-primary" style="padding: 8px 25px; border-radius: 8px;"
@@ -153,56 +160,71 @@
 
       <!-- Changes History / Audit log widget -->
       <div class="glass-panel audit-log-card" style="margin-top: 25px;">
-        <h4 class="font-display text-gradient" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 15px;">Historial de Cambios / Registro de Auditoría</h4>
+        <h4 class="font-display text-gradient" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 15px;">
+          Historial de Cambios / Registro de Auditoría</h4>
         <div style="display: flex; flex-direction: column; gap: 10px;">
-          <div *ngFor="let h of changeHistory; let first = first" class="audit-log-item" [style.border-left-color]="first ? 'var(--accent-cyan)' : 'var(--glass-border)'">
-            <span class="audit-dot" [style.background-color]="first ? 'var(--accent-cyan)' : 'var(--text-muted)'"></span>
+          <div *ngFor="let h of changeHistory; let first = first" class="audit-log-item"
+            [style.border-left-color]="first ? 'var(--accent-cyan)' : 'var(--glass-border)'">
+            <span class="audit-dot"
+              [style.background-color]="first ? 'var(--accent-cyan)' : 'var(--text-muted)'"></span>
             <span style="color: var(--text-secondary); font-size: 0.85rem;">{{ h }}</span>
           </div>
         </div>
       </div>
-    <!-- Payment Confirmation Modal -->
-    <div class="glass-modal-backdrop" *ngIf="selectedProcessForPayment">
-      <div class="glass-panel cyber-modal-card">
-        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; margin-bottom: 20px;">
-          <h3 class="font-display text-mint-gradient" style="font-size: 1.4rem; font-weight: 800; margin: 0;">Confirmar Envío de Fondos</h3>
-          <button class="modal-close-btn" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem;" (click)="selectedProcessForPayment = null">✕</button>
-        </div>
-        <div class="modal-body">
-          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">
-            Estás a punto de procesar la nómina/pago para este contratista remoto certificado. Revisa la liquidación detallada:
-          </p>
-          
-          <div class="glass-panel payment-details-box" style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem;">
-
-            <p style="margin-bottom: 8px;"><strong>Beneficiario:</strong> {{ selectedProcessForPayment.name }}</p>
-            <p style="margin-bottom: 8px;"><strong>País / Destino:</strong> {{ selectedProcessForPayment.country }}</p>
-            <p style="margin-bottom: 8px;"><strong>Método de Pago:</strong> 
-              <span class="payment-card-badge" style="background: rgba(0, 245, 230, 0.1); color: var(--accent-cyan); padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; margin-left: 5px;">
-                BANK_TRANSFER
-              </span>
-            </p>
+      <!-- Payment Confirmation Modal -->
+      <div class="glass-modal-backdrop" *ngIf="selectedProcessForPayment">
+        <div class="glass-panel cyber-modal-card">
+          <div class="modal-header"
+            style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; margin-bottom: 20px;">
+            <h3 class="font-display text-mint-gradient" style="font-size: 1.4rem; font-weight: 800; margin: 0;">
+              Confirmar Envío de Fondos</h3>
+            <button class="modal-close-btn"
+              style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem;"
+              (click)="selectedProcessForPayment = null">✕</button>
           </div>
+          <div class="modal-body">
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">
+              Estás a punto de procesar la nómina/pago para este contratista remoto certificado. Revisa la liquidación
+              detallada:
+            </p>
 
-          <div class="cyber-input-group">
-            <label class="cyber-input-label">MONTO A TRANSFERIR (USD)</label>
-            <div style="position: relative;">
-              <span style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--accent-cyan); font-weight: 700;">$</span>
-              <input type="number" class="cyber-input" [(ngModel)]="paymentAmount" style="padding-left: 30px;" placeholder="0.00">
+            <div class="glass-panel payment-details-box"
+              style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem;">
+
+              <p style="margin-bottom: 8px;"><strong>Beneficiario:</strong> {{ selectedProcessForPayment.name }}</p>
+              <p style="margin-bottom: 8px;"><strong>País / Destino:</strong> {{ selectedProcessForPayment.country }}
+              </p>
+              <p style="margin-bottom: 8px;"><strong>Método de Pago:</strong>
+                <span class="payment-card-badge"
+                  style="background: rgba(0, 245, 230, 0.1); color: var(--accent-cyan); padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; margin-left: 5px;">
+                  BANK_TRANSFER
+                </span>
+              </p>
+            </div>
+
+            <div class="cyber-input-group">
+              <label class="cyber-input-label">MONTO A TRANSFERIR (USD)</label>
+              <div style="position: relative;">
+                <span
+                  style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--accent-cyan); font-weight: 700;">$</span>
+                <input type="number" class="cyber-input" [(ngModel)]="paymentAmount" style="padding-left: 30px;"
+                  placeholder="0.00">
+              </div>
             </div>
           </div>
+          <div class="modal-footer" style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 25px;">
+            <button class="cyber-btn"
+              style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 8px 20px; border-radius: 8px;"
+              (click)="selectedProcessForPayment = null" [disabled]="isProcessingPayment">
+              Cancelar
+            </button>
+            <button class="cyber-btn cyber-btn-primary" style="padding: 8px 25px; border-radius: 8px; font-weight: 700;"
+              (click)="confirmPayment()" [disabled]="isProcessingPayment">
+              {{ isProcessingPayment ? 'Transfiriendo...' : 'Confirmar Envío de Fondos' }}
+            </button>
+          </div>
         </div>
-        <div class="modal-footer" style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 25px;">
-          <button class="cyber-btn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 8px 20px; border-radius: 8px;" (click)="selectedProcessForPayment = null" [disabled]="isProcessingPayment">
-            Cancelar
-          </button>
-          <button class="cyber-btn cyber-btn-primary" style="padding: 8px 25px; border-radius: 8px; font-weight: 700;" (click)="confirmPayment()" [disabled]="isProcessingPayment">
-            {{ isProcessingPayment ? 'Transfiriendo...' : 'Confirmar Envío de Fondos' }}
-          </button>
       </div>
     </div>
-  </div>
-  </div>
-</main>
+  </main>
 </div>
-
