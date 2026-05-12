@@ -120,9 +120,9 @@ export class AppComponent implements OnInit {
   preloadProgress = 0;
   preloadStatus = 'Iniciando servicios seguros...';
   selectedLang = 'es';
-  
+
   currentAudio: HTMLAudioElement | null = null;
-  audioVolume = 75; 
+  audioVolume = 75;
   isMuted = false;
 
   translations: Record<string, Record<string, string>> = {
@@ -136,8 +136,8 @@ export class AppComponent implements OnInit {
       propDesc2: "Firma tu acuerdo de contratista legal de forma instantánea usando el Web Component de DocuSeal.",
       propTitle3: "Biometría KYC",
       propDesc3: "Comprobación de identidad de última generación respaldada por motores biométricos avanzados.",
-      btnOperator: "⚙️ Panel de Operaciones (Demo)",
-      btnActivate: "Iniciar Activación 👤",
+      btnOperator: "Panel de Operaciones (Demo)",
+      btnActivate: "Iniciar Activación ",
       preloading: "Precargando recursos...",
       statusReady: "Portal NorthPay listo para operar ⚡",
       onboardingPortalTitle: "Portal de Onboarding",
@@ -773,7 +773,7 @@ export class AppComponent implements OnInit {
     const audio = new Audio();
     const currentFormat = formats[index];
     audio.src = `assets/audio/greeting_${this.selectedLang}.${currentFormat}`;
-    
+
     // Apply global master settings from the topbar controls!
     audio.volume = this.audioVolume / 100;
     audio.muted = this.isMuted;
@@ -792,11 +792,11 @@ export class AppComponent implements OnInit {
     audio.oncanplaythrough = () => {
       this.currentAudio = audio; // Register globally as actively playing
       audio.play().catch(e => {
-         // In case play fails, suppress and continue scanning fallback chain
-         this.playFallbackAudio(formats, index + 1);
+        // In case play fails, suppress and continue scanning fallback chain
+        this.playFallbackAudio(formats, index + 1);
       });
       // Remove listener once successfully fired to prevent double trigger re-entry
-      audio.oncanplaythrough = null; 
+      audio.oncanplaythrough = null;
     };
 
     audio.load(); // Fire up the network load

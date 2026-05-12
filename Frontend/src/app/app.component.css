@@ -887,7 +887,10 @@
 .cyber-modal-card {
   width: 100%;
   max-width: 500px;
-  background: rgba(2, 9, 8, 0.85);
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
   border: 1px solid var(--accent-cyan-glow);
   padding: 30px;
   border-radius: 12px;
@@ -1034,4 +1037,250 @@
 
 .lang-btn:active {
   transform: scale(0.96);
+}
+
+/* ==========================================================================
+   RESPONSIVENESS & UNIVERSAL DEVICE COMPATIBILITY (PREMIUM MOBILE FIRST FEEL)
+   ========================================================================== */
+
+/* Tablet & Small Desktop Overrides */
+@media (max-width: 1024px) {
+  .main-content {
+    padding: 15px;
+  }
+
+  .onboarding-grid {
+    grid-template-columns: 1fr; /* Stacks sidebar above viewport */
+    gap: 20px;
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: row; /* Horizontal strip on tablet */
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .sidebar-header {
+    flex-direction: row;
+    gap: 20px;
+    text-align: left;
+  }
+
+  .progress-circle-wrapper {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .progress-percent {
+    font-size: 1.3rem;
+  }
+
+  .steps-list {
+    flex-direction: row;
+    overflow-x: auto; /* Side scrollable steps */
+    width: 100%;
+    padding-bottom: 10px;
+    gap: 10px;
+  }
+
+  .step-card {
+    min-width: 180px;
+    flex-shrink: 0;
+    padding: 10px 14px;
+  }
+
+  .viewport-card {
+    padding: 25px;
+  }
+}
+
+/* Mobile Device Breakpoint */
+@media (max-width: 768px) {
+  .app-header {
+    margin: 10px;
+    padding: 12px 15px;
+  }
+
+  .logo-subtitle {
+    display: none; /* Save space */
+  }
+
+  .status-badge {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+
+  /* Landing Adaptation */
+  .landing-wrapper {
+    flex-direction: column-reverse !important; /* Sidebar languages below/above depending on structure */
+    gap: 20px !important;
+  }
+
+  .landing-card {
+    width: 100% !important;
+    min-width: unset !important;
+    padding: 20px 15px !important;
+  }
+
+  /* Dynamic fix for inline landing grid */
+  .landing-prop-grid {
+    grid-template-columns: 1fr !important; /* Stack feature blocks */
+    gap: 10px !important;
+  }
+
+  /* Multi-lang selector strip for mobile */
+  .lang-selector-sidebar {
+    flex-direction: row !important;
+    overflow-x: auto;
+    width: 100%;
+    justify-content: center;
+    padding-bottom: 10px;
+  }
+
+  .input-grid-2 {
+    grid-template-columns: 1fr; /* Stack first & last names */
+    gap: 12px;
+  }
+
+  .upload-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-provider-list {
+    grid-template-columns: repeat(2, 1fr); /* 2x2 Grid instead of inline line */
+  }
+
+  .step-form-title {
+    font-size: 1.3rem;
+  }
+
+  .submit-action-btn {
+    width: 100%;
+    align-self: stretch;
+  }
+
+  .scanner-screen {
+    height: 300px;
+  }
+  
+  .scanner-oval {
+    width: 180px;
+    height: 240px;
+  }
+
+  /* Operator View stacking */
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .operator-card [style*="display: grid; grid-template-columns: 1.5fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  .header-nav {
+    gap: 8px;
+  }
+
+  .audio-control-wrapper span,
+  .audio-control-wrapper input {
+    display: none; /* Hide volume slider on mobile header to save huge space */
+  }
+  
+  .audio-control-wrapper {
+    padding: 6px !important;
+    margin-right: 2px !important;
+  }
+
+  .alerts-container {
+    top: 12% !important;
+  }
+}
+
+/* Extremely Small Screens (Small Mobiles) */
+@media (max-width: 480px) {
+  .logo-title {
+    font-size: 1.2rem;
+  }
+
+  .app-header .cyber-btn.header-btn {
+    display: none; /* Hide huge operator button in tiny mobile, use hamburger later if needed, or keep lean */
+  }
+
+  .header-nav .status-badge span:last-child {
+    display: none; /* Hide 'Servidor NorthPay' text, keep bullet */
+  }
+  
+  .status-badge {
+    padding: 8px;
+  }
+
+  .sidebar-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+  }
+
+  .steps-list {
+    justify-content: flex-start;
+  }
+
+  .payment-provider-list {
+    grid-template-columns: 1fr; /* Complete stack on small phones */
+  }
+  
+  .glass-panel.contractor-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .contractor-row [style*="text-align: right"] {
+    text-align: left !important;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  /* Fix Landing scroll visibility for small screens */
+  .main-content {
+    display: block !important; /* Kill flex-center centering, let it stack naturally for scrolling */
+    padding: 15px 10px 50px 10px !important;
+  }
+
+  .landing-wrapper {
+    margin: 10px auto !important; /* Reset large automatic margins */
+  }
+
+  /* Squeeze and Fit all Language Buttons horizontally */
+  .lang-selector-sidebar {
+    gap: 6px !important;
+    flex-wrap: nowrap !important;
+    overflow-x: visible !important; /* Try to fit without side-scroll */
+    justify-content: space-between !important;
+    padding: 0 5px !important;
+  }
+
+  .lang-btn {
+    width: auto !important;
+    flex: 1 !important;
+    min-width: 50px !important;
+    max-width: 60px !important;
+    padding: 8px 2px !important;
+    gap: 3px !important;
+  }
+
+  .lang-btn img {
+    width: 20px !important;
+    margin-bottom: 3px !important;
+  }
+
+  .lang-btn span {
+    font-size: 0.58rem !important;
+    white-space: nowrap;
+    letter-spacing: -0.3px;
+  }
 }

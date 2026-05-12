@@ -1,4 +1,5 @@
-<div class="main-container" [style.overflow]="currentView === 'landing' ? 'hidden' : 'auto'" [style.max-height]="currentView === 'landing' ? '100vh' : 'none'">
+<div class="main-container" [style.overflow]="currentView === 'landing' ? 'hidden' : 'auto'"
+  [style.max-height]="currentView === 'landing' ? '100vh' : 'none'">
   <header class="glass-panel app-header" *ngIf="currentView !== 'landing'">
     <div class="logo-container">
       <div class="logo-icon">
@@ -21,37 +22,44 @@
         </span>
       </div>
 
-      <button class="cyber-btn cyber-btn-secondary header-btn"
-        *ngIf="currentView === 'onboarding'" (click)="loadOperatorPanel()">
-        Panel de Operaciones ⚙️
+      <button class="cyber-btn cyber-btn-secondary header-btn" *ngIf="currentView === 'onboarding'"
+        (click)="loadOperatorPanel()">
+        Panel de Operaciones
       </button>
 
-      <button class="cyber-btn cyber-btn-primary header-btn"
-        *ngIf="currentView === 'operator'" (click)="currentView = 'onboarding'">
-        Volver a Onboarding 👤
+      <button class="cyber-btn cyber-btn-primary header-btn" *ngIf="currentView === 'operator'"
+        (click)="currentView = 'landing'">
+        Volver al Inicio
       </button>
 
-      <!-- Dynamic Audio Mixer Control -->
-      <div class="glass-panel audio-control-wrapper" *ngIf="currentAudio !== null || currentView === 'welcome'" style="display: flex; align-items: center; gap: 10px; padding: 6px 12px; border-radius: 20px; margin-right: 10px; background: var(--glass-bg); border: 1px solid var(--glass-border); animation: fadeIn 0.5s ease;">
-        <button (click)="toggleMute()" style="background: none; border: none; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; padding: 0; transition: transform 0.2s; width: 24px;" title="Silenciar">
-          {{ isMuted || audioVolume === 0 ? '🔇' : (audioVolume < 50 ? '🔉' : '🔊') }}
-        </button>
-        <input type="range" min="0" max="100" [value]="audioVolume" (input)="updateAudioVolume($event)" 
-          style="width: 65px; cursor: pointer; accent-color: var(--accent-mint); height: 4px; border-radius: 2px; outline: none; filter: drop-shadow(0 0 2px var(--accent-mint));" title="Volumen">
+      <div class="glass-panel audio-control-wrapper" *ngIf="currentAudio !== null || currentView === 'welcome'"
+        style="display: flex; align-items: center; gap: 10px; padding: 6px 12px; border-radius: 20px; margin-right: 10px; background: var(--glass-bg); border: 1px solid var(--glass-border); animation: fadeIn 0.5s ease;">
+        <button (click)="toggleMute()"
+          style="background: none; border: none; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; padding: 0; transition: transform 0.2s; width: 24px;"
+          title="Silenciar">
+          {{ isMuted || audioVolume === 0 ? '🔇' : (audioVolume < 50 ? '🔉' : '🔊' ) }} </button>
+            <input type="range" min="0" max="100" [value]="audioVolume" (input)="updateAudioVolume($event)"
+              style="width: 65px; cursor: pointer; accent-color: var(--accent-mint); height: 4px; border-radius: 2px; outline: none; filter: drop-shadow(0 0 2px var(--accent-mint));"
+              title="Volumen">
       </div>
 
-      <button class="cyber-btn theme-toggle-btn" *ngIf="currentView !== 'welcome' && currentView !== 'register'" (click)="toggleTheme()" style="padding: 8px 12px; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; background: var(--glass-bg); border-color: var(--glass-border); cursor: pointer; position: relative; margin-right: 5px;" title="Cambiar Tema">
+      <button class="cyber-btn theme-toggle-btn" *ngIf="currentView !== 'welcome' && currentView !== 'register'"
+        (click)="toggleTheme()"
+        style="padding: 8px 12px; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; background: var(--glass-bg); border-color: var(--glass-border); cursor: pointer; position: relative; margin-right: 5px;"
+        title="Cambiar Tema">
         {{ currentTheme === 'dark' ? '☀️' : '🌙' }}
       </button>
 
-      <div class="notification-trigger" *ngIf="currentView !== 'welcome' && currentView !== 'register'" (click)="showNotificationDropdown = !showNotificationDropdown">
+      <div class="notification-trigger" *ngIf="currentView !== 'welcome' && currentView !== 'register'"
+        (click)="showNotificationDropdown = !showNotificationDropdown">
         <div class="glass-panel bell-icon" style="cursor: pointer; position: relative;">
           🔔
           <span class="bell-dot" *ngIf="getUnreadNotificationsCount() > 0"></span>
         </div>
 
-        <!-- Dropdown Menu -->
-        <div class="glass-panel notifications-dropdown" *ngIf="showNotificationDropdown" (click)="$event.stopPropagation()">
+
+        <div class="glass-panel notifications-dropdown" *ngIf="showNotificationDropdown"
+          (click)="$event.stopPropagation()">
           <div class="dropdown-header">
             <h5 class="font-display">Mensajes Internos</h5>
             <button class="mark-all-read" (click)="markAllNotificationsAsRead($event)">Limpiar</button>
@@ -73,7 +81,8 @@
     </div>
   </header>
 
-  <div class="alerts-container" *ngIf="notifications.length > 0" [style.top]="(currentView === 'register' || currentView === 'onboarding') ? '6%' : '3%'">
+  <div class="alerts-container" *ngIf="notifications.length > 0"
+    [style.top]="(currentView === 'register' || currentView === 'onboarding') ? '6%' : '3%'">
     <div *ngFor="let n of notifications.slice(0, 1)" class="glass-panel alert-panel"
       [style.border-left-color]="n.type === 'SUCCESS' ? 'var(--accent-mint)' : n.type === 'ERROR' ? 'var(--accent-coral)' : 'var(--accent-cyan)'">
       <div class="alert-content">
@@ -85,90 +94,144 @@
   </div>
 
   <main class="main-content">
-    <div *ngIf="currentView === 'landing'" style="display: flex; align-items: center; justify-content: center; gap: 25px; width: 100%; max-width: 860px; margin: auto; animation: slideUp 0.6s ease-out;">
-      <section class="glass-panel landing-card" style="width: 720px; min-width: 720px; max-width: 100%; flex-shrink: 0; padding: 25px 35px; text-align: center; margin: 0;">
+    <div *ngIf="currentView === 'landing'" class="landing-wrapper"
+      style="display: flex; align-items: center; justify-content: center; gap: 25px; width: 100%; max-width: 860px; margin: auto; animation: slideUp 0.6s ease-out;">
+      <section class="glass-panel landing-card"
+        style="width: 720px; min-width: 720px; max-width: 100%; flex-shrink: 0; padding: 25px 35px; text-align: center; margin: 0;">
         <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 15px;">
-          <div class="logo-icon" style="width: 45px; height: 45px; border-radius: 10px; box-shadow: 0 0 20px var(--accent-cyan-glow); margin: 0; display: flex; align-items: center; justify-content: center;">
+          <div class="logo-icon"
+            style="width: 45px; height: 45px; border-radius: 10px; box-shadow: 0 0 20px var(--accent-cyan-glow); margin: 0; display: flex; align-items: center; justify-content: center;">
             <span class="logo-letter" style="font-size: 1.5rem; display: block; height: auto; width: auto;">N</span>
           </div>
-          <h2 class="font-display text-mint-gradient" style="font-size: 2rem; font-weight: 800; margin: 0; letter-spacing: -0.5px; line-height: 1;">NorthPay</h2>
+          <h2 class="font-display text-mint-gradient"
+            style="font-size: 2rem; font-weight: 800; margin: 0; letter-spacing: -0.5px; line-height: 1;">NorthPay</h2>
         </div>
 
-        <h1 class="font-display text-gradient" style="font-size: 2.1rem; font-weight: 800; margin-top: 10px; margin-bottom: 15px; letter-spacing: -0.5px;">
+        <h1 class="font-display text-gradient"
+          style="font-size: 2.1rem; font-weight: 800; margin-top: 10px; margin-bottom: 15px; letter-spacing: -0.5px;">
           {{ translations[selectedLang]['heroTitle'] }}
         </h1>
-        <p style="color: var(--text-secondary); font-size: 0.95rem; max-width: 580px; margin: 15px auto 25px auto; min-height: 56px; display: flex; align-items: center; justify-content: center; line-height: 1.5;">
+        <p
+          style="color: #77a2e2; font-weight: 500; font-size: 0.95rem; max-width: 580px; margin: 15px auto 25px auto; min-height: 56px; display: flex; align-items: center; justify-content: center; line-height: 1.5;">
+
           {{ translations[selectedLang]['heroDesc'] }}
         </p>
 
-        <!-- Grid de Propuestas de Valor -->
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; text-align: left;">
-          <div class="glass-panel" style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.01); border-color: rgba(0, 245, 230, 0.05); min-height: 135px; display: flex; flex-direction: column; justify-content: flex-start;">
+
+
+        <div class="landing-prop-grid"
+          style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; text-align: left;">
+          <div class="glass-panel"
+            style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.01); border-color: rgba(0, 245, 230, 0.05); min-height: 135px; display: flex; flex-direction: column; justify-content: flex-start;">
             <div style="font-size: 1.5rem; margin-bottom: 8px;">💸</div>
-            <h4 class="font-display" style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">{{ translations[selectedLang]['propTitle1'] }}</h4>
-            <p style="color: var(--text-muted); font-size: 0.75rem; line-height: 1.3; margin: 0;">{{ translations[selectedLang]['propDesc1'] }}</p>
+            <h4 class="font-display"
+              style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">{{
+              translations[selectedLang]['propTitle1'] }}</h4>
+            <p style="color: var(--text-muted); font-size: 0.75rem; line-height: 1.3; margin: 0;">{{
+              translations[selectedLang]['propDesc1'] }}</p>
           </div>
 
-          <div class="glass-panel" style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.01); border-color: rgba(0, 245, 230, 0.05); min-height: 135px; display: flex; flex-direction: column; justify-content: flex-start;">
+          <div class="glass-panel"
+            style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.01); border-color: rgba(0, 245, 230, 0.05); min-height: 135px; display: flex; flex-direction: column; justify-content: flex-start;">
             <div style="font-size: 1.5rem; margin-bottom: 8px;">✍️</div>
-            <h4 class="font-display" style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">{{ translations[selectedLang]['propTitle2'] }}</h4>
-            <p style="color: var(--text-muted); font-size: 0.75rem; line-height: 1.3; margin: 0;">{{ translations[selectedLang]['propDesc2'] }}</p>
+            <h4 class="font-display"
+              style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">{{
+              translations[selectedLang]['propTitle2'] }}</h4>
+            <p style="color: var(--text-muted); font-size: 0.75rem; line-height: 1.3; margin: 0;">{{
+              translations[selectedLang]['propDesc2'] }}</p>
           </div>
 
-          <div class="glass-panel" style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.01); border-color: rgba(0, 245, 230, 0.05); min-height: 135px; display: flex; flex-direction: column; justify-content: flex-start;">
+          <div class="glass-panel"
+            style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.01); border-color: rgba(0, 245, 230, 0.05); min-height: 135px; display: flex; flex-direction: column; justify-content: flex-start;">
             <div style="font-size: 1.5rem; margin-bottom: 8px;">🛡️</div>
-            <h4 class="font-display" style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">{{ translations[selectedLang]['propTitle3'] }}</h4>
-            <p style="color: var(--text-muted); font-size: 0.75rem; line-height: 1.3; margin: 0;">{{ translations[selectedLang]['propDesc3'] }}</p>
+            <h4 class="font-display"
+              style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">{{
+              translations[selectedLang]['propTitle3'] }}</h4>
+            <p style="color: var(--text-muted); font-size: 0.75rem; line-height: 1.3; margin: 0;">{{
+              translations[selectedLang]['propDesc3'] }}</p>
           </div>
         </div>
 
-        <!-- Call to Actions -->
+
         <div style="display: flex; justify-content: center; gap: 15px;">
-          <button class="cyber-btn cyber-btn-secondary" style="padding: 10px 25px; font-size: 0.85rem; font-weight: 700; border-radius: 8px; cursor: pointer;" (click)="loadOperatorPanel()">
+          <button class="cyber-btn cyber-btn-secondary"
+            style="padding: 10px 25px; font-size: 0.85rem; font-weight: 700; border-radius: 8px; cursor: pointer;"
+            (click)="loadOperatorPanel()">
             {{ translations[selectedLang]['btnOperator'] }}
           </button>
-          <button class="cyber-btn cyber-btn-primary" style="padding: 10px 30px; font-size: 0.85rem; font-weight: 800; border-radius: 8px; background: linear-gradient(135deg, var(--accent-mint), #00b0ff); color: var(--bg-darker); box-shadow: 0 0 15px rgba(0, 255, 157, 0.35); cursor: pointer;" (click)="startOnboarding()">
+          <button class="cyber-btn cyber-btn-primary"
+            style="padding: 10px 30px; font-size: 0.85rem; font-weight: 800; border-radius: 8px; background: linear-gradient(135deg, var(--accent-mint), #00b0ff); color: var(--bg-darker); box-shadow: 0 0 15px rgba(0, 255, 157, 0.35); cursor: pointer;"
+            (click)="startOnboarding()">
             {{ translations[selectedLang]['btnActivate'] }}
           </button>
         </div>
 
-        <!-- Preloader Progress Bar -->
-        <div style="margin-top: 20px; text-align: left; max-width: 450px; margin-left: auto; margin-right: auto; animation: fadeIn 0.8s ease-in-out;">
-          <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 5px;">
+
+        <div
+          style="margin-top: 20px; text-align: left; max-width: 450px; margin-left: auto; margin-right: auto; animation: fadeIn 0.8s ease-in-out;">
+          <div
+            style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 5px;">
             <span class="font-display" style="font-weight: 600;">{{ preloadStatus }}</span>
             <span style="font-weight: 700;">{{ preloadProgress }}%</span>
           </div>
-          <div style="width: 100%; height: 5px; background: rgba(0,0,0,0.15); border-radius: 3px; overflow: hidden; border: 1px solid var(--glass-border);">
-            <div [style.width.%]="preloadProgress" style="height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-mint)); transition: width 0.15s ease-out; box-shadow: 0 0 10px var(--accent-cyan-glow);"></div>
+          <div
+            style="width: 100%; height: 5px; background: rgba(0,0,0,0.15); border-radius: 3px; overflow: hidden; border: 1px solid var(--glass-border);">
+            <div [style.width.%]="preloadProgress"
+              style="height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-mint)); transition: width 0.15s ease-out; box-shadow: 0 0 10px var(--accent-cyan-glow);">
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- Vertical Language Selector Sidebar on the Right -->
-      <div style="display: flex; flex-direction: column; gap: 12px; animation: fadeIn 0.8s ease-in-out;">
-        <button (click)="changeLanguage('en')" class="glass-panel lang-btn" [style.border-color]="selectedLang === 'en' ? 'var(--accent-cyan)' : 'var(--glass-border)'" style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-          <img src="https://flagcdn.com/us.svg" alt="USA Flag" style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
-          <span class="font-display" style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">English</span>
+
+      <div class="lang-selector-sidebar"
+        style="display: flex; flex-direction: column; gap: 12px; animation: fadeIn 0.8s ease-in-out;">
+        <button (click)="changeLanguage('en')" class="glass-panel lang-btn"
+          [style.border-color]="selectedLang === 'en' ? 'var(--accent-cyan)' : 'var(--glass-border)'"
+          style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+          <img src="https://flagcdn.com/us.svg" alt="USA Flag"
+            style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
+          <span class="font-display"
+            style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">English</span>
         </button>
-        <button (click)="changeLanguage('es')" class="glass-panel lang-btn" [style.border-color]="selectedLang === 'es' ? 'var(--accent-cyan)' : 'var(--glass-border)'" style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-          <img src="https://flagcdn.com/es.svg" alt="Spain Flag" style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
-          <span class="font-display" style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">Español</span>
+        <button (click)="changeLanguage('es')" class="glass-panel lang-btn"
+          [style.border-color]="selectedLang === 'es' ? 'var(--accent-cyan)' : 'var(--glass-border)'"
+          style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+          <img src="https://flagcdn.com/es.svg" alt="Spain Flag"
+            style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
+          <span class="font-display"
+            style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">Español</span>
         </button>
-        <button (click)="changeLanguage('fr')" class="glass-panel lang-btn" [style.border-color]="selectedLang === 'fr' ? 'var(--accent-cyan)' : 'var(--glass-border)'" style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-          <img src="https://flagcdn.com/fr.svg" alt="France Flag" style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
-          <span class="font-display" style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">Français</span>
+        <button (click)="changeLanguage('fr')" class="glass-panel lang-btn"
+          [style.border-color]="selectedLang === 'fr' ? 'var(--accent-cyan)' : 'var(--glass-border)'"
+          style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+          <img src="https://flagcdn.com/fr.svg" alt="France Flag"
+            style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
+          <span class="font-display"
+            style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">Français</span>
         </button>
-        <button (click)="changeLanguage('pt')" class="glass-panel lang-btn" [style.border-color]="selectedLang === 'pt' ? 'var(--accent-cyan)' : 'var(--glass-border)'" style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-          <img src="https://flagcdn.com/pt.svg" alt="Portugal Flag" style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
-          <span class="font-display" style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">Português</span>
+        <button (click)="changeLanguage('pt')" class="glass-panel lang-btn"
+          [style.border-color]="selectedLang === 'pt' ? 'var(--accent-cyan)' : 'var(--glass-border)'"
+          style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+          <img src="https://flagcdn.com/pt.svg" alt="Portugal Flag"
+            style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
+          <span class="font-display"
+            style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">Português</span>
         </button>
-        <button (click)="changeLanguage('zh')" class="glass-panel lang-btn" [style.border-color]="selectedLang === 'zh' ? 'var(--accent-cyan)' : 'var(--glass-border)'" style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-          <img src="https://flagcdn.com/cn.svg" alt="China Flag" style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
+        <button (click)="changeLanguage('zh')" class="glass-panel lang-btn"
+          [style.border-color]="selectedLang === 'zh' ? 'var(--accent-cyan)' : 'var(--glass-border)'"
+          style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+          <img src="https://flagcdn.com/cn.svg" alt="China Flag"
+            style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
           <span class="font-display" style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">中文</span>
         </button>
-        <button (click)="changeLanguage('it')" class="glass-panel lang-btn" [style.border-color]="selectedLang === 'it' ? 'var(--accent-cyan)' : 'var(--glass-border)'" style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-          <img src="https://flagcdn.com/it.svg" alt="Italy Flag" style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
-          <span class="font-display" style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">Italiano</span>
+        <button (click)="changeLanguage('it')" class="glass-panel lang-btn"
+          [style.border-color]="selectedLang === 'it' ? 'var(--accent-cyan)' : 'var(--glass-border)'"
+          style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+          <img src="https://flagcdn.com/it.svg" alt="Italy Flag"
+            style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
+          <span class="font-display"
+            style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">Italiano</span>
         </button>
       </div>
     </div>
@@ -179,7 +242,8 @@
           <span class="logo-letter" style="font-size: 1.5rem;">N</span>
         </div>
       </div>
-      <h2 class="font-display text-gradient welcome-title">{{ translations[selectedLang]['onboardingPortalTitle'] }}</h2>
+      <h2 class="font-display text-gradient welcome-title">{{ translations[selectedLang]['onboardingPortalTitle'] }}
+      </h2>
       <p class="welcome-text">
         {{ translations[selectedLang]['onboardingWelcomeText'] }}
       </p>
@@ -216,8 +280,7 @@
         <input type="password" class="cyber-input" [(ngModel)]="registerPassword" placeholder="••••••••">
       </div>
 
-      <button class="cyber-btn cyber-btn-primary register-submit-btn"
-        (click)="register()">
+      <button class="cyber-btn cyber-btn-primary register-submit-btn" (click)="register()">
         {{ translations[selectedLang]['regBtnStart'] }}
       </button>
     </section>
@@ -228,8 +291,7 @@
 
         <div class="sidebar-header">
           <div class="progress-circle-wrapper">
-            <div class="progress-circle-overlay"
-              [style.transform]="'rotate(' + (summary.progress * 3.6) + 'deg)'"
+            <div class="progress-circle-overlay" [style.transform]="'rotate(' + (summary.progress * 3.6) + 'deg)'"
               [style.box-shadow]="'0 0 15px var(--accent-cyan-glow)'">
             </div>
             <div class="progress-circle-logo-bg">N</div>
@@ -261,14 +323,16 @@
                   step.type === 'PERSONAL_DATA' ? translations[selectedLang]['step1'] :
                   step.type === 'DOCUMENT_UPLOAD' ? translations[selectedLang]['step2'] :
                   step.type === 'CONTRACT_SIGN' ? translations[selectedLang]['step3'] :
-                  step.type === 'PAYMENT_METHOD' ? translations[selectedLang]['step4'] : translations[selectedLang]['step5'] }}
+                  step.type === 'PAYMENT_METHOD' ? translations[selectedLang]['step4'] :
+                  translations[selectedLang]['step5'] }}
                 </span>
                 <span class="step-status-text"
                   [style.color]="step.status === 'COMPLETED' ? 'var(--accent-mint)' : step.status === 'IN_REVIEW' ? 'var(--accent-amber)' : step.status === 'REJECTED' ? 'var(--accent-coral)' : 'var(--text-muted)'">
                   {{ step.status === 'NOT_STARTED' ? translations[selectedLang]['statusPending'] :
                   step.status === 'IN_PROGRESS' ? translations[selectedLang]['statusInProgress'] :
                   step.status === 'IN_REVIEW' ? translations[selectedLang]['statusInReview'] :
-                  step.status === 'REJECTED' ? translations[selectedLang]['statusRejected'] : translations[selectedLang]['statusCompleted'] }}
+                  step.status === 'REJECTED' ? translations[selectedLang]['statusRejected'] :
+                  translations[selectedLang]['statusCompleted'] }}
                 </span>
               </div>
             </div>
@@ -287,7 +351,8 @@
         <div class="corner-glow"></div>
 
         <div *ngIf="summary.currentStep === 'WHATSAPP_VERIFY'" class="step-form-container">
-          <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 0: {{ translations[selectedLang]['step0'] }}</h3>
+          <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 1: {{
+            translations[selectedLang]['step0'] }}</h3>
           <p class="step-form-desc">
             {{ translations[selectedLang]['wsDesc'] }}
           </p>
@@ -299,22 +364,26 @@
 
           <button class="cyber-btn cyber-btn-primary submit-action-btn" style="margin-bottom: 20px;"
             [disabled]="isSendingWhatsapp || !whatsappPhone" (click)="sendWhatsappCode()">
-            {{ isSendingWhatsapp ? translations[selectedLang]['wsBtnSending'] : translations[selectedLang]['wsBtnSend'] }}
+            {{ isSendingWhatsapp ? translations[selectedLang]['wsBtnSending'] : translations[selectedLang]['wsBtnSend']
+            }}
           </button>
 
           <div *ngIf="whatsappPhone" class="cyber-input-group" style="margin-top: 15px;">
             <label class="cyber-input-label">{{ translations[selectedLang]['wsLabelCode'] }}</label>
-            <input type="text" class="cyber-input" [(ngModel)]="whatsappCode" placeholder="Ingresa 123456" style="text-align: center; letter-spacing: 5px; font-size: 1.2rem;">
+            <input type="text" class="cyber-input" [(ngModel)]="whatsappCode" placeholder="Ingresa 123456"
+              style="text-align: center; letter-spacing: 5px; font-size: 1.2rem;">
           </div>
 
           <button *ngIf="whatsappPhone" class="cyber-btn cyber-btn-primary submit-action-btn" style="margin-top: 10px;"
             [disabled]="isVerifyingWhatsapp || !whatsappCode" (click)="verifyWhatsappCode()">
-            {{ isVerifyingWhatsapp ? translations[selectedLang]['wsBtnVerifying'] : translations[selectedLang]['wsBtnVerify'] }}
+            {{ isVerifyingWhatsapp ? translations[selectedLang]['wsBtnVerifying'] :
+            translations[selectedLang]['wsBtnVerify'] }}
           </button>
         </div>
 
         <div *ngIf="summary.currentStep === 'PERSONAL_DATA'" class="step-form-container">
-          <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 1: {{ translations[selectedLang]['step1'] }}</h3>
+          <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 2: {{
+            translations[selectedLang]['step1'] }}</h3>
           <p class="step-form-desc">
             {{ translations[selectedLang]['persDesc'] }}
           </p>
@@ -353,9 +422,11 @@
         </div>
 
         <div *ngIf="summary.currentStep === 'DOCUMENT_UPLOAD'" class="step-form-container">
-          <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 2: {{ translations[selectedLang]['step2'] }}</h3>
+          <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 3: {{
+            translations[selectedLang]['step2'] }}</h3>
           <p class="step-form-desc">
-            Sube un documento oficial de identificación para que nuestro departamento legal lo valide. Los formatos permitidos son PDF o imágenes claras.
+            Sube un documento oficial de identificación para que nuestro departamento legal lo valide. Los formatos
+            permitidos son PDF o imágenes claras.
           </p>
 
           <div class="upload-grid">
@@ -390,33 +461,42 @@
             </div>
           </div>
 
-          <button class="cyber-btn cyber-btn-primary submit-action-btn"
-            [disabled]="isUploadingDoc || !selectedFile" (click)="uploadDocument()">
+          <button class="cyber-btn cyber-btn-primary submit-action-btn" [disabled]="isUploadingDoc || !selectedFile"
+            (click)="uploadDocument()">
             {{ isUploadingDoc ? 'Subiendo archivo...' : 'Enviar para Revisión Legal' }}
           </button>
         </div>
 
         <div *ngIf="summary.currentStep === 'CONTRACT_SIGN'" class="step-form-container">
-          <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 3: {{ translations[selectedLang]['step3'] }}</h3>
+          <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 4: {{
+            translations[selectedLang]['step3'] }}</h3>
           <p class="step-form-desc">
-            Lee detenidamente el acuerdo de contratista remoto de NorthPay y firma digitalmente usando la tecnología de DocuSeal integrada.
+            Lee detenidamente el acuerdo de contratista remoto de NorthPay y firma digitalmente usando la tecnología de
+            DocuSeal integrada.
           </p>
 
           <div *ngIf="isLocalMock" class="glass-panel contract-viewer" style="margin-bottom: 20px;">
-            <h4 style="text-align: center; color: var(--text-primary); margin-bottom: 15px; font-weight: 700;">ACUERDO DE CONTRATACIÓN INDEPENDIENTE</h4>
-            <p>Este acuerdo se celebra el día de hoy entre <strong>NorthPay Ltd.</strong> ("La Compañía") y el Contratista registrado ("El Contratista").</p>
+            <h4 style="text-align: center; color: var(--text-primary); margin-bottom: 15px; font-weight: 700;">ACUERDO
+              DE CONTRATACIÓN INDEPENDIENTE</h4>
+            <p>Este acuerdo se celebra el día de hoy entre <strong>NorthPay Ltd.</strong> ("La Compañía") y el
+              Contratista registrado ("El Contratista").</p>
             <br>
-            <p><strong>1. Servicios:</strong> El Contratista acuerda prestar servicios de desarrollo y soporte bajo demanda a los clientes asignados de NorthPay.</p>
-            <p><strong>2. Compensación:</strong> La Compañía compensará al Contratista según el método de cobro establecido en el Paso 4 del onboarding.</p>
-            <p><strong>3. Confidencialidad:</strong> Toda información sobre clientes, claves API y operaciones internas se considerará Estrictamente Confidencial.</p>
+            <p><strong>1. Servicios:</strong> El Contratista acuerda prestar servicios de desarrollo y soporte bajo
+              demanda a los clientes asignados de NorthPay.</p>
+            <p><strong>2. Compensación:</strong> La Compañía compensará al Contratista según el método de cobro
+              establecido en el Paso 4 del onboarding.</p>
+            <p><strong>3. Confidencialidad:</strong> Toda información sobre clientes, claves API y operaciones internas
+              se considerará Estrictamente Confidencial.</p>
             <br>
-            <p style="margin-bottom: 20px;"><em>Al hacer clic en el botón de firma digital, certifico que he leído y acepto los términos de este acuerdo legal.</em></p>
+            <p style="margin-bottom: 20px;"><em>Al hacer clic en el botón de firma digital, certifico que he leído y
+                acepto los términos de este acuerdo legal.</em></p>
 
             <div style="border-top: 1px dashed var(--glass-border); padding-top: 20px; margin-top: 20px;">
-              <p style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 700; margin-bottom: 10px; letter-spacing: 0.5px;">DEMOSTRACIÓN INTERACTIVA DE DOCUSEAL:</p>
+              <p
+                style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 700; margin-bottom: 10px; letter-spacing: 0.5px;">
+                DEMOSTRACIÓN INTERACTIVA DE DOCUSEAL:</p>
               <!-- Embedded DocuSeal Interactive Demo inside simulated mode -->
-              <docuseal-form 
-                data-src="https://www.docuseal.com/d/demo" 
+              <docuseal-form data-src="https://www.docuseal.com/d/demo"
                 [attr.data-email]="invitationEmail || 'contractor@northpay.com'">
               </docuseal-form>
             </div>
@@ -424,8 +504,7 @@
 
           <div *ngIf="!isLocalMock" class="glass-panel contract-viewer" style="margin-bottom: 20px;">
             <!-- Live DocuSeal Component pointing to active backend URL -->
-            <docuseal-form 
-              [attr.data-src]="docusealEmbedSrc || 'https://www.docuseal.com/d/demo'" 
+            <docuseal-form [attr.data-src]="docusealEmbedSrc || 'https://www.docuseal.com/d/demo'"
               [attr.data-email]="invitationEmail || 'contractor@northpay.com'">
             </docuseal-form>
           </div>
@@ -440,16 +519,18 @@
             </span>
           </div>
 
-          <button class="cyber-btn cyber-btn-primary submit-action-btn"
-            [disabled]="isSigningContract" (click)="signContract()">
+          <button class="cyber-btn cyber-btn-primary submit-action-btn" [disabled]="isSigningContract"
+            (click)="signContract()">
             {{ isSigningContract ? 'Procesando firma...' : 'Confirmar y Firmar Acuerdo Legal de Forma Segura' }}
           </button>
         </div>
 
         <div *ngIf="summary.currentStep === 'PAYMENT_METHOD'" class="step-form-container">
-          <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 4: {{ translations[selectedLang]['step4'] }}</h3>
+          <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 5: {{
+            translations[selectedLang]['step4'] }}</h3>
           <p class="step-form-desc">
-            Indícanos dónde deseas recibir tus honorarios mensuales. Soportamos transferencias bancarias, Payoneer, Mercado Pago y PayPal.
+            Indícanos dónde deseas recibir tus honorarios mensuales. Soportamos transferencias bancarias, Payoneer,
+            Mercado Pago y PayPal.
           </p>
 
           <div class="payment-provider-list">
@@ -461,24 +542,21 @@
               <span class="payment-card-desc">SWIFT / IBAN local</span>
             </div>
 
-            <div class="glass-panel payment-card"
-              [class.glass-panel-active]="paymentMethod.provider === 'PAYONEER'"
+            <div class="glass-panel payment-card" [class.glass-panel-active]="paymentMethod.provider === 'PAYONEER'"
               (click)="paymentMethod.provider = 'PAYONEER'">
               <span class="payment-card-icon"></span>
               <h4 class="font-display payment-card-title">Payoneer</h4>
               <span class="payment-card-desc">Retiro global</span>
             </div>
 
-            <div class="glass-panel payment-card"
-              [class.glass-panel-active]="paymentMethod.provider === 'MERCADO_PAGO'"
+            <div class="glass-panel payment-card" [class.glass-panel-active]="paymentMethod.provider === 'MERCADO_PAGO'"
               (click)="paymentMethod.provider = 'MERCADO_PAGO'">
               <span class="payment-card-icon"></span>
               <h4 class="font-display payment-card-title">Mercado Pago</h4>
               <span class="payment-card-desc">Alias, CVU local</span>
             </div>
 
-            <div class="glass-panel payment-card"
-              [class.glass-panel-active]="paymentMethod.provider === 'PAYPAL'"
+            <div class="glass-panel payment-card" [class.glass-panel-active]="paymentMethod.provider === 'PAYPAL'"
               (click)="paymentMethod.provider = 'PAYPAL'">
               <span class="payment-card-icon"></span>
               <h4 class="font-display payment-card-title">PayPal</h4>
@@ -486,7 +564,8 @@
             </div>
           </div>
 
-          <div *ngIf="paymentMethod.provider === 'BANK_TRANSFER'" style="display: flex; flex-direction: column; gap: 15px;">
+          <div *ngIf="paymentMethod.provider === 'BANK_TRANSFER'"
+            style="display: flex; flex-direction: column; gap: 15px;">
             <div class="cyber-input-group">
               <label class="cyber-input-label">NOMBRE DEL BANCO</label>
               <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.bankName" placeholder="Ej. BBVA España">
@@ -494,11 +573,13 @@
             <div class="input-grid-2">
               <div class="cyber-input-group">
                 <label class="cyber-input-label">CÓDIGO SWIFT / BIC</label>
-                <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.swiftCode" placeholder="Ej. BBVAESMMXXX">
+                <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.swiftCode"
+                  placeholder="Ej. BBVAESMMXXX">
               </div>
               <div class="cyber-input-group">
                 <label class="cyber-input-label">NÚMERO DE CUENTA (IBAN)</label>
-                <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.accountNumber" placeholder="Ej. ES21 0000...">
+                <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.accountNumber"
+                  placeholder="Ej. ES21 0000...">
               </div>
             </div>
           </div>
@@ -506,29 +587,35 @@
           <div *ngIf="paymentMethod.provider === 'PAYONEER'" style="display: flex; flex-direction: column; gap: 15px;">
             <div class="cyber-input-group">
               <label class="cyber-input-label">ID DE CLIENTE O CORREO DE PAYONEER</label>
-              <input type="email" class="cyber-input" [(ngModel)]="paymentMethod.accountNumber" placeholder="ejemplo@payoneer.com">
+              <input type="email" class="cyber-input" [(ngModel)]="paymentMethod.accountNumber"
+                placeholder="ejemplo@payoneer.com">
             </div>
           </div>
 
-          <div *ngIf="paymentMethod.provider === 'MERCADO_PAGO'" style="display: flex; flex-direction: column; gap: 15px;">
+          <div *ngIf="paymentMethod.provider === 'MERCADO_PAGO'"
+            style="display: flex; flex-direction: column; gap: 15px;">
             <div class="cyber-input-group">
               <label class="cyber-input-label">ALIAS O CLAVE VIRTUAL UNIFICADA (CVU)</label>
-              <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.mpAliasOrCvu" placeholder="Ej. juan.perez.mp o 000000310000...">
+              <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.mpAliasOrCvu"
+                placeholder="Ej. juan.perez.mp o 000000310000...">
             </div>
             <div class="cyber-input-group">
               <label class="cyber-input-label">NOMBRE COMPLETO DEL TITULAR</label>
-              <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.mpAccountHolder" placeholder="Ej. Juan Pérez">
+              <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.mpAccountHolder"
+                placeholder="Ej. Juan Pérez">
             </div>
           </div>
 
           <div *ngIf="paymentMethod.provider === 'PAYPAL'" style="display: flex; flex-direction: column; gap: 15px;">
             <div class="cyber-input-group">
               <label class="cyber-input-label">CORREO ELECTRÓNICO ASOCIADO A PAYPAL</label>
-              <input type="email" class="cyber-input" [(ngModel)]="paymentMethod.paypalEmail" placeholder="ejemplo@paypal.com">
+              <input type="email" class="cyber-input" [(ngModel)]="paymentMethod.paypalEmail"
+                placeholder="ejemplo@paypal.com">
             </div>
             <div class="cyber-input-group">
               <label class="cyber-input-label">NOMBRE COMPLETO DEL TITULAR DE LA CUENTA</label>
-              <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.paypalName" placeholder="Ej. Juan Pérez">
+              <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.paypalName"
+                placeholder="Ej. Juan Pérez">
             </div>
           </div>
 
@@ -538,15 +625,18 @@
         </div>
 
         <div *ngIf="summary.currentStep === 'IDENTITY_VERIFICATION'" class="step-form-container">
-          <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 5: {{ translations[selectedLang]['step5'] }}</h3>
+          <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 6: {{
+            translations[selectedLang]['step5'] }}</h3>
           <p class="step-form-desc">
-            Para prevenir fraudes y asegurar el cumplimiento, utilizaremos la webcam de tu dispositivo para realizar una autenticación facial rápida.
+            Para prevenir fraudes y asegurar el cumplimiento, utilizaremos la webcam de tu dispositivo para realizar una
+            autenticación facial rápida.
           </p>
 
           <div class="glass-panel scanner-screen">
             <div *ngIf="isScanningIdentity" class="scanner-line"></div>
             <div class="scanner-grid"></div>
-            <div class="scanner-oval" [style.border-color]="isScanningIdentity ? 'var(--accent-cyan)' : 'rgba(0, 245, 230, 0.3)'">
+            <div class="scanner-oval"
+              [style.border-color]="isScanningIdentity ? 'var(--accent-cyan)' : 'rgba(0, 245, 230, 0.3)'">
               <span class="scanner-icon"></span>
             </div>
             <div *ngIf="isScanningIdentity" class="scanner-progress-badge">
@@ -559,8 +649,8 @@
             <input type="checkbox" [(ngModel)]="scanSuccess" class="simulation-checkbox">
           </div>
 
-          <button class="cyber-btn cyber-btn-primary submit-action-btn"
-            [disabled]="isScanningIdentity" (click)="startIdentityScanning()">
+          <button class="cyber-btn cyber-btn-primary submit-action-btn" [disabled]="isScanningIdentity"
+            (click)="startIdentityScanning()">
             {{ isScanningIdentity ? 'Escaneando rostro...' : 'Iniciar Escaneo Biométrico de Identidad' }}
           </button>
         </div>
@@ -572,7 +662,9 @@
           <h3 class="font-display text-mint-gradient" style="font-size: 1.8rem; font-weight: 800; margin-bottom: 15px;">
             ¡Cuenta Totalmente Activada!</h3>
           <p class="congrats-text">
-            Felicitaciones <strong>{{ personalData.firstName }}</strong>. El proceso de onboarding legal de NorthPay ha finalizado con éxito en menos de 24 horas. Tu perfil ya se encuentra operativo en el motor de compensaciones.
+            Felicitaciones <strong>{{ personalData.firstName }}</strong>. El proceso de onboarding legal de NorthPay ha
+            finalizado con éxito en menos de 24 horas. Tu perfil ya se encuentra operativo en el motor de
+            compensaciones.
           </p>
 
           <div class="glass-panel congrats-certificate">
@@ -581,10 +673,12 @@
         </div>
 
 
-        <div *ngIf="summary.blockingIssues.length > 0 && summary.status !== 'COMPLETED'" class="glass-panel blocking-card">
+        <div *ngIf="summary.blockingIssues.length > 0 && summary.status !== 'COMPLETED'"
+          class="glass-panel blocking-card">
           <span style="font-size: 1.4rem;"></span>
           <div>
-            <h5 style="font-size: 0.85rem; font-weight: 700; color: var(--accent-coral);">PASO BLOQUEADO POR REVISIÓN</h5>
+            <h5 style="font-size: 0.85rem; font-weight: 700; color: var(--accent-coral);">PASO BLOQUEADO POR REVISIÓN
+            </h5>
             <p *ngFor="let issue of summary.blockingIssues" class="blocking-text">
               {{ issue }}
             </p>
@@ -600,21 +694,26 @@
           <h2 class="font-display text-mint-gradient" style="font-size: 1.8rem; font-weight: 800; margin-bottom: 5px;">
             ¡Bienvenido, {{ personalData.firstName || 'Contratista' }}!
           </h2>
-          <p style="color: var(--text-secondary); font-size: 0.95rem;">Tu perfil de cobro y cumplimiento internacional se encuentra 100% activo y regulado.</p>
+          <p style="color: var(--text-secondary); font-size: 0.95rem;">Tu perfil de cobro y cumplimiento internacional
+            se encuentra 100% activo y regulado.</p>
         </div>
-        <div class="glass-panel status-badge" style="border-color: rgba(0, 255, 157, 0.2); color: var(--accent-mint); font-weight: 700; background: rgba(0, 255, 157, 0.05); padding: 8px 16px; border-radius: 8px; font-size: 0.85rem;">
+        <div class="glass-panel status-badge"
+          style="border-color: rgba(0, 255, 157, 0.2); color: var(--accent-mint); font-weight: 700; background: rgba(0, 255, 157, 0.05); padding: 8px 16px; border-radius: 8px; font-size: 0.85rem;">
           ✓ CUENTA VERIFICADA & ACTIVA
         </div>
       </div>
 
       <!-- Financial Cards Grid -->
       <div class="metrics-grid" style="margin-bottom: 30px;">
-        <div class="glass-panel metric-card" style="border-color: rgba(0, 245, 230, 0.15); box-shadow: 0 0 15px rgba(0, 245, 230, 0.05);">
+        <div class="glass-panel metric-card"
+          style="border-color: rgba(0, 245, 230, 0.15); box-shadow: 0 0 15px rgba(0, 245, 230, 0.05);">
           <span class="metric-icon"></span>
           <div>
             <p class="metric-label">Balance Disponible</p>
-            <h3 class="font-display metric-value" style="color: var(--accent-cyan); font-size: 1.8rem; font-weight: 800;">
-              {{ isContractorPaid() ? '$' + paymentAmount.toLocaleString('en-US', { minimumFractionDigits: 2 }) + ' USD' : '$0.00 USD' }}
+            <h3 class="font-display metric-value"
+              style="color: var(--accent-cyan); font-size: 1.8rem; font-weight: 800;">
+              {{ isContractorPaid() ? '$' + paymentAmount.toLocaleString('en-US', { minimumFractionDigits: 2 }) + ' USD'
+              : '$0.00 USD' }}
             </h3>
           </div>
         </div>
@@ -629,11 +728,15 @@
           <span class="metric-icon"></span>
           <div>
             <p class="metric-label">Método de Pago Activo</p>
-            <h3 class="font-display metric-value" style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-top: 5px;">
-              {{ paymentMethod.provider === 'BANK_TRANSFER' ? 'Transferencia Bancaria' : paymentMethod.provider === 'MERCADO_PAGO' ? 'Mercado Pago' : paymentMethod.provider === 'PAYONEER' ? 'Payoneer' : 'PayPal' }}
+            <h3 class="font-display metric-value"
+              style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-top: 5px;">
+              {{ paymentMethod.provider === 'BANK_TRANSFER' ? 'Transferencia Bancaria' : paymentMethod.provider ===
+              'MERCADO_PAGO' ? 'Mercado Pago' : paymentMethod.provider === 'PAYONEER' ? 'Payoneer' : 'PayPal' }}
             </h3>
             <span style="font-size: 0.8rem; color: var(--text-muted);">
-              {{ paymentMethod.provider === 'BANK_TRANSFER' ? paymentMethod.bankName : paymentMethod.provider === 'MERCADO_PAGO' ? paymentMethod.mpAliasOrCvu : paymentMethod.provider === 'PAYONEER' ? paymentMethod.accountNumber : paymentMethod.paypalEmail }}
+              {{ paymentMethod.provider === 'BANK_TRANSFER' ? paymentMethod.bankName : paymentMethod.provider ===
+              'MERCADO_PAGO' ? paymentMethod.mpAliasOrCvu : paymentMethod.provider === 'PAYONEER' ?
+              paymentMethod.accountNumber : paymentMethod.paypalEmail }}
             </span>
           </div>
         </div>
@@ -642,22 +745,29 @@
       <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 25px; margin-bottom: 30px;">
         <!-- Left: Transactions Table -->
         <div class="glass-panel operator-card" style="padding: 25px;">
-          <h4 class="font-display text-gradient" style="font-size: 1.2rem; font-weight: 700; margin-bottom: 20px;">Historial de Recibos y Cobros</h4>
-          
-          <div *ngIf="!isContractorPaid()" style="text-align: center; padding: 40px; color: var(--text-muted); font-style: italic; border: 1px dashed var(--glass-border); border-radius: 8px;">
+          <h4 class="font-display text-gradient" style="font-size: 1.2rem; font-weight: 700; margin-bottom: 20px;">
+            Historial de Recibos y Cobros</h4>
+
+          <div *ngIf="!isContractorPaid()"
+            style="text-align: center; padding: 40px; color: var(--text-muted); font-style: italic; border: 1px dashed var(--glass-border); border-radius: 8px;">
             No se han procesado pagos para este período de liquidación aún.
           </div>
 
-          <div *ngIf="isContractorPaid()" class="glass-panel contractor-row" style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border-color: rgba(0, 245, 230, 0.05);">
+          <div *ngIf="isContractorPaid()" class="glass-panel contractor-row"
+            style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border-color: rgba(0, 245, 230, 0.05);">
             <div>
-              <h5 class="font-display" style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 3px;">Nómina Mensual - NorthPay Inc.</h5>
+              <h5 class="font-display"
+                style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 3px;">Nómina
+                Mensual - NorthPay Inc.</h5>
               <span style="font-size: 0.8rem; color: var(--text-muted);">Fecha: 07/05/2026 | Ref: NP_PAY_83726</span>
             </div>
             <div style="text-align: right;">
-              <span style="display: block; font-weight: 800; color: var(--accent-mint); font-size: 1rem; margin-bottom: 5px;">
+              <span
+                style="display: block; font-weight: 800; color: var(--accent-mint); font-size: 1rem; margin-bottom: 5px;">
                 +${{ paymentAmount.toLocaleString('en-US', { minimumFractionDigits: 2 }) }} USD
               </span>
-              <span class="glass-panel contractor-status-badge" style="font-size: 0.75rem; color: var(--accent-mint); border-color: rgba(0,255,157,0.2); padding: 2px 8px; border-radius: 12px; font-weight: 700;">
+              <span class="glass-panel contractor-status-badge"
+                style="font-size: 0.75rem; color: var(--accent-mint); border-color: rgba(0,255,157,0.2); padding: 2px 8px; border-radius: 12px; font-weight: 700;">
                 ✓ Recibido
               </span>
             </div>
@@ -666,240 +776,51 @@
 
         <!-- Right: Compliance & Documents Box -->
         <div class="glass-panel operator-card" style="padding: 25px; display: flex; flex-direction: column; gap: 15px;">
-          <h4 class="font-display text-gradient" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 10px;">Cumplimiento & Acuerdo Legal</h4>
-          
-          <div class="glass-panel" style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 12px; border-color: rgba(0, 245, 230, 0.05);">
+          <h4 class="font-display text-gradient" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 10px;">
+            Cumplimiento & Acuerdo Legal</h4>
+
+          <div class="glass-panel"
+            style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 12px; border-color: rgba(0, 245, 230, 0.05);">
             <span style="font-size: 1.2rem;"></span>
             <div>
               <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">Contrato Digital Firmado</p>
-              <span style="font-size: 0.75rem; color: var(--accent-mint); font-weight: 600;">✓ Activo y Registrado</span>
+              <span style="font-size: 0.75rem; color: var(--accent-mint); font-weight: 600;">✓ Activo y
+                Registrado</span>
             </div>
           </div>
 
-          <div class="glass-panel" style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 12px; border-color: rgba(0, 245, 230, 0.05);">
+          <div class="glass-panel"
+            style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 12px; border-color: rgba(0, 245, 230, 0.05);">
             <span style="font-size: 1.2rem;"></span>
             <div>
-              <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">Verificación KYC (Identificación)</p>
-              <span style="font-size: 0.75rem; color: var(--accent-mint); font-weight: 600;">✓ Documentos Aprobados</span>
+              <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">Verificación KYC
+                (Identificación)</p>
+              <span style="font-size: 0.75rem; color: var(--accent-mint); font-weight: 600;">✓ Documentos
+                Aprobados</span>
             </div>
           </div>
 
-          <div class="glass-panel" style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 12px; border-color: rgba(0, 245, 230, 0.05);">
+          <div class="glass-panel"
+            style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 12px; border-color: rgba(0, 245, 230, 0.05);">
             <span style="font-size: 1.2rem;"></span>
             <div>
               <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">Identificación Biométrica</p>
-              <span style="font-size: 0.75rem; color: var(--accent-mint); font-weight: 600;">✓ Certificado Facial Exitoso</span>
+              <span style="font-size: 0.75rem; color: var(--accent-mint); font-weight: 600;">✓ Certificado Facial
+                Exitoso</span>
             </div>
           </div>
 
-          <button class="cyber-btn cyber-btn-secondary" style="width: 100%; padding: 10px; font-size: 0.85rem; border-radius: 8px; margin-top: 10px;">
+          <button class="cyber-btn cyber-btn-secondary"
+            style="width: 100%; padding: 10px; font-size: 0.85rem; border-radius: 8px; margin-top: 10px;">
             Descargar Contrato Firmado (PDF)
           </button>
         </div>
       </div>
     </div>
 
-    <div *ngIf="currentView === 'operator'" class="operator-view-container">
-      <div class="operator-header">
-        <div>
-          <h2 class="font-display text-gradient" style="font-size: 1.8rem; font-weight: 700;">Panel de Operaciones de NorthPay</h2>
-          <p style="color: var(--text-secondary); font-size: 0.9rem;">Monitoreo en tiempo real de los procesos de activación de contratistas internacionales.</p>
-        </div>
-      </div>
+    <!-- Dynamic Encapsulated Operator Dashboard -->
+    <app-admin-dashboard *ngIf="currentView === 'operator'"></app-admin-dashboard>
 
-      <!-- Quick Metrics Grid -->
-      <div class="metrics-grid">
-        <div class="glass-panel metric-card">
-          <span class="metric-icon"></span>
-          <div>
-            <p class="metric-label">Contratistas Activos</p>
-            <h3 class="font-display metric-value">{{ mockContractors.length }}</h3>
-          </div>
-        </div>
-        <div class="glass-panel metric-card">
-          <span class="metric-icon"></span>
-          <div>
-            <p class="metric-label">Tiempo de Activación</p>
-            <h3 class="font-display metric-value">2.4 Días</h3>
-          </div>
-        </div>
-        <div class="glass-panel metric-card">
-          <span class="metric-icon"></span>
-          <div>
-            <p class="metric-label">En Revisión</p>
-            <h3 class="font-display metric-value">{{ getInReviewCount() }}</h3>
-          </div>
-        </div>
-        <div class="glass-panel metric-card">
-          <span class="metric-icon"></span>
-          <div>
-            <p class="metric-label">Completados</p>
-            <h3 class="font-display metric-value">{{ getCompletedCount() }}</h3>
-          </div>
-        </div>
-      </div>
-
-      <!-- Filters and Contractors list -->
-      <div class="glass-panel operator-card">
-        <div class="dashboard-list-header">
-          <h4 class="font-display" style="font-size: 1.1rem; font-weight: 600;">Procesos de Onboarding</h4>
-          
-          <div class="filter-buttons">
-            <button class="filter-btn" [class.active]="operatorFilter === 'ALL'" (click)="operatorFilter = 'ALL'">Todos</button>
-            <button class="filter-btn" [class.active]="operatorFilter === 'IN_PROGRESS'" (click)="operatorFilter = 'IN_PROGRESS'">En Progreso</button>
-            <button class="filter-btn" [class.active]="operatorFilter === 'IN_REVIEW'" (click)="operatorFilter = 'IN_REVIEW'">En Revisión</button>
-            <button class="filter-btn" [class.active]="operatorFilter === 'COMPLETED'" (click)="operatorFilter = 'COMPLETED'">Completados</button>
-          </div>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
-          <div *ngFor="let p of getFilteredContractors()" class="glass-panel contractor-row">
-            <div>
-              <h5 class="font-display" style="font-size: 1rem; font-weight: 600; display: flex; align-items: center; gap: 8px;">
-                {{ p.name }}
-                <span *ngIf="p.id === 502" class="glass-panel" style="background: rgba(255, 190, 26, 0.1); color: var(--accent-amber); border-color: rgba(255, 190, 26, 0.2); font-size: 0.72rem; padding: 2px 8px; border-radius: 4px; font-weight: bold; letter-spacing: 0.5px;">
-                  ⚠️ Fuera de SLA (&gt;48h estancado)
-                </span>
-              </h5>
-              <span style="font-size: 0.8rem; color: var(--text-muted);">
-                País: {{ p.country }} | Correo: {{ p.email }} | Iniciado: {{ p.date }}
-              </span>
-            </div>
-
-            <div class="progress-bar-column">
-              <div class="progress-bar-labels">
-                <span>Progreso Onboarding</span>
-                <strong>{{ p.progress }}%</strong>
-              </div>
-              <div class="progress-bar-track">
-                <div class="progress-bar-fill" [style.width.%]="p.progress"></div>
-              </div>
-            </div>
-
-            <div>
-              <span class="glass-panel contractor-status-badge"
-                [style.color]="p.status === 'PAID' ? 'var(--accent-cyan)' : p.status === 'COMPLETED' ? 'var(--accent-mint)' : p.status === 'IN_REVIEW' ? 'var(--accent-amber)' : 'var(--accent-cyan)'"
-                [style.border-color]="p.status === 'PAID' ? 'rgba(0,245,230,0.2)' : p.status === 'COMPLETED' ? 'rgba(0,255,157,0.2)' : p.status === 'IN_REVIEW' ? 'rgba(255,193,7,0.2)' : 'rgba(0,245,230,0.2)'">
-                {{ p.status === 'PAID' ? 'Pagado' : p.status === 'COMPLETED' ? 'Completado' : p.status === 'IN_REVIEW' ? 'En Revisión' : 'En Progreso' }}
-              </span>
-            </div>
-
-            <div style="display: flex; gap: 10px; align-items: center;">
-              <button class="cyber-btn cyber-btn-secondary"
-                style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px;"
-                *ngIf="p.status === 'IN_REVIEW'" (click)="selectedProcessIdForReview = p.id">
-                Revisar Documentos
-              </button>
-              <button class="cyber-btn cyber-btn-primary"
-                style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; background: linear-gradient(135deg, var(--accent-mint), #00b0ff); color: var(--bg-darker); box-shadow: 0 0 10px rgba(0, 255, 157, 0.3);"
-                *ngIf="p.status === 'COMPLETED'" (click)="openPaymentModal(p)">
-                Emitir Pago
-              </button>
-              <span *ngIf="p.status === 'PAID'"
-                style="font-size: 0.85rem; color: var(--accent-mint); font-weight: 700; display: flex; align-items: center; gap: 5px;">
-                ✓ Nómina Enviada
-              </span>
-              <span *ngIf="p.status !== 'IN_REVIEW' && p.status !== 'COMPLETED' && p.status !== 'PAID'"
-                style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">
-                Onboarding en proceso
-              </span>
-            </div>
-          </div>
-
-          <div *ngIf="getFilteredContractors().length === 0" style="text-align: center; padding: 30px; color: var(--text-muted); font-style: italic;">
-            No se encontraron contratistas en este estado.
-          </div>
-        </div>
-      </div>
-
-      <!-- Changes History / Audit log widget -->
-      <div class="glass-panel audit-log-card" style="margin-top: 25px;">
-        <h4 class="font-display text-gradient" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 15px;">Historial de Cambios / Registro de Auditoría</h4>
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-          <div *ngFor="let h of changeHistory; let first = first" class="audit-log-item" [style.border-left-color]="first ? 'var(--accent-cyan)' : 'var(--glass-border)'">
-            <span class="audit-dot" [style.background-color]="first ? 'var(--accent-cyan)' : 'var(--text-muted)'"></span>
-            <span style="color: var(--text-secondary); font-size: 0.85rem;">{{ h }}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="glass-panel review-pane" *ngIf="selectedProcessIdForReview && summary.steps[2].status === 'IN_REVIEW'">
-        <h4 class="font-display text-gradient" style="font-size: 1.2rem; font-weight: 700; margin-bottom: 10px;">Revisar Documentos de Contratista</h4>
-        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px;">
-          Por favor valida que el documento cargado concuerda con los datos personales del contratista legal.
-        </p>
-
-        <div style="display: flex; gap: 20px; align-items: start; margin-bottom: 25px;">
-          <div class="glass-panel review-details">
-            <h5 style="font-weight: 700; margin-bottom: 10px; color: var(--text-primary);">DATOS EXTRAÍDOS DEL DOCUMENTO:</h5>
-            <p>Nombres: {{ personalData.firstName }}</p>
-            <p>Apellidos: {{ personalData.lastName }}</p>
-            <p>País: {{ personalData.country }}</p>
-            <p>Tipo Documento: PASAPORTE_INTERNACIONAL</p>
-            <p style="margin-top: 15px; color: var(--accent-mint); text-decoration: underline; cursor: pointer;">
-              VER ARCHIVO EN CLOUDINARY (DOCUMENT_ID.PDF)
-            </p>
-          </div>
-
-          <div class="cyber-input-group" style="flex: 1; margin-bottom: 0;">
-            <label class="cyber-input-label">COMENTARIOS / FEEDBACK (SI SE RECHAZA)</label>
-            <textarea class="cyber-input" [(ngModel)]="reviewFeedback" rows="3"
-              placeholder="Ej. El pasaporte está borroso o incompleto..."></textarea>
-          </div>
-        </div>
-
-        <div class="review-actions">
-          <button class="cyber-btn reject-btn"
-            (click)="reviewContractorStep('DOCUMENT_UPLOAD', false)">
-            Solicitar Corrección (Rechazar)
-          </button>
-          <button class="cyber-btn cyber-btn-primary" style="padding: 8px 25px; border-radius: 8px;"
-            (click)="reviewContractorStep('DOCUMENT_UPLOAD', true)">
-            Aprobar Documento
-          </button>
-        </div>
-      </div>
-    <!-- Payment Confirmation Modal -->
-    <div class="glass-modal-backdrop" *ngIf="selectedProcessForPayment">
-      <div class="glass-panel cyber-modal-card">
-        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; margin-bottom: 20px;">
-          <h3 class="font-display text-mint-gradient" style="font-size: 1.4rem; font-weight: 800; margin: 0;">Confirmar Envío de Fondos</h3>
-          <button class="modal-close-btn" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem;" (click)="selectedProcessForPayment = null">✕</button>
-        </div>
-        <div class="modal-body">
-          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">
-            Estás a punto de procesar la nómina/pago para este contratista remoto certificado. Revisa la liquidación detallada:
-          </p>
-          
-          <div class="glass-panel payment-details-box" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem;">
-            <p style="margin-bottom: 8px;"><strong>Beneficiario:</strong> {{ selectedProcessForPayment.name }}</p>
-            <p style="margin-bottom: 8px;"><strong>País / Destino:</strong> {{ selectedProcessForPayment.country }}</p>
-            <p style="margin-bottom: 8px;"><strong>Método de Pago:</strong> 
-              <span class="payment-card-badge" style="background: rgba(0, 245, 230, 0.1); color: var(--accent-cyan); padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; margin-left: 5px;">
-                {{ selectedProcessForPayment.id === 500 ? paymentMethod.provider : 'BANK_TRANSFER' }}
-              </span>
-            </p>
-          </div>
-
-          <div class="cyber-input-group">
-            <label class="cyber-input-label">MONTO A TRANSFERIR (USD)</label>
-            <div style="position: relative;">
-              <span style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--accent-cyan); font-weight: 700;">$</span>
-              <input type="number" class="cyber-input" [(ngModel)]="paymentAmount" style="padding-left: 30px;" placeholder="0.00">
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer" style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 25px;">
-          <button class="cyber-btn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 8px 20px; border-radius: 8px;" (click)="selectedProcessForPayment = null" [disabled]="isProcessingPayment">
-            Cancelar
-          </button>
-          <button class="cyber-btn cyber-btn-primary" style="padding: 8px 25px; border-radius: 8px; font-weight: 700;" (click)="confirmPayment()" [disabled]="isProcessingPayment">
-            {{ isProcessingPayment ? 'Transfiriendo...' : 'Confirmar Envío de Fondos' }}
-          </button>
-        </div>
-      </div>
-    </div>
-    </div>
 
   </main>
   <footer class="glass-panel app-footer">

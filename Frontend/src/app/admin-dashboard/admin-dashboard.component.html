@@ -1,29 +1,8 @@
 <div class="main-container">
-  <header class="glass-panel app-header">
-    <div class="logo-container">
-      <div class="logo-icon">
-        <span class="logo-letter">N</span>
-      </div>
-      <div>
-        <h1 class="font-display text-mint-gradient logo-title">NorthPay</h1>
-        <span class="logo-subtitle">OPERATIONS TEAM</span>
-      </div>
-    </div>
-
-    <div class="header-nav">
-      <div class="glass-panel status-badge">
-        <span class="status-bullet"
-          [style.background-color]="isLocalMock ? 'var(--accent-amber)' : 'var(--accent-mint)'"
-          [style.color]="isLocalMock ? 'var(--accent-amber)' : 'var(--accent-mint)'">
-        </span>
-        <span style="color: var(--text-secondary);">
-          {{ isLocalMock ? 'Local' : 'Servidor NorthPay' }}
-        </span>
-      </div>
-    </div>
-  </header>
-
+  <!-- Unified header provided by parent AppComponent -->
+  
   <main class="main-content">
+
     <div class="operator-view-container">
       <div class="operator-header">
         <div>
@@ -194,7 +173,8 @@
             Estás a punto de procesar la nómina/pago para este contratista remoto certificado. Revisa la liquidación detallada:
           </p>
           
-          <div class="glass-panel payment-details-box" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem;">
+          <div class="glass-panel payment-details-box" style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem;">
+
             <p style="margin-bottom: 8px;"><strong>Beneficiario:</strong> {{ selectedProcessForPayment.name }}</p>
             <p style="margin-bottom: 8px;"><strong>País / Destino:</strong> {{ selectedProcessForPayment.country }}</p>
             <p style="margin-bottom: 8px;"><strong>Método de Pago:</strong> 
@@ -224,8 +204,5 @@
   </div>
   </div>
 </main>
-
-  <footer class="glass-panel app-footer">
-    <span>&copy; 2026 NorthPay Global Payments & Compliance Inc.</span>
-  </footer>
 </div>
+
