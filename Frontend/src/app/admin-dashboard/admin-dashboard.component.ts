@@ -308,7 +308,7 @@ export class AdminDashboardComponent implements OnInit {
 
   @Output() reviewCompleted = new EventEmitter<void>();
   @Output() paymentCompleted = new EventEmitter<number>();
-
+  @Input() isDemoMode = true;
 
   // Reused personalData fallback for simulation details inside review box
   @Input() personalData = {
@@ -354,14 +354,15 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   loadOperatorPanel() {
-    this.mockContractors = [
-      { id: 500, name: 'Juan Pérez', country: 'España', email: 'contractor@northpay.com', progress: this.summary.progress, status: this.paidContractorIds.includes(500) ? 'PAID' : (this.summary.steps[2].status === 'IN_REVIEW' ? 'IN_REVIEW' : this.summary.status), date: '07/05/2026', currentStep: this.summary.currentStep || 'COMPLETED', phone: this.whatsappPhone || '+34600123456' },
-      { id: 501, name: 'María Gómez', country: 'Colombia', email: 'maria.gomez@gmail.com', progress: 100, status: this.paidContractorIds.includes(501) ? 'PAID' : 'COMPLETED', date: '05/05/2026', currentStep: 'COMPLETED', phone: '+573001234567' },
-      { id: 502, name: 'Pierre Dubois', country: 'Francia', email: 'pierre.dubois@yahoo.fr', progress: 20, status: this.paidContractorIds.includes(502) ? 'PAID' : 'IN_PROGRESS', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD', phone: '+33612345678' },
-      { id: 503, name: 'Yuki Tanaka', country: 'Japón', email: 'tanaka.yuki@gmail.com', progress: 40, status: this.paidContractorIds.includes(503) ? 'PAID' : 'IN_REVIEW', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD', phone: '+819012345678' }
-    ];
+    if (this.isDemoMode) {
+      // 🔒 MODO DEMO: Lista cerrada de simulación
+      this.mockContractors = [
+        { id: 500, name: 'Juan Pérez', country: 'España', email: 'contractor@northpay.com', progress: this.summary.progress, status: this.paidContractorIds.includes(500) ? 'PAID' : (this.summary.steps[2].status === 'IN_REVIEW' ? 'IN_REVIEW' : this.summary.status), date: '07/05/2026', currentStep: this.summary.currentStep || 'COMPLETED', phone: this.whatsappPhone || '+34600123456' },
+        { id: 501, name: 'María Gómez', country: 'Colombia', email: 'maria.gomez@gmail.com', progress: 100, status: this.paidContractorIds.includes(501) ? 'PAID' : 'COMPLETED', date: '05/05/2026', currentStep: 'COMPLETED', phone: '+573001234567' },
+        { id: 502, name: 'Pierre Dubois', country: 'Francia', email: 'pierre.dubois@yahoo.fr', progress: 20, status: this.paidContractorIds.includes(502) ? 'PAID' : 'IN_PROGRESS', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD', phone: '+33612345678' },
+        { id: 503, name: 'Yuki Tanaka', country: 'Japón', email: 'tanaka.yuki@gmail.com', progress: 40, status: this.paidContractorIds.includes(503) ? 'PAID' : 'IN_REVIEW', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD', phone: '+819012345678' }
+      ];
 
-    if (this.isLocalMock) {
       this.operatorProcesses = [
         {
           id: 500,
@@ -375,16 +376,54 @@ export class AdminDashboardComponent implements OnInit {
         }
       ];
     } else {
-      this.http.get<OnboardingProcess[]>(`${this.apiBaseUrl}/operator/processes`).subscribe({
-        next: (procs) => this.operatorProcesses = procs,
-        error: (err) => console.error(err)
-      });
+      // 🏢 MODO REAL: Conectando al backend Spring Boot en vivo!
+      this.mockContractors = [];
+      this.operatorProcesses = [];
+
+      if (this.isLocalMock) {
+        // En local sin servidor, dejamos la lista vacía para evidenciar que NO es la demo.
+        console.warn('[NorthPay] Modo Real seleccionado pero Spring Boot está offline.');
+      } else {
+        // Consultamos los datos del servidor en vivo
+        this.http.get<OnboardingProcess[]>(`${this.apiBaseUrl}/operator/processes`).subscribe({
+          next: (procs) => {
+            this.operatorProcesses = procs;
+            // Mapeamos procesos reales de BD a la tabla de interfaz
+            this.mockContractors = procs.map(p => {
+              return {
+                id: p.id,
+                name: `Contratista #${p.contractorUserId}`,
+                country: 'Cargando...',
+                email: `user-${p.contractorUserId}@northpay.com`,
+                progress: p.progress,
+                status: this.paidContractorIds.includes(p.id) ? 'PAID' : p.status,
+                date: new Date(p.createdAt).toLocaleDateString(),
+                currentStep: p.currentStep,
+                phone: ''
+              };
+            });
+          },
+          error: (err) => console.error('[NorthPay Real Mode Error]', err)
+        });
+      }
     }
   }
 
   getFilteredContractors() {
     if (this.operatorFilter === 'ALL') {
       return this.mockContractors;
+    }
+    if (this.operatorFilter === 'IN_PROGRESS') {
+      // Retorna todo lo que no está completado formalmente
+      return this.mockContractors.filter(c => 
+        c.status === 'IN_PROGRESS' || 
+        c.status === 'IN_REVIEW' || 
+        c.status === 'CREATED' || 
+        c.status === 'ACTION_REQUIRED'
+      );
+    }
+    if (this.operatorFilter === 'COMPLETED') {
+      return this.mockContractors.filter(c => c.status === 'COMPLETED' || c.status === 'PAID');
     }
     return this.mockContractors.filter(c => c.status === this.operatorFilter);
   }

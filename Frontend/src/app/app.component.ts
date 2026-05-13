@@ -36,10 +36,11 @@ interface OnboardingProcess {
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  currentView: 'landing' | 'welcome' | 'register' | 'onboarding' | 'operator' = 'landing';
-  previousView: 'landing' | 'welcome' | 'register' | 'onboarding' = 'landing';
+  currentView: 'landing' | 'welcome' | 'register' | 'onboarding' | 'operator' | 'login' = 'landing';
+  previousView: 'landing' | 'welcome' | 'register' | 'onboarding' | 'login' = 'landing';
   apiBaseUrl = 'http://localhost:8080/api';
   isLocalMock = true;
+  isOperatorDemoMode = true;
   cloudinaryCloudName = 'northpay-demo';
   cloudinaryUploadPreset = 'northpay_preset';
 
@@ -48,6 +49,8 @@ export class AppComponent implements OnInit {
   registerPassword = 'password123';
   loginEmail = 'contractor@northpay.com';
   loginPassword = 'password123';
+  adminUser = 'admin@northpay.com';
+  adminPass = 'admin123';
   userId = 1;
   processId = 1;
 
@@ -177,7 +180,12 @@ export class AppComponent implements OnInit {
       persLast: "APELLIDOS",
       persPhone: "NÚMERO DE TELÉFONO",
       persCountry: "PAÍS DE RESIDENCIA FISCAL",
-      persBtnSave: "Guardar y Siguiente Paso"
+      persBtnSave: "Guardar y Siguiente Paso",
+      navOperator: "Panel de Operaciones",
+      notifCodeSent: "Código de activación listo: escribe 123456 en pantalla.",
+      notifWsSuccess: "WhatsApp verificado correctamente. ¡Onboarding desbloqueado!",
+      notifWsFail: "Código incorrecto. Intenta de nuevo.",
+      notifPersSave: "Datos personales guardados con éxito."
     },
     en: {
       logoSubtitle: "WELCOME PORTAL",
@@ -228,7 +236,12 @@ export class AppComponent implements OnInit {
       persLast: "LAST NAMES",
       persPhone: "PHONE NUMBER",
       persCountry: "TAX RESIDENCE COUNTRY",
-      persBtnSave: "Save and Next Step"
+      persBtnSave: "Save and Next Step",
+      navOperator: "Operator Panel",
+      notifCodeSent: "Activation code ready: type 123456 on screen.",
+      notifWsSuccess: "WhatsApp verified successfully. Onboarding unlocked!",
+      notifWsFail: "Incorrect code. Please try again.",
+      notifPersSave: "Personal data saved successfully."
     },
     fr: {
       logoSubtitle: "PORTAIL DE BIENVENUE",
@@ -279,7 +292,12 @@ export class AppComponent implements OnInit {
       persLast: "NOMS DE FAMILLE",
       persPhone: "NUMÉRO DE TÉLÉPHONE",
       persCountry: "PAYS DE RÉSIDENCE FISCALE",
-      persBtnSave: "Enregistrer et Étape Suivante"
+      persBtnSave: "Enregistrer et Étape Suivante",
+      navOperator: "Panneau Opérateur",
+      notifCodeSent: "Code d'activation prêt : tapez 123456 à l'écran.",
+      notifWsSuccess: "WhatsApp vérifié avec succès. Intégration déverrouillée !",
+      notifWsFail: "Code incorrect. Veuillez réessayer.",
+      notifPersSave: "Données personnelles enregistrées avec succès."
     },
     pt: {
       logoSubtitle: "PORTAL DE BOAS-VINDAS",
@@ -330,7 +348,12 @@ export class AppComponent implements OnInit {
       persLast: "SOBRENOMES",
       persPhone: "NÚMERO DE TELEFONE",
       persCountry: "PAÍS DE RESIDÊNCIA FISCAL",
-      persBtnSave: "Salvar e Próxima Etapa"
+      persBtnSave: "Salvar e Próxima Etapa",
+      navOperator: "Painel de Operações",
+      notifCodeSent: "Código de ativação pronto: digite 123456 na tela.",
+      notifWsSuccess: "WhatsApp verificado com sucesso. Integração desbloqueada!",
+      notifWsFail: "Código incorreto. Por favor tente novamente.",
+      notifPersSave: "Dados pessoais salvos com sucesso."
     },
     zh: {
       logoSubtitle: "欢迎门户",
@@ -381,7 +404,12 @@ export class AppComponent implements OnInit {
       persLast: "姓氏",
       persPhone: "电话号码",
       persCountry: "税务居留国",
-      persBtnSave: "保存并下一步"
+      persBtnSave: "保存并下一步",
+      navOperator: "操作面板",
+      notifCodeSent: "激活码已就绪：请在屏幕上输入 123456。",
+      notifWsSuccess: "WhatsApp 验证成功。入职流程已解锁！",
+      notifWsFail: "代码错误。请再试一次。",
+      notifPersSave: "个人数据已成功保存。"
     },
     it: {
       logoSubtitle: "PORTALE DI BENVENUTO",
@@ -432,7 +460,12 @@ export class AppComponent implements OnInit {
       persLast: "COGNOMI",
       persPhone: "NUMERO DI TELEFONO",
       persCountry: "PAESE DI RESIDENZA FISCALE",
-      persBtnSave: "Salva e Prossimo Passo"
+      persBtnSave: "Salva e Prossimo Passo",
+      navOperator: "Pannello Operazioni",
+      notifCodeSent: "Codice di attivazione pronto: digita 123456 sullo schermo.",
+      notifWsSuccess: "WhatsApp verificato con successo. Onboarding sbloccato!",
+      notifWsFail: "Codice non corretto. Riprova.",
+      notifPersSave: "Dati personali salvati con successo."
     }
   };
 
@@ -585,12 +618,12 @@ export class AppComponent implements OnInit {
     if (this.isLocalMock) {
       this.summary.steps[1].status = 'COMPLETED';
       this.summary.steps[2].status = 'IN_PROGRESS';
-      this.addLocalNotification('Paso 1 Completado: Datos personales guardados.', 'SUCCESS');
+      this.addLocalNotification(this.translations[this.selectedLang]['notifPersSave'], 'SUCCESS');
       this.refreshSummary();
     } else {
       this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/personal-data`, this.personalData).subscribe({
         next: () => {
-          this.addLocalNotification('Datos personales guardados en backend.', 'SUCCESS');
+          this.addLocalNotification(this.translations[this.selectedLang]['notifPersSave'], 'SUCCESS');
           this.refreshSummary();
         },
         error: (err) => this.handleError(err)
@@ -831,6 +864,33 @@ export class AppComponent implements OnInit {
     }
   }
 
+  submitAdminLogin() {
+    if (this.isLocalMock) {
+      // Soft Sandbox validation to enable a smooth user trial with realistic feel!
+      if (this.adminUser.toLowerCase() === 'admin@northpay.com' && this.adminPass === 'admin123') {
+        this.addLocalNotification('Acceso Autorizado. Cargando terminal de Operador Real...', 'SUCCESS');
+        this.isOperatorDemoMode = false;
+        this.loadOperatorPanel();
+      } else {
+        this.addLocalNotification('Error de Acceso: Credenciales incorrectas. Utiliza admin@northpay.com / admin123', 'ERROR');
+      }
+    } else {
+      this.http.post(`${this.apiBaseUrl}/auth/login`, {
+        username: this.adminUser,
+        password: this.adminPass
+      }).subscribe({
+        next: () => {
+          this.addLocalNotification('Bienvenido de vuelta, Administrador.', 'SUCCESS');
+          this.isOperatorDemoMode = false;
+          this.loadOperatorPanel();
+        },
+        error: (err) => {
+          this.addLocalNotification('Acceso Denegado: Verifica usuario y clave.', 'ERROR');
+        }
+      });
+    }
+  }
+
   loadOperatorPanel() {
     this.notifications = []; // Clear alerts for cleaner operator interface
     this.previousView = this.currentView as any;
@@ -945,7 +1005,7 @@ export class AppComponent implements OnInit {
       const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
 
       window.open(url, '_blank');
-      this.addLocalNotification('Código de activación listo: escribe 123456 en pantalla.', 'SUCCESS');
+      this.addLocalNotification(this.translations[this.selectedLang]['notifCodeSent'], 'SUCCESS');
     }, 1200);
   }
 
@@ -976,10 +1036,10 @@ export class AppComponent implements OnInit {
         }
         this.summary.steps[0].status = 'COMPLETED';
         this.summary.steps[1].status = 'IN_PROGRESS';
-        this.addLocalNotification('WhatsApp verificado correctamente. ¡Onboarding desbloqueado!', 'SUCCESS');
+        this.addLocalNotification(this.translations[this.selectedLang]['notifWsSuccess'], 'SUCCESS');
         this.refreshSummary();
       } else {
-        this.addLocalNotification('Código incorrecto. Intenta de nuevo.', 'ERROR');
+        this.addLocalNotification(this.translations[this.selectedLang]['notifWsFail'], 'ERROR');
       }
     }, 1200);
   }

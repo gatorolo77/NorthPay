@@ -3,10 +3,18 @@
   <main class="main-content">
 
     <div class="operator-view-container">
-      <div class="operator-header">
-        <div>
-          <h2 class="font-display text-gradient" style="font-size: 1.8rem; font-weight: 700;">{{ dashboardTranslations[selectedLang]['opTitle'] }}</h2>
-          <p style="color: var(--text-secondary); font-size: 0.9rem;">{{ dashboardTranslations[selectedLang]['opDesc'] }}</p>
+      <div class="operator-header" style="margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; gap: 15px; justify-content: space-between; width: 100%;">
+          <div>
+            <h2 class="font-display text-gradient" style="font-size: 1.8rem; font-weight: 700; display: flex; align-items: center; gap: 12px;">
+              {{ dashboardTranslations[selectedLang]['opTitle'] }}
+              <span [ngClass]="isDemoMode ? 'status-pill-demo' : 'status-pill-official'"
+                style="font-size: 0.7rem; padding: 4px 12px; border-radius: 20px; font-weight: 800; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 5px;">
+                {{ isDemoMode ? '🚧 MODO DEMO' : '🏢 TERMINAL OFICIAL' }}
+              </span>
+            </h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">{{ dashboardTranslations[selectedLang]['opDesc'] }}</p>
+          </div>
         </div>
       </div>
 
@@ -50,8 +58,6 @@
               (click)="operatorFilter = 'ALL'">{{ dashboardTranslations[selectedLang]['all'] }}</button>
             <button class="filter-btn" [class.active]="operatorFilter === 'IN_PROGRESS'"
               (click)="operatorFilter = 'IN_PROGRESS'">{{ dashboardTranslations[selectedLang]['inProgress'] }}</button>
-            <button class="filter-btn" [class.active]="operatorFilter === 'IN_REVIEW'"
-              (click)="operatorFilter = 'IN_REVIEW'">{{ dashboardTranslations[selectedLang]['inReview'] }}</button>
             <button class="filter-btn" [class.active]="operatorFilter === 'COMPLETED'"
               (click)="operatorFilter = 'COMPLETED'">{{ dashboardTranslations[selectedLang]['completed'] }}</button>
           </div>
