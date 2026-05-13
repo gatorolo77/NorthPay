@@ -79,6 +79,7 @@ export class AppComponent implements OnInit {
     phone: '',
     country: 'Spain'
   };
+  globalPaidIds: number[] = [];
 
   uploadedDocs: { type: string; filename: string; fileUrl: string }[] = [];
   selectedDocType = 'PASSPORT';
@@ -471,7 +472,7 @@ export class AppComponent implements OnInit {
   }
 
   isContractorPaid(): boolean {
-    return this.mockContractors.find(c => c.id === 500)?.status === 'PAID';
+    return this.summary.status === 'PAID' || this.globalPaidIds.includes(500);
   }
 
   constructor(private http: HttpClient) { }
@@ -528,6 +529,13 @@ export class AppComponent implements OnInit {
     if (this.isLocalMock) {
       this.userId = 100;
       this.processId = 500;
+      
+      // ✨ Warm Default Pre-fill for high-quality Sandbox UX
+      if (!this.personalData.firstName) {
+        this.personalData.firstName = 'Juan';
+        this.personalData.lastName = 'Pérez';
+      }
+      
       this.addLocalNotification('Usuario registrado con éxito', 'SUCCESS');
       this.summary.status = 'IN_PROGRESS';
       this.currentView = 'onboarding';
@@ -947,6 +955,25 @@ export class AppComponent implements OnInit {
       this.isVerifyingWhatsapp = false;
       if (this.whatsappCode === '123456') {
         this.whatsappVerified = true;
+        this.personalData.phone = this.whatsappPhone;
+        
+        // 🌐 Smart Country Auto-Detection based on verification dial-code
+        const cleanNum = this.whatsappPhone.replace(/\D/g, '');
+        if (cleanNum.startsWith('54')) {
+          this.personalData.country = 'Argentina';
+        } else if (cleanNum.startsWith('34')) {
+          this.personalData.country = 'Spain';
+        } else if (cleanNum.startsWith('52')) {
+          this.personalData.country = 'Mexico';
+        } else if (cleanNum.startsWith('57')) {
+          this.personalData.country = 'Colombia';
+        } else if (cleanNum.startsWith('55')) {
+          this.personalData.country = 'Brazil';
+        } else if (cleanNum.startsWith('56')) {
+          this.personalData.country = 'Chile';
+        } else if (cleanNum.startsWith('1')) {
+          this.personalData.country = 'United States';
+        }
         this.summary.steps[0].status = 'COMPLETED';
         this.summary.steps[1].status = 'IN_PROGRESS';
         this.addLocalNotification('WhatsApp verificado correctamente. ¡Onboarding desbloqueado!', 'SUCCESS');
@@ -955,6 +982,19 @@ export class AppComponent implements OnInit {
         this.addLocalNotification('Código incorrecto. Intenta de nuevo.', 'ERROR');
       }
     }, 1200);
+  }
+
+  handlePaymentCompleted(contractorId: number) {
+    if (contractorId === 500) { // 500 is our simulated process ID for the sandbox
+      this.summary.status = 'PAID';
+      this.addLocalNotification('¡Felicidades! Se ha emitido tu pago y el balance ha sido actualizado.', 'SUCCESS');
+      this.refreshSummary();
+    }
+    
+    // Persist the state globally in case the operator panel reloads!
+    if (!this.globalPaidIds.includes(contractorId)) {
+      this.globalPaidIds.push(contractorId);
+    }
   }
 
   resolveLocalState() {

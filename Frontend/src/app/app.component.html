@@ -1,5 +1,5 @@
-<div class="main-container" [style.overflow]="currentView === 'landing' ? 'hidden' : 'auto'"
-  [style.max-height]="currentView === 'landing' ? '100vh' : 'none'">
+<div class="main-container">
+
   <header class="glass-panel app-header" *ngIf="currentView !== 'landing'">
     <div class="logo-container">
       <div class="logo-icon">
@@ -113,7 +113,8 @@
           {{ translations[selectedLang]['heroTitle'] }}
         </h1>
         <p
-          style="color: #77a2e2; font-weight: 500; font-size: 0.95rem; max-width: 580px; margin: 15px auto 25px auto; min-height: 56px; display: flex; align-items: center; justify-content: center; line-height: 1.5;">
+          style="color: #00f5e6; font-weight: 500; font-size: 0.95rem; max-width: 580px; margin: 15px auto 25px auto; min-height: 56px; display: flex; align-items: center; justify-content: center; line-height: 1.5;">
+
 
           {{ translations[selectedLang]['heroDesc'] }}
         </p>
@@ -408,12 +409,45 @@
           <div class="cyber-input-group">
             <label class="cyber-input-label">{{ translations[selectedLang]['persCountry'] }}</label>
             <select class="cyber-input" [(ngModel)]="personalData.country">
-              <option value="Spain">España</option>
-              <option value="Mexico">México</option>
-              <option value="Colombia">Colombia</option>
-              <option value="Argentina">Argentina</option>
-              <option value="Chile">Chile</option>
-              <option value="United States">Estados Unidos</option>
+              <optgroup label="América Latina">
+                <option value="Argentina">Argentina</option>
+                <option value="Bolivia">Bolivia</option>
+                <option value="Brazil">Brasil</option>
+                <option value="Chile">Chile</option>
+                <option value="Colombia">Colombia</option>
+                <option value="Costa Rica">Costa Rica</option>
+                <option value="Ecuador">Ecuador</option>
+                <option value="Mexico">México</option>
+                <option value="Panama">Panamá</option>
+                <option value="Paraguay">Paraguay</option>
+                <option value="Peru">Perú</option>
+                <option value="Puerto Rico">Puerto Rico</option>
+                <option value="Dominican Republic">República Dominicana</option>
+                <option value="Uruguay">Uruguay</option>
+                <option value="Venezuela">Venezuela</option>
+              </optgroup>
+              <optgroup label="Norteamérica">
+                <option value="Canada">Canadá</option>
+                <option value="United States">Estados Unidos</option>
+              </optgroup>
+              <optgroup label="Europa">
+                <option value="Germany">Alemania</option>
+                <option value="Spain">España</option>
+                <option value="France">Francia</option>
+                <option value="Italy">Italia</option>
+                <option value="Portugal">Portugal</option>
+                <option value="United Kingdom">Reino Unido</option>
+              </optgroup>
+              <optgroup label="Asia & Oceanía">
+                <option value="Australia">Australia</option>
+                <option value="China">China</option>
+                <option value="India">India</option>
+                <option value="Japan">Japón</option>
+                <option value="South Korea">Corea del Sur</option>
+              </optgroup>
+              <optgroup label="África">
+                <option value="South Africa">Sudáfrica</option>
+              </optgroup>
             </select>
           </div>
 
@@ -820,7 +854,17 @@
     </div>
 
     <!-- Dynamic Encapsulated Operator Dashboard -->
-    <app-admin-dashboard *ngIf="currentView === 'operator'" [summary]="summary" [personalData]="personalData" [isLocalMock]="isLocalMock" (reviewCompleted)="refreshSummary()"></app-admin-dashboard>
+    <app-admin-dashboard *ngIf="currentView === 'operator'" 
+      [summary]="summary" 
+      [personalData]="personalData" 
+      [isLocalMock]="isLocalMock" 
+      [selectedLang]="selectedLang" 
+      [whatsappPhone]="whatsappPhone" 
+      [paidContractorIds]="globalPaidIds"
+      (reviewCompleted)="refreshSummary()"
+      (paymentCompleted)="handlePaymentCompleted($event)">
+    </app-admin-dashboard>
+
 
 
 

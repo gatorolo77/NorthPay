@@ -257,3 +257,11 @@ body {
 .cyber-input::placeholder {
   color: var(--text-muted);
 }
+
+/* Prevent white-on-white options in select dropdowns */
+.cyber-input option {
+  background-color: #0a0f1d !important;
+  color: #ffffff !important;
+  font-family: var(--font-body);
+  padding: 10px;
+}

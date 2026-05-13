@@ -5,10 +5,8 @@
     <div class="operator-view-container">
       <div class="operator-header">
         <div>
-          <h2 class="font-display text-gradient" style="font-size: 1.8rem; font-weight: 700;">Panel de Operaciones de
-            NorthPay</h2>
-          <p style="color: var(--text-secondary); font-size: 0.9rem;">Monitoreo en tiempo real de los procesos de
-            activación de contratistas internacionales.</p>
+          <h2 class="font-display text-gradient" style="font-size: 1.8rem; font-weight: 700;">{{ dashboardTranslations[selectedLang]['opTitle'] }}</h2>
+          <p style="color: var(--text-secondary); font-size: 0.9rem;">{{ dashboardTranslations[selectedLang]['opDesc'] }}</p>
         </div>
       </div>
 
@@ -16,28 +14,28 @@
         <div class="glass-panel metric-card">
           <span class="metric-icon"></span>
           <div>
-            <p class="metric-label">Contratistas Activos</p>
+            <p class="metric-label">{{ dashboardTranslations[selectedLang]['active'] }}</p>
             <h3 class="font-display metric-value">{{ mockContractors.length }}</h3>
           </div>
         </div>
         <div class="glass-panel metric-card">
           <span class="metric-icon"></span>
           <div>
-            <p class="metric-label">Tiempo de Activación</p>
-            <h3 class="font-display metric-value">2.4 Días</h3>
+            <p class="metric-label">{{ dashboardTranslations[selectedLang]['avgTime'] }}</p>
+            <h3 class="font-display metric-value">{{ dashboardTranslations[selectedLang]['days'] }}</h3>
           </div>
         </div>
         <div class="glass-panel metric-card">
           <span class="metric-icon"></span>
           <div>
-            <p class="metric-label">En Revisión</p>
+            <p class="metric-label">{{ dashboardTranslations[selectedLang]['inReview'] }}</p>
             <h3 class="font-display metric-value">{{ getInReviewCount() }}</h3>
           </div>
         </div>
         <div class="glass-panel metric-card">
           <span class="metric-icon"></span>
           <div>
-            <p class="metric-label">Completados</p>
+            <p class="metric-label">{{ dashboardTranslations[selectedLang]['completed'] }}</p>
             <h3 class="font-display metric-value">{{ getCompletedCount() }}</h3>
           </div>
         </div>
@@ -45,34 +43,43 @@
 
       <div class="glass-panel operator-card">
         <div class="dashboard-list-header">
-          <h4 class="font-display" style="font-size: 1.1rem; font-weight: 600;">Procesos de Onboarding</h4>
+          <h4 class="font-display" style="font-size: 1.1rem; font-weight: 600;">{{ dashboardTranslations[selectedLang]['onbProcs'] }}</h4>
 
           <div class="filter-buttons">
             <button class="filter-btn" [class.active]="operatorFilter === 'ALL'"
-              (click)="operatorFilter = 'ALL'">Todos</button>
+              (click)="operatorFilter = 'ALL'">{{ dashboardTranslations[selectedLang]['all'] }}</button>
             <button class="filter-btn" [class.active]="operatorFilter === 'IN_PROGRESS'"
-              (click)="operatorFilter = 'IN_PROGRESS'">En Progreso</button>
+              (click)="operatorFilter = 'IN_PROGRESS'">{{ dashboardTranslations[selectedLang]['inProgress'] }}</button>
             <button class="filter-btn" [class.active]="operatorFilter === 'IN_REVIEW'"
-              (click)="operatorFilter = 'IN_REVIEW'">En Revisión</button>
+              (click)="operatorFilter = 'IN_REVIEW'">{{ dashboardTranslations[selectedLang]['inReview'] }}</button>
             <button class="filter-btn" [class.active]="operatorFilter === 'COMPLETED'"
-              (click)="operatorFilter = 'COMPLETED'">Completados</button>
+              (click)="operatorFilter = 'COMPLETED'">{{ dashboardTranslations[selectedLang]['completed'] }}</button>
           </div>
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
           <div *ngFor="let p of getFilteredContractors()" class="glass-panel contractor-row">
             <div>
-              <h5 class="font-display" style="font-size: 1rem; font-weight: 600;">
+              <h5 class="font-display" style="font-size: 1rem; font-weight: 600; display: flex; align-items: center; gap: 8px; margin: 0 0 4px 0;">
                 {{ p.name }}
+                <button class="whatsapp-bubble-btn" *ngIf="p.phone" (click)="openWhatsApp(p.phone)" 
+                  style="background: #25D366; border: none; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); padding: 0; box-shadow: 0 2px 8px rgba(37, 211, 102, 0.4);"
+                  onmouseover="this.style.transform='scale(1.2) rotate(8deg)'; this.style.boxShadow='0 4px 12px rgba(37,211,102,0.6)'"
+                  onmouseout="this.style.transform='scale(1) rotate(0deg)'; this.style.boxShadow='0 2px 8px rgba(37,211,102,0.4)'"
+                  title="Contactar vía WhatsApp (Verificado)">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="#ffffff">
+                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.059 5.356 5.415 0 12.004 0 15.196.001 18.19 1.242 20.44 3.494c2.249 2.252 3.487 5.248 3.487 8.442 0 6.644-5.357 12-11.946 12-2.002-.001-3.972-.503-5.719-1.457L.057 24zM6.59 19.757c1.615.958 3.2 1.463 4.967 1.463l.55.001c5.46 0 9.902-4.443 9.904-9.902 0-2.639-1.027-5.12-2.892-6.987-1.866-1.867-4.348-2.894-6.989-2.894-5.461 0-9.903 4.443-9.904 9.903-.001 1.874.525 3.52 1.5 5.1l-.983 3.591 3.677-.974zm10.177-5.46c-.282-.141-1.668-.823-1.925-.917-.258-.094-.446-.141-.633.141-.188.282-.727.917-.892 1.106-.164.19-.329.21-.611.07-.282-.141-1.189-.438-2.264-1.4C9.588 12.534 9.013 11.53 8.872 11.248c-.141-.282-.015-.435.126-.575.127-.126.282-.329.423-.493.141-.164.188-.282.282-.47.094-.188.047-.353-.024-.494-.07-.141-.633-1.527-.868-2.092-.23-.553-.462-.477-.633-.486-.164-.008-.353-.009-.54-.009-.188 0-.493.07-.751.353-.258.282-.986.963-.986 2.349 0 1.386 1.008 2.725 1.149 2.913.141.188 1.985 3.031 4.809 4.247.672.289 1.197.462 1.606.592.675.215 1.29.185 1.775.113.54-.082 1.668-.681 1.903-1.339.235-.657.235-1.222.164-1.338-.071-.117-.258-.188-.54-.329z"/>
+                  </svg>
+                </button>
               </h5>
               <span style="font-size: 0.8rem; color: var(--text-muted);">
-                País: {{ p.country }} | Correo: {{ p.email }} | Iniciado: {{ p.date }}
+                {{ dashboardTranslations[selectedLang]['country'] }}: {{ p.country }} | {{ dashboardTranslations[selectedLang]['email'] }}: {{ p.email }} | {{ dashboardTranslations[selectedLang]['started'] }}: {{ p.date }}
               </span>
             </div>
 
             <div class="progress-bar-column">
               <div class="progress-bar-labels">
-                <span>Progreso Onboarding</span>
+                <span>{{ dashboardTranslations[selectedLang]['progLabel'] }}</span>
                 <strong>{{ p.progress }}%</strong>
               </div>
               <div class="progress-bar-track">
@@ -84,8 +91,8 @@
               <span class="glass-panel contractor-status-badge"
                 [style.color]="p.status === 'PAID' ? 'var(--accent-cyan)' : p.status === 'COMPLETED' ? 'var(--accent-mint)' : p.status === 'IN_REVIEW' ? 'var(--accent-amber)' : 'var(--accent-cyan)'"
                 [style.border-color]="p.status === 'PAID' ? 'rgba(0,245,230,0.2)' : p.status === 'COMPLETED' ? 'rgba(0,255,157,0.2)' : p.status === 'IN_REVIEW' ? 'rgba(255,193,7,0.2)' : 'rgba(0,245,230,0.2)'">
-                {{ p.status === 'PAID' ? 'Pagado' : p.status === 'COMPLETED' ? 'Completado' : p.status === 'IN_REVIEW' ?
-                'En Revisión' : 'En Progreso' }}
+                {{ p.status === 'PAID' ? dashboardTranslations[selectedLang]['paid'] : p.status === 'COMPLETED' ? dashboardTranslations[selectedLang]['completed'] : p.status === 'IN_REVIEW' ?
+                dashboardTranslations[selectedLang]['inReview'] : dashboardTranslations[selectedLang]['inProgress'] }}
               </span>
             </div>
 
@@ -93,27 +100,27 @@
               <button class="cyber-btn cyber-btn-secondary"
                 style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px;" *ngIf="p.status === 'IN_REVIEW'"
                 (click)="selectedProcessIdForReview = p.id">
-                Revisar Documentos
+                {{ dashboardTranslations[selectedLang]['revDocs'] }}
               </button>
               <button class="cyber-btn cyber-btn-primary"
                 style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; background: linear-gradient(135deg, var(--accent-mint), #00b0ff); color: var(--bg-darker); box-shadow: 0 0 10px rgba(0, 255, 157, 0.3);"
                 *ngIf="p.status === 'COMPLETED'" (click)="openPaymentModal(p)">
-                Emitir Pago
+                {{ dashboardTranslations[selectedLang]['emitPay'] }}
               </button>
               <span *ngIf="p.status === 'PAID'"
                 style="font-size: 0.85rem; color: var(--accent-mint); font-weight: 700; display: flex; align-items: center; gap: 5px;">
-                ✓ Nómina Enviada
+                {{ dashboardTranslations[selectedLang]['paySent'] }}
               </span>
               <span *ngIf="p.status !== 'IN_REVIEW' && p.status !== 'COMPLETED' && p.status !== 'PAID'"
                 style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">
-                Onboarding en proceso
+                {{ dashboardTranslations[selectedLang]['onbProc'] }}
               </span>
             </div>
           </div>
 
           <div *ngIf="getFilteredContractors().length === 0"
             style="text-align: center; padding: 30px; color: var(--text-muted); font-style: italic;">
-            No se encontraron contratistas en este estado.
+            {{ dashboardTranslations[selectedLang]['noFound'] }}
           </div>
         </div>
       </div>
@@ -121,39 +128,37 @@
       <!-- Document Review Section -->
       <div class="glass-panel review-pane" *ngIf="selectedProcessIdForReview && summary.steps[2].status === 'IN_REVIEW'"
         style="margin-top: 25px;">
-        <h4 class="font-display text-gradient" style="font-size: 1.2rem; font-weight: 700; margin-bottom: 10px;">Revisar
-          Documentos de Contratista</h4>
+        <h4 class="font-display text-gradient" style="font-size: 1.2rem; font-weight: 700; margin-bottom: 10px;">{{ dashboardTranslations[selectedLang]['revTitle'] }}</h4>
         <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px;">
-          Por favor valida que el documento cargado concuerda con los datos personales del contratista legal.
+          {{ dashboardTranslations[selectedLang]['revInst'] }}
         </p>
 
         <div style="display: flex; gap: 20px; align-items: start; margin-bottom: 25px;">
           <div class="glass-panel review-details">
-            <h5 style="font-weight: 700; margin-bottom: 10px; color: var(--text-primary);">DATOS EXTRAÍDOS DEL
-              DOCUMENTO:</h5>
-            <p>Nombres: {{ personalData.firstName || 'Juan' }}</p>
-            <p>Apellidos: {{ personalData.lastName || 'Pérez' }}</p>
-            <p>País: {{ personalData.country || 'España' }}</p>
-            <p>Tipo Documento: PASAPORTE_INTERNACIONAL</p>
+            <h5 style="font-weight: 700; margin-bottom: 10px; color: var(--text-primary);">{{ dashboardTranslations[selectedLang]['extData'] }}</h5>
+            <p>{{ dashboardTranslations[selectedLang]['names'] }}: {{ personalData.firstName || 'Juan' }}</p>
+            <p>{{ dashboardTranslations[selectedLang]['lasts'] }}: {{ personalData.lastName || 'Pérez' }}</p>
+            <p>{{ dashboardTranslations[selectedLang]['country'] }}: {{ personalData.country || 'España' }}</p>
+            <p>{{ dashboardTranslations[selectedLang]['docType'] }}: PASAPORTE_INTERNACIONAL</p>
             <p style="margin-top: 15px; color: var(--accent-mint); text-decoration: underline; cursor: pointer;">
-              VER ARCHIVO EN CLOUDINARY (DOCUMENT_ID.PDF)
+              {{ dashboardTranslations[selectedLang]['viewFile'] }} (DOCUMENT_ID.PDF)
             </p>
           </div>
 
           <div class="cyber-input-group" style="flex: 1; margin-bottom: 0;">
-            <label class="cyber-input-label">COMENTARIOS / FEEDBACK (SI SE RECHAZA)</label>
+            <label class="cyber-input-label">{{ dashboardTranslations[selectedLang]['comments'] }}</label>
             <textarea class="cyber-input" [(ngModel)]="reviewFeedback" rows="3"
-              placeholder="Ej. El pasaporte está borroso o incompleto..."></textarea>
+              [placeholder]="dashboardTranslations[selectedLang]['placeholderFeed']"></textarea>
           </div>
         </div>
 
         <div class="review-actions">
           <button class="cyber-btn reject-btn" (click)="reviewContractorStep('DOCUMENT_UPLOAD', false)">
-            Solicitar Corrección (Rechazar)
+            {{ dashboardTranslations[selectedLang]['rejectBtn'] }}
           </button>
           <button class="cyber-btn cyber-btn-primary" style="padding: 8px 25px; border-radius: 8px;"
             (click)="reviewContractorStep('DOCUMENT_UPLOAD', true)">
-            Aprobar Documento
+            {{ dashboardTranslations[selectedLang]['approveBtn'] }}
           </button>
         </div>
       </div>
@@ -161,7 +166,7 @@
       <!-- Changes History / Audit log widget -->
       <div class="glass-panel audit-log-card" style="margin-top: 25px;">
         <h4 class="font-display text-gradient" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 15px;">
-          Historial de Cambios / Registro de Auditoría</h4>
+          {{ dashboardTranslations[selectedLang]['auditTitle'] }}</h4>
         <div style="display: flex; flex-direction: column; gap: 10px;">
           <div *ngFor="let h of changeHistory; let first = first" class="audit-log-item"
             [style.border-left-color]="first ? 'var(--accent-cyan)' : 'var(--glass-border)'">
@@ -177,24 +182,22 @@
           <div class="modal-header"
             style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; margin-bottom: 20px;">
             <h3 class="font-display text-mint-gradient" style="font-size: 1.4rem; font-weight: 800; margin: 0;">
-              Confirmar Envío de Fondos</h3>
+              {{ dashboardTranslations[selectedLang]['confPayTitle'] }}</h3>
             <button class="modal-close-btn"
               style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem;"
               (click)="selectedProcessForPayment = null">✕</button>
           </div>
           <div class="modal-body">
             <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">
-              Estás a punto de procesar la nómina/pago para este contratista remoto certificado. Revisa la liquidación
-              detallada:
+              {{ dashboardTranslations[selectedLang]['confPayDesc'] }}
             </p>
 
             <div class="glass-panel payment-details-box"
               style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem;">
 
-              <p style="margin-bottom: 8px;"><strong>Beneficiario:</strong> {{ selectedProcessForPayment.name }}</p>
-              <p style="margin-bottom: 8px;"><strong>País / Destino:</strong> {{ selectedProcessForPayment.country }}
-              </p>
-              <p style="margin-bottom: 8px;"><strong>Método de Pago:</strong>
+              <p style="margin-bottom: 8px;"><strong>{{ dashboardTranslations[selectedLang]['bene'] }}:</strong> {{ selectedProcessForPayment.name }}</p>
+              <p style="margin-bottom: 8px;"><strong>{{ dashboardTranslations[selectedLang]['dest'] }}:</strong> {{ selectedProcessForPayment.country }}</p>
+              <p style="margin-bottom: 8px;"><strong>{{ dashboardTranslations[selectedLang]['payMethod'] }}:</strong>
                 <span class="payment-card-badge"
                   style="background: rgba(0, 245, 230, 0.1); color: var(--accent-cyan); padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; margin-left: 5px;">
                   BANK_TRANSFER
@@ -203,7 +206,7 @@
             </div>
 
             <div class="cyber-input-group">
-              <label class="cyber-input-label">MONTO A TRANSFERIR (USD)</label>
+              <label class="cyber-input-label">{{ dashboardTranslations[selectedLang]['amount'] }}</label>
               <div style="position: relative;">
                 <span
                   style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--accent-cyan); font-weight: 700;">$</span>
@@ -216,11 +219,11 @@
             <button class="cyber-btn"
               style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 8px 20px; border-radius: 8px;"
               (click)="selectedProcessForPayment = null" [disabled]="isProcessingPayment">
-              Cancelar
+              {{ dashboardTranslations[selectedLang]['cancel'] }}
             </button>
             <button class="cyber-btn cyber-btn-primary" style="padding: 8px 25px; border-radius: 8px; font-weight: 700;"
               (click)="confirmPayment()" [disabled]="isProcessingPayment">
-              {{ isProcessingPayment ? 'Transfiriendo...' : 'Confirmar Envío de Fondos' }}
+              {{ isProcessingPayment ? dashboardTranslations[selectedLang]['transferring'] : dashboardTranslations[selectedLang]['confPayTitle'] }}
             </button>
           </div>
         </div>

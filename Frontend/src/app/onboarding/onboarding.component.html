@@ -205,12 +205,45 @@
           <div class="cyber-input-group">
             <label class="cyber-input-label">PAÍS DE RESIDENCIA FISCAL</label>
             <select class="cyber-input" [(ngModel)]="personalData.country">
-              <option value="Spain">España</option>
-              <option value="Mexico">México</option>
-              <option value="Colombia">Colombia</option>
-              <option value="Argentina">Argentina</option>
-              <option value="Chile">Chile</option>
-              <option value="United States">Estados Unidos</option>
+              <optgroup label="América Latina">
+                <option value="Argentina">Argentina</option>
+                <option value="Bolivia">Bolivia</option>
+                <option value="Brazil">Brasil</option>
+                <option value="Chile">Chile</option>
+                <option value="Colombia">Colombia</option>
+                <option value="Costa Rica">Costa Rica</option>
+                <option value="Ecuador">Ecuador</option>
+                <option value="Mexico">México</option>
+                <option value="Panama">Panamá</option>
+                <option value="Paraguay">Paraguay</option>
+                <option value="Peru">Perú</option>
+                <option value="Puerto Rico">Puerto Rico</option>
+                <option value="Dominican Republic">República Dominicana</option>
+                <option value="Uruguay">Uruguay</option>
+                <option value="Venezuela">Venezuela</option>
+              </optgroup>
+              <optgroup label="Norteamérica">
+                <option value="Canada">Canadá</option>
+                <option value="United States">Estados Unidos</option>
+              </optgroup>
+              <optgroup label="Europa">
+                <option value="Germany">Alemania</option>
+                <option value="Spain">España</option>
+                <option value="France">Francia</option>
+                <option value="Italy">Italia</option>
+                <option value="Portugal">Portugal</option>
+                <option value="United Kingdom">Reino Unido</option>
+              </optgroup>
+              <optgroup label="Asia & Oceanía">
+                <option value="Australia">Australia</option>
+                <option value="China">China</option>
+                <option value="India">India</option>
+                <option value="Japan">Japón</option>
+                <option value="South Korea">Corea del Sur</option>
+              </optgroup>
+              <optgroup label="África">
+                <option value="South Africa">Sudáfrica</option>
+              </optgroup>
             </select>
           </div>
 

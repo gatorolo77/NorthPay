@@ -110,7 +110,8 @@
 
 .alerts-container {
   position: fixed;
-  left: 50%;
+  margin-top: 0.5%;
+  left: 30%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
@@ -432,7 +433,7 @@
   padding: 30px;
   text-align: center;
   border-radius: 12px;
-  background: rgba(0,0,0,0.2);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .dropzone-icon {
@@ -478,7 +479,7 @@
 }
 
 .contract-viewer {
-  background: rgba(0,0,0,0.3);
+  background: rgba(0, 0, 0, 0.3);
   border-radius: 12px;
   padding: 25px;
   height: 220px;
@@ -491,7 +492,7 @@
 }
 
 .signature-box {
-  background: rgba(2,9,8,0.7);
+  background: rgba(2, 9, 8, 0.7);
   border: 2px dashed rgba(0, 245, 230, 0.2);
   border-radius: 12px;
   padding: 20px;
@@ -600,7 +601,7 @@
 .scanner-progress-badge {
   position: absolute;
   bottom: 15px;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0, 0, 0, 0.7);
   padding: 5px 15px;
   border-radius: 20px;
   font-size: 0.8rem;
@@ -667,8 +668,8 @@
   font-family: monospace;
   font-size: 0.8rem;
   color: var(--accent-mint);
-  background: rgba(0,255,157,0.03);
-  border-color: rgba(0,255,157,0.15);
+  background: rgba(0, 255, 157, 0.03);
+  border-color: rgba(0, 255, 157, 0.15);
   margin-bottom: 30px;
 }
 
@@ -715,7 +716,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(0,0,0,0.2);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .progress-bar-column {
@@ -736,7 +737,7 @@
   border-radius: 3px;
   position: relative;
   overflow: hidden;
-  box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
 }
 
 .progress-bar-fill {
@@ -763,7 +764,7 @@
 .review-details {
   flex: 1;
   padding: 20px;
-  background: rgba(0,0,0,0.3);
+  background: rgba(0, 0, 0, 0.3);
   font-size: 0.85rem;
   font-family: monospace;
   border-color: var(--glass-border);
@@ -840,7 +841,8 @@
   transition: all 0.3s;
 }
 
-.filter-btn.active, .filter-btn:hover {
+.filter-btn.active,
+.filter-btn:hover {
   border-color: var(--accent-cyan);
   color: var(--accent-cyan);
   box-shadow: 0 0 10px rgba(0, 245, 230, 0.2);
@@ -899,13 +901,25 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .app-footer {
@@ -920,7 +934,6 @@
   border-color: rgba(0, 245, 230, 0.05);
 }
 
-/* Notifications Dropdown Styles */
 .notifications-dropdown {
   position: absolute;
   top: calc(100% + 15px);
@@ -949,14 +962,14 @@
 .dropdown-header h5 {
   font-size: 0.88rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: #ffffff; /* Force light color on dark dropdown background */
   margin: 0;
 }
 
 .mark-all-read {
   background: transparent;
   border: none;
-  color: var(--accent-cyan);
+  color: #00f5e6; /* Always bright cyan on dark dropdown background */
   font-size: 0.72rem;
   font-weight: 600;
   cursor: pointer;
@@ -1007,20 +1020,20 @@
 
 .item-message {
   font-size: 0.78rem;
-  color: var(--text-primary);
+  color: #ffffff; /* Force white text inside notifications */
   margin: 0 0 4px 0;
   line-height: 1.3;
 }
 
 .item-time {
   font-size: 0.68rem;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.5); /* Fixed translucent light gray */
 }
 
 .empty-dropdown {
   padding: 30px;
   text-align: center;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.6); /* Readable empty state on dark background */
   font-style: italic;
   font-size: 0.8rem;
 }
@@ -1050,13 +1063,15 @@
   }
 
   .onboarding-grid {
-    grid-template-columns: 1fr; /* Stacks sidebar above viewport */
+    grid-template-columns: 1fr;
+    /* Stacks sidebar above viewport */
     gap: 20px;
   }
 
   .sidebar {
     display: flex;
-    flex-direction: row; /* Horizontal strip on tablet */
+    flex-direction: row;
+    /* Horizontal strip on tablet */
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
@@ -1073,14 +1088,15 @@
     width: 80px;
     height: 80px;
   }
-  
+
   .progress-percent {
     font-size: 1.3rem;
   }
 
   .steps-list {
     flex-direction: row;
-    overflow-x: auto; /* Side scrollable steps */
+    overflow-x: auto;
+    /* Side scrollable steps */
     width: 100%;
     padding-bottom: 10px;
     gap: 10px;
@@ -1105,7 +1121,8 @@
   }
 
   .logo-subtitle {
-    display: none; /* Save space */
+    display: none;
+    /* Save space */
   }
 
   .status-badge {
@@ -1115,7 +1132,8 @@
 
   /* Landing Adaptation */
   .landing-wrapper {
-    flex-direction: column-reverse !important; /* Sidebar languages below/above depending on structure */
+    flex-direction: column-reverse !important;
+    /* Sidebar languages below/above depending on structure */
     gap: 20px !important;
   }
 
@@ -1127,7 +1145,8 @@
 
   /* Dynamic fix for inline landing grid */
   .landing-prop-grid {
-    grid-template-columns: 1fr !important; /* Stack feature blocks */
+    grid-template-columns: 1fr !important;
+    /* Stack feature blocks */
     gap: 10px !important;
   }
 
@@ -1141,7 +1160,8 @@
   }
 
   .input-grid-2 {
-    grid-template-columns: 1fr; /* Stack first & last names */
+    grid-template-columns: 1fr;
+    /* Stack first & last names */
     gap: 12px;
   }
 
@@ -1150,7 +1170,8 @@
   }
 
   .payment-provider-list {
-    grid-template-columns: repeat(2, 1fr); /* 2x2 Grid instead of inline line */
+    grid-template-columns: repeat(2, 1fr);
+    /* 2x2 Grid instead of inline line */
   }
 
   .step-form-title {
@@ -1165,7 +1186,7 @@
   .scanner-screen {
     height: 300px;
   }
-  
+
   .scanner-oval {
     width: 180px;
     height: 240px;
@@ -1175,7 +1196,7 @@
   .metrics-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .operator-card [style*="display: grid; grid-template-columns: 1.5fr 1fr"] {
     grid-template-columns: 1fr !important;
   }
@@ -1186,9 +1207,10 @@
 
   .audio-control-wrapper span,
   .audio-control-wrapper input {
-    display: none; /* Hide volume slider on mobile header to save huge space */
+    display: none;
+    /* Hide volume slider on mobile header to save huge space */
   }
-  
+
   .audio-control-wrapper {
     padding: 6px !important;
     margin-right: 2px !important;
@@ -1205,14 +1227,20 @@
     font-size: 1.2rem;
   }
 
+  .alerts-container {
+    margin-top: -7%;
+  }
+
   .app-header .cyber-btn.header-btn {
-    display: none; /* Hide huge operator button in tiny mobile, use hamburger later if needed, or keep lean */
+    display: none;
+    /* Hide huge operator button in tiny mobile, use hamburger later if needed, or keep lean */
   }
 
   .header-nav .status-badge span:last-child {
-    display: none; /* Hide 'Servidor NorthPay' text, keep bullet */
+    display: none;
+    /* Hide 'Servidor NorthPay' text, keep bullet */
   }
-  
+
   .status-badge {
     padding: 8px;
   }
@@ -1229,15 +1257,16 @@
   }
 
   .payment-provider-list {
-    grid-template-columns: 1fr; /* Complete stack on small phones */
+    grid-template-columns: 1fr;
+    /* Complete stack on small phones */
   }
-  
+
   .glass-panel.contractor-row {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
-  
+
   .contractor-row [style*="text-align: right"] {
     text-align: left !important;
     display: flex;
@@ -1247,19 +1276,22 @@
 
   /* Fix Landing scroll visibility for small screens */
   .main-content {
-    display: block !important; /* Kill flex-center centering, let it stack naturally for scrolling */
+    display: block !important;
+    /* Kill flex-center centering, let it stack naturally for scrolling */
     padding: 15px 10px 50px 10px !important;
   }
 
   .landing-wrapper {
-    margin: 10px auto !important; /* Reset large automatic margins */
+    margin: 10px auto !important;
+    /* Reset large automatic margins */
   }
 
   /* Squeeze and Fit all Language Buttons horizontally */
   .lang-selector-sidebar {
     gap: 6px !important;
     flex-wrap: nowrap !important;
-    overflow-x: visible !important; /* Try to fit without side-scroll */
+    overflow-x: visible !important;
+    /* Try to fit without side-scroll */
     justify-content: space-between !important;
     padding: 0 5px !important;
   }
