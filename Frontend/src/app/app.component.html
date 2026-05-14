@@ -104,6 +104,11 @@
           <span>🔐</span> {{ translations[selectedLang]['loginEntryLink'] }}
         </button>
 
+        <button (click)="currentView = 'contractor_login'" class="admin-badge-link" 
+          style="top: 52px; right: 20px; border-color: rgba(0, 245, 230, 0.35);" title="Ingreso Directo de Contratista">
+          <span>👤</span> {{ translations[selectedLang]['loginContractorEntry'] }}
+        </button>
+
         <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 15px;">
           <div class="logo-icon"
             style="width: 45px; height: 45px; border-radius: 10px; box-shadow: 0 0 20px var(--accent-cyan-glow); margin: 0; display: flex; align-items: center; justify-content: center;">
@@ -275,6 +280,54 @@
 
       <div style="margin-top: 12px; text-align: center; font-size: 0.7rem; color: var(--text-muted);">
         {{ translations[selectedLang]['loginTip'] }}
+      </div>
+    </section>
+
+    <!-- Ingreso de Contratista (Bypass a Dashboard) -->
+    <section *ngIf="currentView === 'contractor_login'" class="glass-panel admin-login-card" style="border-color: rgba(0, 245, 230, 0.15);">
+      <div style="text-align: center; margin-bottom: 12px;">
+        <div class="logo-icon" style="width: 40px; height: 40px; border-radius: 10px; margin: 0 auto 10px auto; background: linear-gradient(135deg, var(--accent-cyan), #0080ff);">
+          <span class="logo-letter" style="font-size: 1.4rem;">C</span>
+        </div>
+        <h2 class="font-display text-gradient" style="font-size: 1.4rem; font-weight: 800; margin-bottom: 4px;">
+          {{ translations[selectedLang]['btnPortalLogin'] }}
+        </h2>
+        <p style="color: var(--text-secondary); font-size: 0.8rem;">
+          Accede directamente a tu panel verificado de cobros
+        </p>
+      </div>
+
+      <div class="cyber-input-group" style="margin-bottom: 12px;">
+        <label class="cyber-input-label" style="font-size: 0.7rem; margin-bottom: 4px;">
+          {{ translations[selectedLang]['contractorEmailLabel'] }}
+        </label>
+        <input type="text" class="cyber-input" [(ngModel)]="loginEmail" placeholder="ejemplo@correo.com" style="padding: 10px 12px; font-size: 0.85rem;">
+      </div>
+
+      <div class="cyber-input-group" style="margin-bottom: 0;">
+        <label class="cyber-input-label" style="font-size: 0.7rem; margin-bottom: 4px;">
+          CONTRASEÑA
+        </label>
+        <div style="position: relative;">
+          <input [type]="showLoginPassword ? 'text' : 'password'" class="cyber-input" [(ngModel)]="loginPassword" 
+            placeholder="••••••••" style="padding: 10px 35px 10px 12px; font-size: 0.85rem; width: 100%;">
+          <button class="password-toggle-btn" (click)="showLoginPassword = !showLoginPassword" 
+            style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; padding: 0; z-index: 10;">
+            {{ showLoginPassword ? '👁️' : '👁️‍🗨️' }}
+          </button>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 15px; margin-top: 18px;">
+        <button class="cyber-btn cyber-btn-secondary" style="flex: 1; border-radius: 8px; padding: 9px; font-size: 0.85rem;"
+          (click)="currentView = 'landing'">
+          {{ translations[selectedLang]['loginBtnBack'] }}
+        </button>
+        <button class="cyber-btn cyber-btn-primary"
+          style="flex: 2; border-radius: 8px; padding: 9px; background: linear-gradient(135deg, var(--accent-cyan), #0080ff); color: var(--bg-darker); font-weight: 700; font-size: 0.85rem;"
+          (click)="submitContractorPortalLogin()">
+          {{ translations[selectedLang]['loginBtnSubmit'] }}
+        </button>
       </div>
     </section>
 

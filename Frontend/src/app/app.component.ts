@@ -36,8 +36,8 @@ interface OnboardingProcess {
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  currentView: 'landing' | 'welcome' | 'register' | 'onboarding' | 'operator' | 'login' = 'landing';
-  previousView: 'landing' | 'welcome' | 'register' | 'onboarding' | 'login' = 'landing';
+  currentView: 'landing' | 'welcome' | 'register' | 'onboarding' | 'operator' | 'login' | 'contractor_login' = 'landing';
+  previousView: 'landing' | 'welcome' | 'register' | 'onboarding' | 'login' | 'contractor_login' = 'landing';
   apiBaseUrl = 'http://localhost:8080/api';
   isLocalMock = true;
   isOperatorDemoMode = true;
@@ -50,6 +50,7 @@ export class AppComponent implements OnInit {
   showRegisterPassword = false;
   loginEmail = 'contractor@northpay.com';
   loginPassword = 'password123';
+  showLoginPassword = false;
   adminUser = 'admin@northpay.com';
   adminPass = 'admin123';
   userId = 1;
@@ -147,6 +148,7 @@ export class AppComponent implements OnInit {
       propDesc3: "Comprobación de identidad de última generación respaldada por motores biométricos avanzados.",
       btnOperator: "Panel de Operaciones (Demo)",
       btnActivate: "Iniciar Activación ",
+      btnPortalLogin: "Ingresar al Portal",
       preloading: "Precargando recursos...",
       statusReady: "Portal NorthPay listo para operar ⚡",
       onboardingPortalTitle: "Portal de Onboarding",
@@ -196,6 +198,7 @@ export class AppComponent implements OnInit {
       btnBackToStart: "Volver al Inicio",
       btnBackToOnboarding: "Volver a Onboarding",
       loginEntryLink: "Ingreso Operador",
+      loginContractorEntry: "Ingreso Contratista",
       loginTitle: "Acceso Operador",
       loginSubtitle: "Ingresa tus credenciales administrativas de NorthPay",
       loginUserLabel: "USUARIO O CORREO",
@@ -216,6 +219,7 @@ export class AppComponent implements OnInit {
       propDesc3: "Next-generation identity verification powered by advanced biometric engines.",
       btnOperator: "Operator Panel (Demo)",
       btnActivate: "Start Activation",
+      btnPortalLogin: "Access Portal",
       preloading: "Preloading resources...",
       statusReady: "NorthPay Portal ready to operate ⚡",
       onboardingPortalTitle: "Onboarding Portal",
@@ -265,6 +269,7 @@ export class AppComponent implements OnInit {
       btnBackToStart: "Back to Home",
       btnBackToOnboarding: "Back to Onboarding",
       loginEntryLink: "Operator Login",
+      loginContractorEntry: "Contractor Login",
       loginTitle: "Operator Access",
       loginSubtitle: "Enter your NorthPay administrative credentials",
       loginUserLabel: "USERNAME OR EMAIL",
@@ -285,6 +290,7 @@ export class AppComponent implements OnInit {
       propDesc3: "Vérification d'identité de pointe optimisée par des moteurs biométriques avancés.",
       btnOperator: "Panneau Opérateur (Démo)",
       btnActivate: "Lancer l'activation ",
+      btnPortalLogin: "Accéder au Portail",
       preloading: "Préchargement des ressources...",
       statusReady: "Portail NorthPay prêt à fonctionner ⚡",
       onboardingPortalTitle: "Portail d'Intégration",
@@ -334,6 +340,7 @@ export class AppComponent implements OnInit {
       btnBackToStart: "Retour à l'accueil",
       btnBackToOnboarding: "Retour à l'intégration",
       loginEntryLink: "Connexion Opérateur",
+      loginContractorEntry: "Accès Prestataire",
       loginTitle: "Accès Opérateur",
       loginSubtitle: "Saisissez vos identifiants administratifs NorthPay",
       loginUserLabel: "UTILISATEUR OU EMAIL",
@@ -354,6 +361,7 @@ export class AppComponent implements OnInit {
       propDesc3: "Verificação de identidade de última geração com suporte de motores biométricos avançados.",
       btnOperator: "Painel do Operador (Demo)",
       btnActivate: "Iniciar Ativação ",
+      btnPortalLogin: "Acessar o Portal",
       preloading: "Pré-carregando recursos...",
       statusReady: "Portal NorthPay pronto para operar ⚡",
       onboardingPortalTitle: "Portal de Integração",
@@ -403,6 +411,7 @@ export class AppComponent implements OnInit {
       btnBackToStart: "Voltar ao Início",
       btnBackToOnboarding: "Voltar ao Onboarding",
       loginEntryLink: "Acesso do Operador",
+      loginContractorEntry: "Acesso do Contratado",
       loginTitle: "Acesso do Operador",
       loginSubtitle: "Insira suas credenciais administrativas da NorthPay",
       loginUserLabel: "USUÁRIO OU E-MAIL",
@@ -423,6 +432,7 @@ export class AppComponent implements OnInit {
       propDesc3: "由先进 of 生物识别引擎支持的新一代身份验证。",
       btnOperator: "运营商面板 (演示)",
       btnActivate: "开始激活",
+      btnPortalLogin: "登录门户",
       preloading: "正在预载资源...",
       statusReady: "NorthPay 门户已准备就绪 ⚡",
       onboardingPortalTitle: "入职门户",
@@ -472,6 +482,7 @@ export class AppComponent implements OnInit {
       btnBackToStart: "返回首页",
       btnBackToOnboarding: "返回入职",
       loginEntryLink: "运营商登录",
+      loginContractorEntry: "承包商登录",
       loginTitle: "操作员访问权限",
       loginSubtitle: "输入您的 NorthPay 管理凭据",
       loginUserLabel: "用户名或电子邮件",
@@ -492,6 +503,7 @@ export class AppComponent implements OnInit {
       propDesc3: "Verifica dell'identità di nuova generazione supportata da motori biometrici avanzati.",
       btnOperator: "Pannello Operazioni (Demo)",
       btnActivate: "Avvia Attivazione",
+      btnPortalLogin: "Accedi al Portale",
       preloading: "Precaricamento risorse...",
       statusReady: "Portale NorthPay pronto a operare ⚡",
       onboardingPortalTitle: "Portale di Onboarding",
@@ -541,6 +553,7 @@ export class AppComponent implements OnInit {
       btnBackToStart: "Torna alla Home",
       btnBackToOnboarding: "Torna all'Onboarding",
       loginEntryLink: "Ingresso Operatore",
+      loginContractorEntry: "Ingresso Appaltatore",
       loginTitle: "Accesso Operatore",
       loginSubtitle: "Inserisci le tue credenziali amministrative NorthPay",
       loginUserLabel: "UTENTE O E-MAIL",
@@ -991,6 +1004,24 @@ export class AppComponent implements OnInit {
           this.addLocalNotification('Acceso Denegado: Verifica usuario y clave.', 'ERROR');
         }
       });
+    }
+  }
+
+  submitContractorPortalLogin() {
+    const targetEmail = this.invitationEmail || 'contractor@northpay.com';
+    const targetPass = this.registerPassword || 'password123';
+    
+    if (this.loginEmail.toLowerCase() === targetEmail.toLowerCase() && this.loginPassword === targetPass) {
+      this.addLocalNotification('Sesión iniciada correctamente. Cargando tu Dashboard...', 'SUCCESS');
+      
+      // Sincronizar estados de simulación a COMPLETADO para evitar hacer el onboarding
+      this.summary.status = 'COMPLETED';
+      this.summary.progress = 100;
+      this.summary.steps.forEach(s => s.status = 'COMPLETED');
+      
+      this.currentView = 'onboarding';
+    } else {
+      this.addLocalNotification('Credenciales incorrectas. Revisa tu correo y contraseña.', 'ERROR');
     }
   }
 

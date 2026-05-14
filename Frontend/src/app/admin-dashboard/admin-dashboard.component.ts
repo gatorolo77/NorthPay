@@ -77,7 +77,13 @@ export class AdminDashboardComponent implements OnInit {
       auditEmpty: "Sin eventos de auditoría registrados aún en esta sesión.",
       auditApp: "Paso 2 APROBADO para {name}: Documentos aceptados.",
       auditRej: "Paso 2 RECHAZADO para {name}: Solicitud de corrección enviada.",
-      auditPaid: "Pago de ${amount} USD procesado y enviado a {name} vía transferencia bancaria."
+      auditPaid: "Pago de ${amount} USD procesado y enviado a {name} vía transferencia bancaria.",
+      auditDel: "🗑️ Contratista {name} eliminado del panel de operaciones.",
+      confirmDel: "¿Estás seguro de que deseas eliminar a {name}?",
+      delModalTitle: "🛡️ Confirmación de Seguridad",
+      delModalDesc: "Para proceder a borrar a {name}, escribe su número de WhatsApp verificado como factor de confirmación:",
+      delError: "Acceso Denegado: El WhatsApp no coincide con los registros.",
+      delConfirmBtn: "Eliminar Permanentemente"
     },
     en: {
       opTitle: "NorthPay Operator Panel",
@@ -123,7 +129,13 @@ export class AdminDashboardComponent implements OnInit {
       auditEmpty: "No audit events recorded yet in this session.",
       auditApp: "Step 2 APPROVED for {name}: Documents accepted.",
       auditRej: "Step 2 REJECTED for {name}: Correction request sent.",
-      auditPaid: "Payment of ${amount} USD processed and sent to {name} via bank transfer."
+      auditPaid: "Payment of ${amount} USD processed and sent to {name} via bank transfer.",
+      auditDel: "🗑️ Contractor {name} deleted from operator panel.",
+      confirmDel: "Are you sure you want to delete {name}?",
+      delModalTitle: "🛡️ Security Confirmation",
+      delModalDesc: "To proceed with deleting {name}, type their verified WhatsApp number as a confirmation factor:",
+      delError: "Access Denied: The WhatsApp does not match our records.",
+      delConfirmBtn: "Permanently Delete"
     },
     fr: {
       opTitle: "Panneau des Opérations NorthPay",
@@ -169,7 +181,13 @@ export class AdminDashboardComponent implements OnInit {
       auditEmpty: "Aucun événement d'audit enregistré pour le moment dans cette session.",
       auditApp: "Étape 2 APPROUVÉE pour {name} : Documents acceptés.",
       auditRej: "Étape 2 REJETÉE pour {name} : Demande de correction envoyée.",
-      auditPaid: "Paiement de {amount} $ USD traité et envoyé à {name} par virement bancaire."
+      auditPaid: "Paiement de ${amount} USD traité et envoyé à {name} par virement bancaire.",
+      auditDel: "🗑️ Prestataire {name} supprimé du panneau d'opérations.",
+      confirmDel: "Êtes-vous sûr de vouloir supprimer {name}?",
+      delModalTitle: "🛡️ Confirmation de Sécurité",
+      delModalDesc: "Pour procéder à la suppression de {name}, saisissez son numéro WhatsApp vérifié comme facteur de confirmation:",
+      delError: "Accès Refusé: Le WhatsApp ne correspond pas aux enregistrements.",
+      delConfirmBtn: "Supprimer Définitivement"
     },
     pt: {
       opTitle: "Painel de Operações NorthPay",
@@ -215,7 +233,13 @@ export class AdminDashboardComponent implements OnInit {
       auditEmpty: "Nenhum evento de auditoria registrado ainda nesta sessão.",
       auditApp: "Passo 2 APROVADO para {name}: Documentos aceitos.",
       auditRej: "Passo 2 REJEITADO para {name}: Solicitação de correção enviada.",
-      auditPaid: "Pagamento de ${amount} USD processado e enviado para {name} via transferência bancária."
+      auditPaid: "Pagamento de ${amount} USD processado e enviado para {name} por transferência bancária.",
+      auditDel: "🗑️ Contratado {name} removido do painel de operações.",
+      confirmDel: "Tem certeza que deseja excluir {name}?",
+      delModalTitle: "🛡️ Confirmação de Segurança",
+      delModalDesc: "Para prosseguir com a exclusão de {name}, digite seu WhatsApp verificado como fator de confirmação:",
+      delError: "Acesso Negado: O WhatsApp não coincide com os registros.",
+      delConfirmBtn: "Excluir Permanentemente"
     },
     zh: {
       opTitle: "NorthPay 运营商面板",
@@ -261,7 +285,13 @@ export class AdminDashboardComponent implements OnInit {
       auditEmpty: "本次会话尚未记录审计事件。",
       auditApp: "第 2 步已批准 {name}：文件已接受。",
       auditRej: "第 2 步已拒绝 {name}：更正请求已发送。",
-      auditPaid: "已通过银行转账向 {name} 处理并发送 ${amount} 美元的款项。"
+      auditPaid: "向 {name} 支付的 ${amount} USD 已通过银行转账处理完毕。",
+      auditDel: "🗑️ 承包商 {name} 已从运营商面板删除。",
+      confirmDel: "您确定要删除 {name} 吗？",
+      delModalTitle: "🛡️ 安全确认",
+      delModalDesc: "要继续删除 {name}，请输入其验证过的 WhatsApp 号码作为确认因子：",
+      delError: "访问被拒绝：WhatsApp 与记录不符。",
+      delConfirmBtn: "永久删除"
     },
     it: {
       opTitle: "Pannello Operativo NorthPay",
@@ -307,7 +337,13 @@ export class AdminDashboardComponent implements OnInit {
       auditEmpty: "Nessun evento di audit registrato ancora in questa sessione.",
       auditApp: "Passo 2 APPROVATO per {name}: Documenti accettati.",
       auditRej: "Passo 2 RESPINTO per {name}: Richiesta di correzione inviata.",
-      auditPaid: "Pagamento di {amount} $ USD elaborato e inviato a {name} tramite bonifico bancario."
+      auditPaid: "Pagamento di ${amount} USD elaborato e inviato a {name} tramite bonifico bancario.",
+      auditDel: "🗑️ Appaltatore {name} eliminato dal pannello operativo.",
+      confirmDel: "Sei sicuro di voler eliminare {name}?",
+      delModalTitle: "🛡️ Conferma di Sicurezza",
+      delModalDesc: "Per procedere con l'eliminazione di {name}, digita il suo numero WhatsApp verificato come fattore di conferma:",
+      delError: "Accesso Negato: Il WhatsApp non corrisponde ai registri.",
+      delConfirmBtn: "Elimina Permanentemente"
     }
   };
 
@@ -316,6 +352,9 @@ export class AdminDashboardComponent implements OnInit {
   selectedProcessIdForReview: number | null = null;
   selectedProcessSummary: OnboardingSummary | null = null;
   reviewFeedback = '';
+
+  selectedContractorForDelete: any | null = null;
+  inputWhatsappConfirm = '';
 
   selectedProcessForPayment: any | null = null;
   paymentAmount = 2500;
@@ -638,8 +677,36 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   openWhatsApp(phone: string) {
-    if (!phone) return;
-    const cleanPhone = phone.replace(/\D/g, '');
-    window.open(`https://wa.me/${cleanPhone}`, '_blank');
+    const formattedPhone = phone.replace(/\D/g, '');
+    window.open(`https://wa.me/${formattedPhone}`, '_blank');
+  }
+
+  deleteContractor(id: number) {
+    const target = this.mockContractors.find(c => c.id === id);
+    if (!target) return;
+    
+    // Abrir modal seguro de borrado
+    this.selectedContractorForDelete = target;
+    this.inputWhatsappConfirm = '';
+  }
+
+  confirmDeleteContractor() {
+    if (!this.selectedContractorForDelete) return;
+
+    const target = this.selectedContractorForDelete;
+    const cleanInput = this.inputWhatsappConfirm.replace(/\D/g, '');
+    const cleanTarget = target.phone ? target.phone.replace(/\D/g, '') : '';
+
+    if (cleanInput === cleanTarget && cleanTarget !== '') {
+      this.mockContractors = this.mockContractors.filter(c => c.id !== target.id);
+      
+      const auditMsg = this.dashboardTranslations[this.selectedLang]['auditDel'].replace('{name}', target.name);
+      this.changeHistory.unshift(auditMsg);
+
+      this.selectedContractorForDelete = null;
+      this.inputWhatsappConfirm = '';
+    } else {
+      alert(this.dashboardTranslations[this.selectedLang]['delError']);
+    }
   }
 }
