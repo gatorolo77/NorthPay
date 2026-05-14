@@ -29,7 +29,7 @@
   --bg-darker: #fcfaf6;
   --bg-dark: #f3ebda;
   --bg-medium: #e7dbbd;
-  --bg-light: #b8c4d2;
+  --bg-light: #caf8c1;
   --accent-cyan: #9c1a6c;
   --accent-cyan-glow: rgba(156, 26, 108, 0.15);
   --accent-mint: #0052cc;
@@ -292,7 +292,6 @@ body {
   background: rgba(0, 82, 204, 0.07) !important;
   border: 1px solid rgba(0, 82, 204, 0.25) !important;
   color: var(--accent-mint) !important;
-  /* Pure navy/royal blue in light mode! */
   font-weight: 600 !important;
 }
 
@@ -322,4 +321,106 @@ body {
 [data-theme="light"] .landing-hero-desc {
   color: var(--text-primary) !important;
   font-weight: 600 !important;
+}
+
+/* Interactive Password Reveal Toggle (Cyber Eye) */
+.password-toggle-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  color: var(--text-secondary);
+  opacity: 0.6;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 6px;
+  border-radius: 50%;
+}
+
+.password-toggle-btn:hover {
+  opacity: 1;
+  color: var(--accent-cyan) !important;
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: 0 0 8px rgba(0, 245, 230, 0.15);
+}
+
+[data-theme="light"] .password-toggle-btn:hover {
+  background: rgba(0, 82, 204, 0.06);
+  color: var(--accent-mint) !important;
+  box-shadow: 0 0 8px rgba(0, 82, 204, 0.1);
+}
+
+.password-toggle-btn:active {
+  transform: translateY(-50%) scale(0.94);
+}
+
+/* ==========================================================================
+   GLOBAL ALERT TOAST WRAPPER (ENCAPSULATION BUSTED & FULLY ACCESSIBLE)
+   ========================================================================== */
+
+.alerts-container {
+  position: fixed;
+  margin-top: 0.5%;
+  left: 30%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+  z-index: 9999 !important;
+  /* Force toast alerts above modals and sticky elements */
+  width: calc(100% - 50px);
+  max-width: 320px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==========================================================================
+   SECCIÓN DE POSICIONAMIENTO MANUAL DE ALERTAS POR CADA VISTA
+   Modifica los valores de top, left, right, bottom y transform según tu gusto
+   para evitar colisiones visuales con el contenido de cada sección.
+   ========================================================================== */
+
+/* 🌅 Vista: Landing Page (Página de Inicio) */
+.alerts-container.alerts-view-landing {
+  top: 3.5%;
+  left: 29%;
+  /* Mantén el valor actual, o cámbialo a 50% si deseas centrado */
+}
+
+/* 👋 Vista: Welcome (Ingreso de Correo de Contratista) */
+.alerts-container.alerts-view-welcome {
+  top: 3%;
+  left: 30%;
+}
+
+/* 📝 Vista: Register (Configuración de Contraseña y Token) */
+.alerts-container.alerts-view-register {
+  top: 4.5%;
+  left: 33%;
+}
+
+/* 📊 Vista: Onboarding (Pasos de Documentación, Panel Principal) */
+.alerts-container.alerts-view-onboarding {
+  top: 6%;
+  left: 30%;
+}
+
+/* 🔐 Vista: Login (Acceso Administrativo de Operador Real) */
+.alerts-container.alerts-view-login {
+  top: 5%;
+  left: 30%;
+}
+
+/* 🖥️ Vista: Operator (Panel de Monitoreo Sandbox / Dashboard Oficial) */
+.alerts-container.alerts-view-operator {
+  top: 5%;
+  left: 30%;
 }

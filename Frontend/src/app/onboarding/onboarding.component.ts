@@ -34,6 +34,7 @@ export class OnboardingComponent implements OnInit {
   invitationToken = '';
   invitationEmail = 'contractor@northpay.com';
   registerPassword = 'password123';
+  showRegisterPassword = false;
   loginEmail = 'contractor@northpay.com';
   loginPassword = 'password123';
   userId = 1;

@@ -47,6 +47,7 @@ export class AppComponent implements OnInit {
   invitationToken = '';
   invitationEmail = 'contractor@northpay.com';
   registerPassword = 'password123';
+  showRegisterPassword = false;
   loginEmail = 'contractor@northpay.com';
   loginPassword = 'password123';
   adminUser = 'admin@northpay.com';
@@ -186,6 +187,8 @@ export class AppComponent implements OnInit {
       notifWsSuccess: "WhatsApp verificado correctamente. ¡Onboarding desbloqueado!",
       notifWsFail: "Código incorrecto. Intenta de nuevo.",
       notifPersSave: "Datos personales guardados con éxito.",
+      notifStep2App: "Paso 2 APROBADO: Documentos aceptados por operaciones.",
+      notifStep2Rej: "Paso 2 RECHAZADO: Se enviaron solicitudes de corrección.",
       btnLogout: "Cerrar Sesión",
       btnBackToStart: "Volver al Inicio",
       btnBackToOnboarding: "Volver a Onboarding",
@@ -253,6 +256,8 @@ export class AppComponent implements OnInit {
       notifWsSuccess: "WhatsApp verified successfully. Onboarding unlocked!",
       notifWsFail: "Incorrect code. Please try again.",
       notifPersSave: "Personal data saved successfully.",
+      notifStep2App: "Step 2 APPROVED: Documents accepted by operations.",
+      notifStep2Rej: "Step 2 REJECTED: Correction requests sent.",
       btnLogout: "Logout",
       btnBackToStart: "Back to Home",
       btnBackToOnboarding: "Back to Onboarding",
@@ -320,6 +325,8 @@ export class AppComponent implements OnInit {
       notifWsSuccess: "WhatsApp vérifié avec succès. Intégration déverrouillée !",
       notifWsFail: "Code incorrect. Veuillez réessayer.",
       notifPersSave: "Données personnelles enregistrées avec succès.",
+      notifStep2App: "Étape 2 APPROUVÉE : Documents acceptés par les opérations.",
+      notifStep2Rej: "Étape 2 REJETÉE : Demandes de correction envoyées.",
       btnLogout: "Se déconnecter",
       btnBackToStart: "Retour à l'accueil",
       btnBackToOnboarding: "Retour à l'intégration",
@@ -387,6 +394,8 @@ export class AppComponent implements OnInit {
       notifWsSuccess: "WhatsApp verificado com sucesso. Integração desbloqueada!",
       notifWsFail: "Código incorreto. Por favor tente novamente.",
       notifPersSave: "Dados pessoais salvos com sucesso.",
+      notifStep2App: "Passo 2 APROVADO: Documentos aceitos pelas operações.",
+      notifStep2Rej: "Passo 2 REJEITADO: Solicitações de correção enviadas.",
       btnLogout: "Sair",
       btnBackToStart: "Voltar ao Início",
       btnBackToOnboarding: "Voltar ao Onboarding",
@@ -454,6 +463,8 @@ export class AppComponent implements OnInit {
       notifWsSuccess: "WhatsApp 验证成功。入职流程已解锁！",
       notifWsFail: "代码错误。请再试一次。",
       notifPersSave: "个人数据已成功保存。",
+      notifStep2App: "第 2 步审核通过：运营已接受文档。",
+      notifStep2Rej: "第 2 步已拒绝：已发送更正请求。",
       btnLogout: "注销",
       btnBackToStart: "返回首页",
       btnBackToOnboarding: "返回入职",
@@ -521,6 +532,8 @@ export class AppComponent implements OnInit {
       notifWsSuccess: "WhatsApp verificato con successo. Onboarding sbloccato!",
       notifWsFail: "Codice non corretto. Riprova.",
       notifPersSave: "Dati personali salvati con successo.",
+      notifStep2App: "Passo 2 APPROVATO: Documenti accettati dalle operazioni.",
+      notifStep2Rej: "Passo 2 RESPINTO: Inviate richieste di correzione.",
       btnLogout: "Disconnetti",
       btnBackToStart: "Torna alla Home",
       btnBackToOnboarding: "Torna all'Onboarding",
@@ -1015,10 +1028,10 @@ export class AppComponent implements OnInit {
       if (approved) {
         this.summary.steps[2].status = 'COMPLETED';
         this.summary.steps[3].status = 'IN_PROGRESS';
-        this.addLocalNotification('Paso 2 APROBADO: Documentos aceptados por operaciones.', 'SUCCESS');
+        this.addLocalNotification(this.translations[this.selectedLang]['notifStep2App'], 'SUCCESS');
       } else {
         this.summary.steps[2].status = 'REJECTED';
-        this.addLocalNotification('Paso 2 RECHAZADO: Se enviaron solicitudes de corrección.', 'ERROR');
+        this.addLocalNotification(this.translations[this.selectedLang]['notifStep2Rej'], 'ERROR');
       }
       this.reviewFeedback = '';
       this.refreshSummary();
@@ -1222,6 +1235,10 @@ export class AppComponent implements OnInit {
     return this.notifications.filter(n => !n.isRead).length;
   }
 
+  getUnreadNotifications() {
+    return this.notifications.filter(n => !n.isRead);
+  }
+
   markAllNotificationsAsRead(event: Event) {
     event.stopPropagation();
     this.notifications.forEach(n => n.isRead = true);
@@ -1379,7 +1396,10 @@ export class AppComponent implements OnInit {
 
   markNotificationRead(id: number) {
     if (this.isLocalMock) {
-      this.notifications = this.notifications.filter(n => n.id !== id);
+      const notif = this.notifications.find(n => n.id === id);
+      if (notif) {
+        notif.isRead = true;
+      }
     } else {
       this.http.post(`${this.apiBaseUrl}/notifications/${id}/read`, {}).subscribe({
         next: () => this.loadNotifications()

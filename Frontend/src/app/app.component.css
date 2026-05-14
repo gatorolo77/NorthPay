@@ -94,7 +94,7 @@
 }
 
 [data-theme="light"] .status-pill-official {
-  background: rgba(0, 82, 204, 0.1) !important;
+  background: rgba(154, 191, 245, 0.1) !important;
   border-color: rgba(0, 82, 204, 0.4) !important;
 }
 
@@ -128,21 +128,6 @@
   height: 8px;
   border-radius: 50%;
   box-shadow: 0 0 8px var(--accent-coral);
-}
-
-.alerts-container {
-  position: fixed;
-  margin-top: 0.5%;
-  left: 30%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  pointer-events: none;
-  z-index: 1000;
-  width: calc(100% - 50px);
-  max-width: 320px;
 }
 
 .alert-panel {
@@ -230,6 +215,17 @@
   padding: 24px 30px;
   margin: auto;
   border-color: rgba(0, 255, 157, 0.15);
+}
+
+.admin-login-card {
+  width: 100%;
+  max-width: 380px; /* Reducido 15% para compactar */
+  padding: 18px 25px; /* Menos padding interno */
+  margin: auto; /* Centrado vertical/horizontal perfecto sin margen estático */
+  border-color: rgba(0, 255, 157, 0.15);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
 .register-title {
@@ -743,7 +739,7 @@
 
 .progress-bar-column {
   width: 100%;
-  max-width: 300px;
+  max-width: 210px; /* Reducido 30% de 300px para liberar espacio para la columna de estado */
 }
 
 .progress-bar-labels {
@@ -776,6 +772,7 @@
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
+  white-space: nowrap; /* Evita saltos de línea en estados largos como 'In Progress' */
 }
 
 .review-pane {
@@ -1080,11 +1077,12 @@
   transform: scale(0.96);
 }
 
-/* ==========================================================================
-   RESPONSIVENESS & UNIVERSAL DEVICE COMPATIBILITY (PREMIUM MOBILE FIRST FEEL)
-   ========================================================================== */
+.gato {
+  font-size: 10px;
+  font-family: italic;
+}
 
-/* Tablet & Small Desktop Overrides */
+
 @media (max-width: 1024px) {
   .main-content {
     padding: 15px;

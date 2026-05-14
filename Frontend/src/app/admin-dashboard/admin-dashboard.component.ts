@@ -74,7 +74,10 @@ export class AdminDashboardComponent implements OnInit {
       amount: "MONTO A TRANSFERIR (USD)",
       cancel: "Cancelar",
       transferring: "Transfiriendo...",
-      auditEmpty: "Sin eventos de auditoría registrados aún en esta sesión."
+      auditEmpty: "Sin eventos de auditoría registrados aún en esta sesión.",
+      auditApp: "Paso 2 APROBADO para {name}: Documentos aceptados.",
+      auditRej: "Paso 2 RECHAZADO para {name}: Solicitud de corrección enviada.",
+      auditPaid: "Pago de ${amount} USD procesado y enviado a {name} vía transferencia bancaria."
     },
     en: {
       opTitle: "NorthPay Operator Panel",
@@ -117,7 +120,10 @@ export class AdminDashboardComponent implements OnInit {
       amount: "AMOUNT TO TRANSFER (USD)",
       cancel: "Cancel",
       transferring: "Transferring...",
-      auditEmpty: "No audit events recorded yet in this session."
+      auditEmpty: "No audit events recorded yet in this session.",
+      auditApp: "Step 2 APPROVED for {name}: Documents accepted.",
+      auditRej: "Step 2 REJECTED for {name}: Correction request sent.",
+      auditPaid: "Payment of ${amount} USD processed and sent to {name} via bank transfer."
     },
     fr: {
       opTitle: "Panneau des Opérations NorthPay",
@@ -160,7 +166,10 @@ export class AdminDashboardComponent implements OnInit {
       amount: "MONTANT À TRANSFÉRER (USD)",
       cancel: "Annuler",
       transferring: "Transfert en cours...",
-      auditEmpty: "Aucun événement d'audit enregistré pour le moment dans cette session."
+      auditEmpty: "Aucun événement d'audit enregistré pour le moment dans cette session.",
+      auditApp: "Étape 2 APPROUVÉE pour {name} : Documents acceptés.",
+      auditRej: "Étape 2 REJETÉE pour {name} : Demande de correction envoyée.",
+      auditPaid: "Paiement de {amount} $ USD traité et envoyé à {name} par virement bancaire."
     },
     pt: {
       opTitle: "Painel de Operações NorthPay",
@@ -203,7 +212,10 @@ export class AdminDashboardComponent implements OnInit {
       amount: "VALOR A TRANSFERIR (USD)",
       cancel: "Cancelar",
       transferring: "Transferindo...",
-      auditEmpty: "Nenhum evento de auditoria registrado ainda nesta sessão."
+      auditEmpty: "Nenhum evento de auditoria registrado ainda nesta sessão.",
+      auditApp: "Passo 2 APROVADO para {name}: Documentos aceitos.",
+      auditRej: "Passo 2 REJEITADO para {name}: Solicitação de correção enviada.",
+      auditPaid: "Pagamento de ${amount} USD processado e enviado para {name} via transferência bancária."
     },
     zh: {
       opTitle: "NorthPay 运营商面板",
@@ -246,7 +258,10 @@ export class AdminDashboardComponent implements OnInit {
       amount: "转账金额 (USD)",
       cancel: "取消",
       transferring: "正在转账...",
-      auditEmpty: "本次会话尚未记录审计事件。"
+      auditEmpty: "本次会话尚未记录审计事件。",
+      auditApp: "第 2 步已批准 {name}：文件已接受。",
+      auditRej: "第 2 步已拒绝 {name}：更正请求已发送。",
+      auditPaid: "已通过银行转账向 {name} 处理并发送 ${amount} 美元的款项。"
     },
     it: {
       opTitle: "Pannello Operativo NorthPay",
@@ -289,7 +304,10 @@ export class AdminDashboardComponent implements OnInit {
       amount: "IMPORTO DA TRASFERIRE (USD)",
       cancel: "Annulla",
       transferring: "Trasferimento in corso...",
-      auditEmpty: "Nessun evento di audit registrato ancora in questa sessione."
+      auditEmpty: "Nessun evento di audit registrato ancora in questa sessione.",
+      auditApp: "Passo 2 APPROVATO per {name}: Documenti accettati.",
+      auditRej: "Passo 2 RESPINTO per {name}: Richiesta di correzione inviata.",
+      auditPaid: "Pagamento di {amount} $ USD elaborato e inviato a {name} tramite bonifico bancario."
     }
   };
 
@@ -472,7 +490,9 @@ export class AdminDashboardComponent implements OnInit {
           targetContractor.progress = 100;
           targetContractor.currentStep = 'COMPLETED';
         }
-        this.changeHistory.unshift(`Paso 2 APROBADO para ${targetContractor?.name || 'Contratista'}: Documentos aceptados.`);
+        const auditMsg = this.dashboardTranslations[this.selectedLang]['auditApp']
+          .replace('{name}', targetContractor?.name || 'Contratista');
+        this.changeHistory.unshift(auditMsg);
         
         // Si aprobamos al contratista actual del onboarding (Juan Pérez, ID 500), sincronizamos su progreso real!
         if (targetId === 500) {
@@ -485,7 +505,9 @@ export class AdminDashboardComponent implements OnInit {
         if (targetContractor) {
           targetContractor.status = 'IN_PROGRESS'; // O requiere ajustes
         }
-        this.changeHistory.unshift(`Paso 2 RECHAZADO para ${targetContractor?.name || 'Contratista'}: Solicitud de corrección enviada.`);
+        const auditMsg = this.dashboardTranslations[this.selectedLang]['auditRej']
+          .replace('{name}', targetContractor?.name || 'Contratista');
+        this.changeHistory.unshift(auditMsg);
         
         if (targetId === 500) {
           this.summary.steps[2].status = 'REJECTED';
@@ -534,7 +556,11 @@ export class AdminDashboardComponent implements OnInit {
         target.paid = true;
       }
 
-      this.changeHistory.unshift(`Pago de $${this.paymentAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD procesado y enviado a ${c.name} vía transferencia bancaria.`);
+      const formattedAmount = this.paymentAmount.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      const auditMsg = this.dashboardTranslations[this.selectedLang]['auditPaid']
+        .replace('{amount}', formattedAmount)
+        .replace('{name}', c.name);
+      this.changeHistory.unshift(auditMsg);
       
       // Notify the parent shell that payment occurred!
       this.paymentCompleted.emit(c.id);
