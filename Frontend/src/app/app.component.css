@@ -438,7 +438,7 @@
 
 .submit-action-btn {
   align-self: flex-end;
-  margin-top: auto;
+  margin-top: 15px;
   height: 48px;
 }
 
@@ -777,7 +777,6 @@
   font-weight: 700;
   text-transform: uppercase;
   white-space: nowrap;
-  /* Evita saltos de línea en estados largos como 'In Progress' */
 }
 
 .review-pane {

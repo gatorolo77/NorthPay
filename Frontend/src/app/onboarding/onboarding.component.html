@@ -293,6 +293,11 @@
             </div>
           </div>
 
+          <button class="cyber-btn cyber-btn-primary submit-action-btn" [disabled]="isUploadingDoc || !selectedFile"
+            (click)="uploadDocument()" style="margin-bottom: 15px;">
+            {{ isUploadingDoc ? 'Subiendo archivo...' : 'Enviar para Revisión Legal' }}
+          </button>
+
           <div class="uploaded-list" *ngIf="uploadedDocs.length > 0">
             <h5 class="uploaded-list-title">Archivos Subidos</h5>
             <div *ngFor="let doc of uploadedDocs" class="glass-panel uploaded-item">
@@ -300,11 +305,6 @@
               <span style="color: var(--accent-amber); font-weight: 600;">EN REVISIÓN</span>
             </div>
           </div>
-
-          <button class="cyber-btn cyber-btn-primary submit-action-btn" [disabled]="isUploadingDoc || !selectedFile"
-            (click)="uploadDocument()">
-            {{ isUploadingDoc ? 'Subiendo archivo...' : 'Enviar para Revisión Legal' }}
-          </button>
         </div>
 
         <div *ngIf="summary.currentStep === 'CONTRACT_SIGN'" class="step-form-container">

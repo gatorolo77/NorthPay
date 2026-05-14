@@ -67,7 +67,8 @@
             <button class="mark-all-read" (click)="markAllNotificationsAsRead($event)">Limpiar</button>
           </div>
           <div class="dropdown-body">
-            <div *ngFor="let n of notifications" class="dropdown-item" [class.unread]="!n.isRead" (click)="markNotificationRead(n.id)">
+            <div *ngFor="let n of notifications" class="dropdown-item" [class.unread]="!n.isRead"
+              (click)="markNotificationRead(n.id)">
               <span class="item-icon">{{ n.type === 'SUCCESS' ? '✅' : n.type === 'ERROR' ? '❌' : 'ℹ️' }}</span>
               <div class="item-content">
                 <p class="item-message" style="margin: 0; line-height: 1.3;">{{ n.message }}</p>
@@ -104,7 +105,7 @@
           <span>🔐</span> {{ translations[selectedLang]['loginEntryLink'] }}
         </button>
 
-        <button (click)="currentView = 'contractor_login'" class="admin-badge-link" 
+        <button (click)="currentView = 'contractor_login'" class="admin-badge-link"
           style="top: 52px; right: 20px; border-color: rgba(0, 245, 230, 0.35);" title="Ingreso Directo de Contratista">
           <span>👤</span> {{ translations[selectedLang]['loginContractorEntry'] }}
         </button>
@@ -257,18 +258,22 @@
       </div>
 
       <div class="cyber-input-group" style="margin-bottom: 12px;">
-        <label class="cyber-input-label" style="font-size: 0.7rem; margin-bottom: 4px;">{{ translations[selectedLang]['loginUserLabel'] }}</label>
-        <input type="text" class="cyber-input" [(ngModel)]="adminUser" placeholder="admin@northpay.com" style="padding: 10px 12px; font-size: 0.85rem;">
+        <label class="cyber-input-label" style="font-size: 0.7rem; margin-bottom: 4px;">{{
+          translations[selectedLang]['loginUserLabel'] }}</label>
+        <input type="text" class="cyber-input" [(ngModel)]="adminUser" placeholder="admin@northpay.com"
+          style="padding: 10px 12px; font-size: 0.85rem;">
       </div>
 
       <div class="cyber-input-group" style="margin-bottom: 0;">
-        <label class="cyber-input-label" style="font-size: 0.7rem; margin-bottom: 4px;">{{ translations[selectedLang]['loginPassLabel'] }}</label>
-        <input type="password" class="cyber-input" [(ngModel)]="adminPass" placeholder="••••••••" style="padding: 10px 12px; font-size: 0.85rem;">
+        <label class="cyber-input-label" style="font-size: 0.7rem; margin-bottom: 4px;">{{
+          translations[selectedLang]['loginPassLabel'] }}</label>
+        <input type="password" class="cyber-input" [(ngModel)]="adminPass" placeholder="••••••••"
+          style="padding: 10px 12px; font-size: 0.85rem;">
       </div>
 
       <div style="display: flex; gap: 15px; margin-top: 18px;">
-        <button class="cyber-btn cyber-btn-secondary" style="flex: 1; border-radius: 8px; padding: 9px; font-size: 0.85rem;"
-          (click)="currentView = 'landing'">
+        <button class="cyber-btn cyber-btn-secondary"
+          style="flex: 1; border-radius: 8px; padding: 9px; font-size: 0.85rem;" (click)="currentView = 'landing'">
           {{ translations[selectedLang]['loginBtnBack'] }}
         </button>
         <button class="cyber-btn cyber-btn-primary"
@@ -284,9 +289,11 @@
     </section>
 
     <!-- Ingreso de Contratista (Bypass a Dashboard) -->
-    <section *ngIf="currentView === 'contractor_login'" class="glass-panel admin-login-card" style="border-color: rgba(0, 245, 230, 0.15);">
+    <section *ngIf="currentView === 'contractor_login'" class="glass-panel admin-login-card"
+      style="border-color: rgba(0, 245, 230, 0.15);">
       <div style="text-align: center; margin-bottom: 12px;">
-        <div class="logo-icon" style="width: 40px; height: 40px; border-radius: 10px; margin: 0 auto 10px auto; background: linear-gradient(135deg, var(--accent-cyan), #0080ff);">
+        <div class="logo-icon"
+          style="width: 40px; height: 40px; border-radius: 10px; margin: 0 auto 10px auto; background: linear-gradient(135deg, var(--accent-cyan), #0080ff);">
           <span class="logo-letter" style="font-size: 1.4rem;">C</span>
         </div>
         <h2 class="font-display text-gradient" style="font-size: 1.4rem; font-weight: 800; margin-bottom: 4px;">
@@ -301,7 +308,8 @@
         <label class="cyber-input-label" style="font-size: 0.7rem; margin-bottom: 4px;">
           {{ translations[selectedLang]['contractorEmailLabel'] }}
         </label>
-        <input type="text" class="cyber-input" [(ngModel)]="loginEmail" placeholder="ejemplo@correo.com" style="padding: 10px 12px; font-size: 0.85rem;">
+        <input type="text" class="cyber-input" [(ngModel)]="loginEmail" placeholder="ejemplo@correo.com"
+          style="padding: 10px 12px; font-size: 0.85rem;">
       </div>
 
       <div class="cyber-input-group" style="margin-bottom: 0;">
@@ -309,9 +317,9 @@
           CONTRASEÑA
         </label>
         <div style="position: relative;">
-          <input [type]="showLoginPassword ? 'text' : 'password'" class="cyber-input" [(ngModel)]="loginPassword" 
+          <input [type]="showLoginPassword ? 'text' : 'password'" class="cyber-input" [(ngModel)]="loginPassword"
             placeholder="••••••••" style="padding: 10px 35px 10px 12px; font-size: 0.85rem; width: 100%;">
-          <button class="password-toggle-btn" (click)="showLoginPassword = !showLoginPassword" 
+          <button class="password-toggle-btn" (click)="showLoginPassword = !showLoginPassword"
             style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; padding: 0; z-index: 10;">
             {{ showLoginPassword ? '👁️' : '👁️‍🗨️' }}
           </button>
@@ -319,8 +327,8 @@
       </div>
 
       <div style="display: flex; gap: 15px; margin-top: 18px;">
-        <button class="cyber-btn cyber-btn-secondary" style="flex: 1; border-radius: 8px; padding: 9px; font-size: 0.85rem;"
-          (click)="currentView = 'landing'">
+        <button class="cyber-btn cyber-btn-secondary"
+          style="flex: 1; border-radius: 8px; padding: 9px; font-size: 0.85rem;" (click)="currentView = 'landing'">
           {{ translations[selectedLang]['loginBtnBack'] }}
         </button>
         <button class="cyber-btn cyber-btn-primary"
@@ -373,14 +381,26 @@
       <div class="cyber-input-group">
         <label class="cyber-input-label">{{ translations[selectedLang]['regPassLabel'] }}</label>
         <div style="position: relative; width: 100%;">
-          <input [type]="showRegisterPassword ? 'text' : 'password'" class="cyber-input" 
-            [(ngModel)]="registerPassword" placeholder="••••••••" style="padding-right: 45px; width: 100%;">
+          <input [type]="showRegisterPassword ? 'text' : 'password'" class="cyber-input" [(ngModel)]="registerPassword"
+            placeholder="••••••••" style="padding-right: 45px; width: 100%;">
           <button type="button" class="password-toggle-btn" (click)="showRegisterPassword = !showRegisterPassword"
             [title]="showRegisterPassword ? 'Ocultar' : 'Mostrar'">
             <!-- Feather icon eye -->
-            <svg *ngIf="!showRegisterPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            <svg *ngIf="!showRegisterPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
             <!-- Feather icon eye-off -->
-            <svg *ngIf="showRegisterPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+            <svg *ngIf="showRegisterPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path
+                d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+              </path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
           </button>
         </div>
       </div>
@@ -563,26 +583,25 @@
           <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 3: {{
             translations[selectedLang]['step2'] }}</h3>
           <p class="step-form-desc">
-            Sube un documento oficial de identificación para que nuestro departamento legal lo valide. Los formatos
-            permitidos son PDF o imágenes claras.
+            {{ translations[selectedLang]['step2Desc'] }}
           </p>
 
           <div class="upload-grid">
             <div class="cyber-input-group">
-              <label class="cyber-input-label">TIPO DE DOCUMENTO</label>
+              <label class="cyber-input-label">{{ translations[selectedLang]['docTypeLabel'] }}</label>
               <select class="cyber-input" [(ngModel)]="selectedDocType">
-                <option value="PASSPORT">Pasaporte o D.N.I</option>
-                <option value="TAX_FORM">Identificación Fiscal</option>
+                <option value="PASSPORT">{{ translations[selectedLang]['docTypePassport'] }}</option>
+                <option value="TAX_FORM">{{ translations[selectedLang]['docTypeTax'] }}</option>
               </select>
             </div>
 
             <div class="cyber-input-group" style="flex: 1;">
-              <label class="cyber-input-label">SELECCIONAR ARCHIVO</label>
+              <label class="cyber-input-label">{{ translations[selectedLang]['docSelectFileLabel'] }}</label>
               <div class="upload-dropzone">
                 <span class="dropzone-icon"></span>
                 <input type="file" (change)="onFileSelected($event)" id="fileInput" style="display: none;">
                 <label for="fileInput" class="cyber-btn cyber-btn-secondary dropzone-btn">
-                  Buscar archivo local
+                  {{ translations[selectedLang]['docBrowseBtn'] }}
                 </label>
                 <span *ngIf="selectedFile" class="dropzone-file">
                   ✓ {{ selectedFile.name }}
@@ -591,26 +610,27 @@
             </div>
           </div>
 
+          <button class="cyber-btn cyber-btn-primary submit-action-btn" [disabled]="isUploadingDoc || !selectedFile"
+            (click)="uploadDocument()" style="margin-top: 15px;">
+            {{ isUploadingDoc ? translations[selectedLang]['docUploading'] : translations[selectedLang]['docSubmitBtn']
+            }}
+          </button>
+
           <div class="uploaded-list" *ngIf="uploadedDocs.length > 0">
-            <h5 class="uploaded-list-title">Archivos Subidos</h5>
+            <h5 class="uploaded-list-title">{{ translations[selectedLang]['docUploadedTitle'] }}</h5>
             <div *ngFor="let doc of uploadedDocs" class="glass-panel uploaded-item">
               <span>{{ doc.type }}: <strong>{{ doc.filename }}</strong></span>
-              <span style="color: var(--accent-amber); font-weight: 600;">EN REVISIÓN</span>
+              <span style="color: var(--accent-amber); font-weight: 600;">{{
+                translations[selectedLang]['docInReviewLabel'] }}</span>
             </div>
           </div>
-
-          <button class="cyber-btn cyber-btn-primary submit-action-btn" [disabled]="isUploadingDoc || !selectedFile"
-            (click)="uploadDocument()">
-            {{ isUploadingDoc ? 'Subiendo archivo...' : 'Enviar para Revisión Legal' }}
-          </button>
         </div>
 
         <div *ngIf="summary.currentStep === 'CONTRACT_SIGN'" class="step-form-container">
           <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 4: {{
             translations[selectedLang]['step3'] }}</h3>
           <p class="step-form-desc">
-            Lee detenidamente el acuerdo de contratista remoto de NorthPay y firma digitalmente usando la tecnología de
-            DocuSeal integrada.
+            {{ translations[selectedLang]['step3Desc'] }}
           </p>
 
           <div *ngIf="isLocalMock" class="glass-panel contract-viewer" style="margin-bottom: 20px;">
@@ -667,25 +687,27 @@
           <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 5: {{
             translations[selectedLang]['step4'] }}</h3>
           <p class="step-form-desc">
-            Indícanos dónde deseas recibir tus honorarios mensuales. Soportamos transferencias bancarias, Payoneer,
-            Mercado Pago y PayPal.
+            {{ translations[selectedLang]['step4Desc'] }}
           </p>
 
           <!-- Fintech Multicurrency Picker -->
           <div style="margin-bottom: 20px;">
             <label class="cyber-input-label" style="margin-bottom: 10px;">DIVISA DE COBRO / PREFERRED CURRENCY</label>
             <div style="display: flex; gap: 12px;">
-              <button class="glass-panel" style="flex: 1; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; font-weight: 600; color: var(--text-primary); border: 1px solid var(--glass-border); border-radius: 8px; transition: all 0.3s;"
+              <button class="glass-panel"
+                style="flex: 1; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; font-weight: 600; color: var(--text-primary); border: 1px solid var(--glass-border); border-radius: 8px; transition: all 0.3s;"
                 [class.glass-panel-active]="paymentMethod.currency === 'USD'"
                 (click)="paymentMethod.currency = 'USD'; paymentMethod.provider = paymentMethod.provider === 'CRYPTO' ? 'BANK_TRANSFER' : paymentMethod.provider">
                 <span>💵</span> USD ($)
               </button>
-              <button class="glass-panel" style="flex: 1; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; font-weight: 600; color: var(--text-primary); border: 1px solid var(--glass-border); border-radius: 8px; transition: all 0.3s;"
+              <button class="glass-panel"
+                style="flex: 1; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; font-weight: 600; color: var(--text-primary); border: 1px solid var(--glass-border); border-radius: 8px; transition: all 0.3s;"
                 [class.glass-panel-active]="paymentMethod.currency === 'EUR'"
                 (click)="paymentMethod.currency = 'EUR'; paymentMethod.provider = paymentMethod.provider === 'CRYPTO' ? 'BANK_TRANSFER' : paymentMethod.provider">
                 <span>💶</span> EUR (€)
               </button>
-              <button class="glass-panel" style="flex: 1; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; font-weight: 600; color: var(--text-primary); border: 1px solid var(--glass-border); border-radius: 8px; transition: all 0.3s;"
+              <button class="glass-panel"
+                style="flex: 1; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; font-weight: 600; color: var(--text-primary); border: 1px solid var(--glass-border); border-radius: 8px; transition: all 0.3s;"
                 [class.glass-panel-active]="paymentMethod.currency === 'USDT'"
                 (click)="paymentMethod.currency = 'USDT'; paymentMethod.provider = 'CRYPTO'">
                 <span>⚡</span> CRYPTO (USDT)
@@ -725,9 +747,12 @@
           </div>
 
           <!-- Crypto Form Structure -->
-          <div *ngIf="paymentMethod.currency === 'USDT'" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px;">
-            <div class="glass-panel payment-card glass-panel-active" style="max-width: 100%; cursor: default; display: flex; align-items: center; gap: 15px; padding: 15px;">
-              <span style="font-size: 2rem; background: linear-gradient(135deg, #26a17b, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">₿</span>
+          <div *ngIf="paymentMethod.currency === 'USDT'"
+            style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px;">
+            <div class="glass-panel payment-card glass-panel-active"
+              style="max-width: 100%; cursor: default; display: flex; align-items: center; gap: 15px; padding: 15px;">
+              <span
+                style="font-size: 2rem; background: linear-gradient(135deg, #26a17b, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">₿</span>
               <div>
                 <h4 class="font-display payment-card-title" style="margin: 0;">Billetera Cripto (USDT)</h4>
                 <span class="payment-card-desc">Cobro seguro e instantáneo en stablecoin multired</span>
@@ -737,7 +762,8 @@
             <div class="input-grid-2">
               <div class="cyber-input-group">
                 <label class="cyber-input-label">RED BLOCKCHAIN (NETWORK)</label>
-                <select class="cyber-input" [(ngModel)]="paymentMethod.cryptoNetwork" style="background: var(--bg-darker); color: var(--text-primary); border: 1px solid rgba(0, 245, 230, 0.2); border-radius: 8px; cursor: pointer; padding: 12px;">
+                <select class="cyber-input" [(ngModel)]="paymentMethod.cryptoNetwork"
+                  style="background: var(--bg-darker); color: var(--text-primary); border: 1px solid rgba(0, 245, 230, 0.2); border-radius: 8px; cursor: pointer; padding: 12px;">
                   <option value="TRC20">Tron (TRC20) - Comisión Baja</option>
                   <option value="ERC20">Ethereum (ERC20) - Máxima Seguridad</option>
                   <option value="BEP20">BSC (BEP20) - Rápida y Económica</option>
@@ -816,8 +842,7 @@
           <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 6: {{
             translations[selectedLang]['step5'] }}</h3>
           <p class="step-form-desc">
-            Para prevenir fraudes y asegurar el cumplimiento, utilizaremos la webcam de tu dispositivo para realizar una
-            autenticación facial rápida.
+            {{ translations[selectedLang]['step5Desc'] }}
           </p>
 
           <div class="glass-panel scanner-screen">
@@ -832,8 +857,8 @@
             </div>
           </div>
 
-          <button class="cyber-btn cyber-btn-primary submit-action-btn" [disabled]="isScanningIdentity" style="margin-top: 15px;"
-            (click)="startIdentityScanning()">
+          <button class="cyber-btn cyber-btn-primary submit-action-btn" [disabled]="isScanningIdentity"
+            style="margin-top: 15px;" (click)="startIdentityScanning()">
             {{ isScanningIdentity ? 'Escaneando rostro...' : 'Iniciar Escaneo Biométrico de Identidad' }}
           </button>
 
@@ -884,9 +909,14 @@
           <p style="color: var(--text-secondary); font-size: 0.95rem;">Tu perfil de cobro y cumplimiento internacional
             se encuentra 100% activo y regulado.</p>
         </div>
-        <div class="glass-panel status-badge"
-          style="border-color: rgba(0, 255, 157, 0.2); color: var(--accent-mint); font-weight: 700; background: rgba(0, 255, 157, 0.05); padding: 8px 16px; border-radius: 8px; font-size: 0.85rem;">
-          ✓ CUENTA VERIFICADA & ACTIVA
+        <div style="display: flex; gap: 15px; align-items: center;">
+          <button class="settings-btn" (click)="showContractorSettings = true" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.3rem; padding: 5px; transition: all 0.3s; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.color='var(--accent-cyan)'; this.style.transform='rotate(90deg)'" onmouseout="this.style.color='var(--text-muted)'; this.style.transform='rotate(0deg)'" title="Configuración de Perfil">
+            ⚙️
+          </button>
+          <div class="glass-panel status-badge"
+            style="border-color: rgba(0, 255, 157, 0.2); color: var(--accent-mint); font-weight: 700; background: rgba(0, 255, 157, 0.05); padding: 8px 16px; border-radius: 8px; font-size: 0.85rem;">
+            ✓ CUENTA VERIFICADA & ACTIVA
+          </div>
         </div>
       </div>
 
@@ -898,7 +928,8 @@
             <p class="metric-label">Balance Disponible</p>
             <h3 class="font-display metric-value"
               style="color: var(--accent-cyan); font-size: 1.8rem; font-weight: 800;">
-              {{ isContractorPaid() ? getFormattedAmount(false) : (paymentMethod.currency === 'EUR' ? '€0.00 EUR' : paymentMethod.currency === 'USDT' ? '₮0.00 USDT' : '$0.00 USD') }}
+              {{ isContractorPaid() ? getFormattedAmount(false) : (paymentMethod.currency === 'EUR' ? '€0.00 EUR' :
+              paymentMethod.currency === 'USDT' ? '₮0.00 USDT' : '$0.00 USD') }}
             </h3>
           </div>
         </div>
@@ -916,12 +947,14 @@
             <h3 class="font-display metric-value"
               style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-top: 5px;">
               {{ paymentMethod.provider === 'BANK_TRANSFER' ? 'Transferencia Bancaria' : paymentMethod.provider ===
-              'MERCADO_PAGO' ? 'Mercado Pago' : paymentMethod.provider === 'PAYONEER' ? 'Payoneer' : paymentMethod.provider === 'CRYPTO' ? 'Criptomonedas' : 'PayPal' }}
+              'MERCADO_PAGO' ? 'Mercado Pago' : paymentMethod.provider === 'PAYONEER' ? 'Payoneer' :
+              paymentMethod.provider === 'CRYPTO' ? 'Criptomonedas' : 'PayPal' }}
             </h3>
             <span style="font-size: 0.8rem; color: var(--text-muted);">
               {{ paymentMethod.provider === 'BANK_TRANSFER' ? paymentMethod.bankName : paymentMethod.provider ===
               'MERCADO_PAGO' ? paymentMethod.mpAliasOrCvu : paymentMethod.provider === 'PAYONEER' ?
-              paymentMethod.accountNumber : paymentMethod.provider === 'CRYPTO' ? paymentMethod.cryptoAddress + ' (' + paymentMethod.cryptoNetwork + ')' : paymentMethod.paypalEmail }}
+              paymentMethod.accountNumber : paymentMethod.provider === 'CRYPTO' ? paymentMethod.cryptoAddress + ' (' +
+              paymentMethod.cryptoNetwork + ')' : paymentMethod.paypalEmail }}
             </span>
           </div>
         </div>
@@ -1001,12 +1034,55 @@
           </button>
         </div>
       </div>
+
+      <!-- Settings Modal -->
+      <div class="glass-modal-backdrop" *ngIf="showContractorSettings">
+        <div class="glass-panel cyber-modal-card" style="max-width: 480px; border-color: rgba(0, 245, 230, 0.25);">
+          <div class="modal-header"
+            style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0, 245, 230, 0.15); padding-bottom: 15px; margin-bottom: 20px;">
+            <h3 class="font-display text-gradient" style="font-size: 1.3rem; font-weight: 800; margin: 0; color: var(--accent-cyan) !important;">
+              Configuración de Perfil</h3>
+            <button class="modal-close-btn"
+              style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem;"
+              (click)="showContractorSettings = false">✕</button>
+          </div>
+
+          <div class="modal-body">
+            <div class="cyber-input-group" style="margin-bottom: 20px;">
+              <label class="cyber-input-label">NÚMERO DE WHATSAPP REGISTRADO</label>
+              <input type="text" class="cyber-input" [(ngModel)]="whatsappPhone" style="border-color: var(--accent-cyan);">
+            </div>
+
+            <div class="cyber-input-group" style="margin-bottom: 20px;">
+              <label class="cyber-input-label">MÉTODO DE PAGO ACTIVO</label>
+              <select class="cyber-input" [(ngModel)]="paymentMethod.provider" style="cursor: pointer;">
+                <option value="BANK_TRANSFER">Transferencia Bancaria (SWIFT/IBAN)</option>
+                <option value="MERCADO_PAGO">Mercado Pago (Alias/CVU)</option>
+                <option value="PAYONEER">Payoneer (Retiro Global)</option>
+                <option value="PAYPAL">PayPal (Billetera Global)</option>
+                <option value="CRYPTO">Criptomonedas (USDT/USDC)</option>
+              </select>
+            </div>
+            
+            <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px;">
+              * Al cambiar el método de pago, los próximos pagos mensuales se enrutarán automáticamente a la nueva plataforma seleccionada.
+            </p>
+          </div>
+
+          <div class="modal-footer" style="display: flex; justify-content: flex-end; margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
+            <button class="cyber-btn cyber-btn-primary" style="padding: 10px 25px; border-radius: 8px; font-weight: 700; width: 100%;"
+              (click)="showContractorSettings = false; addLocalNotification(translations[selectedLang]['persBtnSave'] || 'Perfil actualizado correctamente', 'SUCCESS')">
+              Guardar Cambios
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <app-admin-dashboard *ngIf="currentView === 'operator'" [summary]="summary" [personalData]="personalData"
       [isLocalMock]="isLocalMock" [selectedLang]="selectedLang" [whatsappPhone]="whatsappPhone"
-      [paidContractorIds]="globalPaidIds" [isDemoMode]="isOperatorDemoMode" [paymentMethod]="paymentMethod" (reviewCompleted)="refreshSummary()"
-      (paymentCompleted)="handlePaymentCompleted($event)">
+      [paidContractorIds]="globalPaidIds" [isDemoMode]="isOperatorDemoMode" [paymentMethod]="paymentMethod"
+      (reviewCompleted)="refreshSummary()" (paymentCompleted)="handlePaymentCompleted($event)">
     </app-admin-dashboard>
 
 
