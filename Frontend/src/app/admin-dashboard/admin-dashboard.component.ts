@@ -330,6 +330,20 @@ export class AdminDashboardComponent implements OnInit {
   @Output() paymentCompleted = new EventEmitter<number>();
   @Input() isDemoMode = true;
 
+  @Input() paymentMethod = {
+    provider: 'BANK_TRANSFER',
+    bankName: '',
+    accountNumber: '',
+    swiftCode: '',
+    mpAliasOrCvu: '',
+    mpAccountHolder: '',
+    paypalEmail: '',
+    paypalName: '',
+    currency: 'USD',
+    cryptoNetwork: 'TRC20',
+    cryptoAddress: ''
+  };
+
   // Reused personalData fallback for simulation details inside review box
   @Input() personalData = {
     firstName: 'Juan',
@@ -411,8 +425,35 @@ export class AdminDashboardComponent implements OnInit {
       this.operatorProcesses = [];
 
       if (this.isLocalMock) {
-        // En local sin servidor, dejamos la lista vacía para evidenciar que NO es la demo.
-        console.warn('[NorthPay] Modo Real seleccionado pero Spring Boot está offline.');
+        // En modo Sandbox sin Spring Boot en vivo, garantizamos que el contratista simulado actual
+        // esté visible para poder realizar y probar los flujos de aprobación oficiales!
+        const fullName = this.personalData.firstName ? `${this.personalData.firstName} ${this.personalData.lastName}` : 'Juan Pérez';
+        this.mockContractors = [
+          { 
+            id: 500, 
+            name: fullName, 
+            country: this.personalData.country || 'España', 
+            email: 'contractor@northpay.com', 
+            progress: this.summary.progress, 
+            status: this.paidContractorIds.includes(500) ? 'PAID' : (this.summary.steps[2].status === 'IN_REVIEW' ? 'IN_REVIEW' : this.summary.status), 
+            date: new Date().toLocaleDateString(), 
+            currentStep: this.summary.currentStep || 'COMPLETED', 
+            phone: this.whatsappPhone || '+34600123456' 
+          }
+        ];
+
+        this.operatorProcesses = [
+          {
+            id: 500,
+            contractorUserId: 100,
+            status: this.summary.steps[2].status === 'IN_REVIEW' ? 'IN_REVIEW' : this.summary.status,
+            currentStep: this.summary.currentStep || 'COMPLETED',
+            progress: this.summary.progress,
+            assignedOperatorId: 1,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          }
+        ];
       } else {
         // Consultamos los datos del servidor en vivo
         this.http.get<OnboardingProcess[]>(`${this.apiBaseUrl}/operator/processes`).subscribe({
@@ -532,9 +573,36 @@ export class AdminDashboardComponent implements OnInit {
 
   }
 
+  getContractorPaymentMethod(c: any): string {
+    if (c.id === 500) {
+      return this.paymentMethod.provider === 'CRYPTO' ? `CRYPTO (${this.paymentMethod.cryptoNetwork})` : this.paymentMethod.provider;
+    }
+    return 'BANK_TRANSFER';
+  }
+
+  getCurrencySymbol(c: any): string {
+    if (c && c.id === 500) {
+      const curr = this.paymentMethod.currency;
+      if (curr === 'EUR') return '€';
+      if (curr === 'USDT') return '₮';
+    }
+    return '$';
+  }
+
+  getCurrencyLabel(c: any): string {
+    if (c && c.id === 500) {
+      return this.paymentMethod.currency || 'USD';
+    }
+    return 'USD';
+  }
+
   openPaymentModal(contractor: any) {
     this.selectedProcessForPayment = contractor;
-    this.paymentAmount = 2500;
+    let base = 2500;
+    if (contractor.id === 500 && this.paymentMethod.currency === 'EUR') {
+      base = 2500 * 0.92;
+    }
+    this.paymentAmount = parseFloat(base.toFixed(2));
   }
 
   confirmPayment() {
@@ -559,7 +627,9 @@ export class AdminDashboardComponent implements OnInit {
       const formattedAmount = this.paymentAmount.toLocaleString('en-US', { minimumFractionDigits: 2 });
       const auditMsg = this.dashboardTranslations[this.selectedLang]['auditPaid']
         .replace('{amount}', formattedAmount)
-        .replace('{name}', c.name);
+        .replace('{name}', c.name)
+        .replace('$', this.getCurrencySymbol(c))
+        .replace('USD', this.getCurrencyLabel(c));
       this.changeHistory.unshift(auditMsg);
       
       // Notify the parent shell that payment occurred!

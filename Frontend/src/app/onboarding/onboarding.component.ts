@@ -92,7 +92,10 @@ export class OnboardingComponent implements OnInit {
     mpAliasOrCvu: '',
     mpAccountHolder: '',
     paypalEmail: '',
-    paypalName: ''
+    paypalName: '',
+    currency: 'USD',
+    cryptoNetwork: 'TRC20',
+    cryptoAddress: ''
   };
 
   identityProvider = 'STRIPE_IDENTITY';
@@ -105,6 +108,27 @@ export class OnboardingComponent implements OnInit {
 
   isContractorPaid(): boolean {
     return this.summary.status === 'PAID';
+  }
+
+  getFormattedAmount(showPlus = false): string {
+    const baseAmount = this.paymentAmount || 2500;
+    const curr = this.paymentMethod.currency || 'USD';
+    let converted = baseAmount;
+    let symbol = '$';
+
+    if (curr === 'EUR') {
+      converted = baseAmount * 0.92;
+      symbol = '€';
+    } else if (curr === 'USDT') {
+      symbol = '₮';
+    }
+
+    const formatted = converted.toLocaleString('en-US', { 
+      minimumFractionDigits: 2, 
+      maximumFractionDigits: 2 
+    });
+
+    return `${showPlus ? '+' : ''}${symbol}${formatted} ${curr}`;
   }
 
   constructor(private http: HttpClient) { }

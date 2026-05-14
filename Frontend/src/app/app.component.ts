@@ -108,7 +108,10 @@ export class AppComponent implements OnInit {
     mpAliasOrCvu: '',
     mpAccountHolder: '',
     paypalEmail: '',
-    paypalName: ''
+    paypalName: '',
+    currency: 'USD',
+    cryptoNetwork: 'TRC20',
+    cryptoAddress: ''
   };
 
   identityProvider = 'STRIPE_IDENTITY';
@@ -585,6 +588,27 @@ export class AppComponent implements OnInit {
 
   isContractorPaid(): boolean {
     return this.summary.status === 'PAID' || this.globalPaidIds.includes(500);
+  }
+
+  getFormattedAmount(showPlus = false): string {
+    const baseAmount = this.paymentAmount || 2500;
+    const curr = this.paymentMethod.currency || 'USD';
+    let converted = baseAmount;
+    let symbol = '$';
+
+    if (curr === 'EUR') {
+      converted = baseAmount * 0.92; // Simulador de Tasa de Cambio EUR/USD
+      symbol = '€';
+    } else if (curr === 'USDT') {
+      symbol = '₮';
+    }
+
+    const formatted = converted.toLocaleString('en-US', { 
+      minimumFractionDigits: 2, 
+      maximumFractionDigits: 2 
+    });
+
+    return `${showPlus ? '+' : ''}${symbol}${formatted} ${curr}`;
   }
 
   constructor(private http: HttpClient) { }

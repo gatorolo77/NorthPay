@@ -371,7 +371,29 @@
             Mercado Pago y PayPal.
           </p>
 
-          <div class="payment-provider-list">
+          <!-- Fintech Multicurrency Picker -->
+          <div style="margin-bottom: 20px;">
+            <label class="cyber-input-label" style="margin-bottom: 10px;">DIVISA DE COBRO / PREFERRED CURRENCY</label>
+            <div style="display: flex; gap: 12px;">
+              <button class="glass-panel" style="flex: 1; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; font-weight: 600; color: var(--text-primary); border: 1px solid var(--glass-border); border-radius: 8px; transition: all 0.3s;"
+                [class.glass-panel-active]="paymentMethod.currency === 'USD'"
+                (click)="paymentMethod.currency = 'USD'; paymentMethod.provider = paymentMethod.provider === 'CRYPTO' ? 'BANK_TRANSFER' : paymentMethod.provider">
+                <span>💵</span> USD ($)
+              </button>
+              <button class="glass-panel" style="flex: 1; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; font-weight: 600; color: var(--text-primary); border: 1px solid var(--glass-border); border-radius: 8px; transition: all 0.3s;"
+                [class.glass-panel-active]="paymentMethod.currency === 'EUR'"
+                (click)="paymentMethod.currency = 'EUR'; paymentMethod.provider = paymentMethod.provider === 'CRYPTO' ? 'BANK_TRANSFER' : paymentMethod.provider">
+                <span>💶</span> EUR (€)
+              </button>
+              <button class="glass-panel" style="flex: 1; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; font-weight: 600; color: var(--text-primary); border: 1px solid var(--glass-border); border-radius: 8px; transition: all 0.3s;"
+                [class.glass-panel-active]="paymentMethod.currency === 'USDT'"
+                (click)="paymentMethod.currency = 'USDT'; paymentMethod.provider = 'CRYPTO'">
+                <span>⚡</span> CRYPTO (USDT)
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="paymentMethod.currency !== 'USDT'" class="payment-provider-list">
             <div class="glass-panel payment-card"
               [class.glass-panel-active]="paymentMethod.provider === 'BANK_TRANSFER'"
               (click)="paymentMethod.provider = 'BANK_TRANSFER'">
@@ -399,6 +421,34 @@
               <span class="payment-card-icon"></span>
               <h4 class="font-display payment-card-title">PayPal</h4>
               <span class="payment-card-desc">Billetera global</span>
+            </div>
+          </div>
+
+          <!-- Crypto Form Structure -->
+          <div *ngIf="paymentMethod.currency === 'USDT'" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px;">
+            <div class="glass-panel payment-card glass-panel-active" style="max-width: 100%; cursor: default; display: flex; align-items: center; gap: 15px; padding: 15px;">
+              <span style="font-size: 2rem; background: linear-gradient(135deg, #26a17b, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">₿</span>
+              <div>
+                <h4 class="font-display payment-card-title" style="margin: 0;">Billetera Cripto (USDT)</h4>
+                <span class="payment-card-desc">Cobro seguro e instantáneo en stablecoin multired</span>
+              </div>
+            </div>
+
+            <div class="input-grid-2">
+              <div class="cyber-input-group">
+                <label class="cyber-input-label">RED BLOCKCHAIN (NETWORK)</label>
+                <select class="cyber-input" [(ngModel)]="paymentMethod.cryptoNetwork" style="background: var(--bg-darker); color: var(--text-primary); border: 1px solid rgba(0, 245, 230, 0.2); border-radius: 8px; cursor: pointer; padding: 12px;">
+                  <option value="TRC20">Tron (TRC20) - Comisión Baja</option>
+                  <option value="ERC20">Ethereum (ERC20) - Máxima Seguridad</option>
+                  <option value="BEP20">BSC (BEP20) - Rápida y Económica</option>
+                  <option value="POLYGON">Polygon Network - Ultra Veloz</option>
+                </select>
+              </div>
+              <div class="cyber-input-group">
+                <label class="cyber-input-label">DIRECCIÓN DE BILLETERA (WALLET ADDRESS)</label>
+                <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.cryptoAddress"
+                  placeholder="Ej. TLAy8Jq9G8mQd4tK..." style="border-color: var(--accent-cyan);">
+              </div>
             </div>
           </div>
 
@@ -481,15 +531,15 @@
             </div>
           </div>
 
-          <div class="simulation-control-row">
-            <span>SIMULAR AUTO-VERIFICACIÓN CON ÉXITO:</span>
-            <input type="checkbox" [(ngModel)]="scanSuccess" class="simulation-checkbox">
-          </div>
-
-          <button class="cyber-btn cyber-btn-primary submit-action-btn" [disabled]="isScanningIdentity"
+          <button class="cyber-btn cyber-btn-primary submit-action-btn" [disabled]="isScanningIdentity" style="margin-top: 15px;"
             (click)="startIdentityScanning()">
             {{ isScanningIdentity ? 'Escaneando rostro...' : 'Iniciar Escaneo Biométrico de Identidad' }}
           </button>
+
+          <div class="simulation-control-row" style="margin-top: 10px;">
+            <span>SIMULAR AUTO-VERIFICACIÓN CON ÉXITO:</span>
+            <input type="checkbox" [(ngModel)]="scanSuccess" class="simulation-checkbox">
+          </div>
         </div>
 
         <div class="congrats-card" *ngIf="summary.status === 'COMPLETED'">
@@ -547,8 +597,7 @@
             <p class="metric-label">Balance Disponible</p>
             <h3 class="font-display metric-value"
               style="color: var(--accent-cyan); font-size: 1.8rem; font-weight: 800;">
-              {{ isContractorPaid() ? '$' + paymentAmount.toLocaleString('en-US', { minimumFractionDigits: 2 }) + ' USD'
-              : '$0.00 USD' }}
+              {{ isContractorPaid() ? getFormattedAmount(false) : (paymentMethod.currency === 'EUR' ? '€0.00 EUR' : paymentMethod.currency === 'USDT' ? '₮0.00 USDT' : '$0.00 USD') }}
             </h3>
           </div>
         </div>
@@ -566,12 +615,12 @@
             <h3 class="font-display metric-value"
               style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-top: 5px;">
               {{ paymentMethod.provider === 'BANK_TRANSFER' ? 'Transferencia Bancaria' : paymentMethod.provider ===
-              'MERCADO_PAGO' ? 'Mercado Pago' : paymentMethod.provider === 'PAYONEER' ? 'Payoneer' : 'PayPal' }}
+              'MERCADO_PAGO' ? 'Mercado Pago' : paymentMethod.provider === 'PAYONEER' ? 'Payoneer' : paymentMethod.provider === 'CRYPTO' ? 'Criptomonedas' : 'PayPal' }}
             </h3>
             <span style="font-size: 0.8rem; color: var(--text-muted);">
               {{ paymentMethod.provider === 'BANK_TRANSFER' ? paymentMethod.bankName : paymentMethod.provider ===
               'MERCADO_PAGO' ? paymentMethod.mpAliasOrCvu : paymentMethod.provider === 'PAYONEER' ?
-              paymentMethod.accountNumber : paymentMethod.paypalEmail }}
+              paymentMethod.accountNumber : paymentMethod.provider === 'CRYPTO' ? paymentMethod.cryptoAddress + ' (' + paymentMethod.cryptoNetwork + ')' : paymentMethod.paypalEmail }}
             </span>
           </div>
         </div>
@@ -599,7 +648,7 @@
             <div style="text-align: right;">
               <span
                 style="display: block; font-weight: 800; color: var(--accent-mint); font-size: 1rem; margin-bottom: 5px;">
-                +${{ paymentAmount.toLocaleString('en-US', { minimumFractionDigits: 2 }) }} USD
+                {{ getFormattedAmount(true) }}
               </span>
               <span class="glass-panel contractor-status-badge"
                 style="font-size: 0.75rem; color: var(--accent-mint); border-color: rgba(0,255,157,0.2); padding: 2px 8px; border-radius: 12px; font-weight: 700;">

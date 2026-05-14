@@ -131,43 +131,7 @@
         </div>
       </div>
 
-      <!-- Document Review Section -->
-      <div class="glass-panel review-pane" *ngIf="getSelectedContractorForReview()"
-        style="margin-top: 25px;">
-        <h4 class="font-display text-gradient" style="font-size: 1.2rem; font-weight: 700; margin-bottom: 10px;">{{ dashboardTranslations[selectedLang]['revTitle'] }}</h4>
-        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px;">
-          {{ dashboardTranslations[selectedLang]['revInst'] }}
-        </p>
 
-        <div style="display: flex; gap: 20px; align-items: start; margin-bottom: 25px;">
-          <div class="glass-panel review-details">
-            <h5 style="font-weight: 700; margin-bottom: 10px; color: var(--text-primary);">{{ dashboardTranslations[selectedLang]['extData'] }}</h5>
-            <p>{{ dashboardTranslations[selectedLang]['names'] }}: {{ getSelectedContractorForReview()?.name }}</p>
-            <p>{{ dashboardTranslations[selectedLang]['email'] }}: {{ getSelectedContractorForReview()?.email }}</p>
-            <p>{{ dashboardTranslations[selectedLang]['country'] }}: {{ getSelectedContractorForReview()?.country }}</p>
-            <p>{{ dashboardTranslations[selectedLang]['docType'] }}: PASAPORTE_INTERNACIONAL</p>
-            <p style="margin-top: 15px; color: var(--accent-mint); text-decoration: underline; cursor: pointer;">
-              {{ dashboardTranslations[selectedLang]['viewFile'] }} (DOCUMENT_ID.PDF)
-            </p>
-          </div>
-
-          <div class="cyber-input-group" style="flex: 1; margin-bottom: 0;">
-            <label class="cyber-input-label">{{ dashboardTranslations[selectedLang]['comments'] }}</label>
-            <textarea class="cyber-input" [(ngModel)]="reviewFeedback" rows="3"
-              [placeholder]="dashboardTranslations[selectedLang]['placeholderFeed']"></textarea>
-          </div>
-        </div>
-
-        <div class="review-actions">
-          <button class="cyber-btn reject-btn" (click)="reviewContractorStep('DOCUMENT_UPLOAD', false)">
-            {{ dashboardTranslations[selectedLang]['rejectBtn'] }}
-          </button>
-          <button class="cyber-btn cyber-btn-primary" style="padding: 8px 25px; border-radius: 8px;"
-            (click)="reviewContractorStep('DOCUMENT_UPLOAD', true)">
-            {{ dashboardTranslations[selectedLang]['approveBtn'] }}
-          </button>
-        </div>
-      </div>
 
       <!-- Changes History / Audit log widget -->
       <div class="glass-panel audit-log-card" style="margin-top: 25px;">
@@ -209,20 +173,20 @@
 
               <p style="margin-bottom: 8px;"><strong>{{ dashboardTranslations[selectedLang]['bene'] }}:</strong> {{ selectedProcessForPayment.name }}</p>
               <p style="margin-bottom: 8px;"><strong>{{ dashboardTranslations[selectedLang]['dest'] }}:</strong> {{ selectedProcessForPayment.country }}</p>
-              <p style="margin-bottom: 8px;"><strong>{{ dashboardTranslations[selectedLang]['payMethod'] }}:</strong>
+               <p style="margin-bottom: 8px;"><strong>{{ dashboardTranslations[selectedLang]['payMethod'] }}:</strong>
                 <span class="payment-card-badge"
                   style="background: rgba(0, 245, 230, 0.1); color: var(--accent-cyan); padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; margin-left: 5px;">
-                  BANK_TRANSFER
+                  {{ getContractorPaymentMethod(selectedProcessForPayment) }}
                 </span>
               </p>
             </div>
 
             <div class="cyber-input-group">
-              <label class="cyber-input-label">{{ dashboardTranslations[selectedLang]['amount'] }}</label>
+              <label class="cyber-input-label">{{ dashboardTranslations[selectedLang]['amount'] }} ({{ getCurrencyLabel(selectedProcessForPayment) }})</label>
               <div style="position: relative;">
                 <span
-                  style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--accent-cyan); font-weight: 700;">$</span>
-                <input type="number" class="cyber-input" [(ngModel)]="paymentAmount" style="padding-left: 30px;"
+                  style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--accent-cyan); font-weight: 700;">{{ getCurrencySymbol(selectedProcessForPayment) }}</span>
+                <input type="number" class="cyber-input" [(ngModel)]="paymentAmount" style="padding-left: 35px;"
                   placeholder="0.00">
               </div>
             </div>
@@ -236,6 +200,56 @@
             <button class="cyber-btn cyber-btn-primary" style="padding: 8px 25px; border-radius: 8px; font-weight: 700;"
               (click)="confirmPayment()" [disabled]="isProcessingPayment">
               {{ isProcessingPayment ? dashboardTranslations[selectedLang]['transferring'] : dashboardTranslations[selectedLang]['confPayTitle'] }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Document Review Modal -->
+      <div class="glass-modal-backdrop" *ngIf="getSelectedContractorForReview()">
+        <div class="glass-panel cyber-modal-card" style="max-width: 680px;">
+          <div class="modal-header"
+            style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; margin-bottom: 20px;">
+            <h3 class="font-display text-mint-gradient" style="font-size: 1.4rem; font-weight: 800; margin: 0;">
+              {{ dashboardTranslations[selectedLang]['revTitle'] }}</h3>
+            <button class="modal-close-btn"
+              style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem;"
+              (click)="selectedProcessIdForReview = null">✕</button>
+          </div>
+
+          <div class="modal-body">
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">
+              {{ dashboardTranslations[selectedLang]['revInst'] }}
+            </p>
+
+            <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; align-items: stretch; margin-bottom: 20px;">
+              <div class="glass-panel review-details" style="padding: 20px; border-radius: 8px; display: flex; flex-direction: column; gap: 8px; justify-content: center;">
+                <h5 style="font-weight: 700; margin-bottom: 10px; color: var(--text-primary); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px;">{{ dashboardTranslations[selectedLang]['extData'] }}</h5>
+                <p style="margin: 0;"><strong>{{ dashboardTranslations[selectedLang]['names'] }}:</strong> {{ getSelectedContractorForReview()?.name }}</p>
+                <p style="margin: 0;"><strong>{{ dashboardTranslations[selectedLang]['email'] }}:</strong> {{ getSelectedContractorForReview()?.email }}</p>
+                <p style="margin: 0;"><strong>{{ dashboardTranslations[selectedLang]['country'] }}:</strong> {{ getSelectedContractorForReview()?.country }}</p>
+                <p style="margin: 0;"><strong>{{ dashboardTranslations[selectedLang]['docType'] }}:</strong> PASAPORTE</p>
+                
+                <p style="margin-top: 15px; color: var(--accent-mint); text-decoration: underline; cursor: pointer; font-weight: 600; font-size: 0.9rem;">
+                  📄 {{ dashboardTranslations[selectedLang]['viewFile'] }} (DOCUMENT_ID.PDF)
+                </p>
+              </div>
+
+              <div class="cyber-input-group" style="margin-bottom: 0; display: flex; flex-direction: column;">
+                <label class="cyber-input-label">{{ dashboardTranslations[selectedLang]['comments'] }}</label>
+                <textarea class="cyber-input" [(ngModel)]="reviewFeedback" rows="5"
+                  [placeholder]="dashboardTranslations[selectedLang]['placeholderFeed']" style="flex: 1; resize: none; font-size: 0.9rem;"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer" style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
+            <button class="cyber-btn reject-btn" style="padding: 8px 20px; border-radius: 8px;" (click)="reviewContractorStep('DOCUMENT_UPLOAD', false)">
+              {{ dashboardTranslations[selectedLang]['rejectBtn'] }}
+            </button>
+            <button class="cyber-btn cyber-btn-primary" style="padding: 8px 25px; border-radius: 8px; font-weight: 700;"
+              (click)="reviewContractorStep('DOCUMENT_UPLOAD', true)">
+              {{ dashboardTranslations[selectedLang]['approveBtn'] }}
             </button>
           </div>
         </div>

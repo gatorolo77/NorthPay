@@ -219,9 +219,12 @@
 
 .admin-login-card {
   width: 100%;
-  max-width: 380px; /* Reducido 15% para compactar */
-  padding: 18px 25px; /* Menos padding interno */
-  margin: auto; /* Centrado vertical/horizontal perfecto sin margen estático */
+  max-width: 380px;
+  /* Reducido 15% para compactar */
+  padding: 18px 25px;
+  /* Menos padding interno */
+  margin: auto;
+  /* Centrado vertical/horizontal perfecto sin margen estático */
   border-color: rgba(0, 255, 157, 0.15);
   display: flex;
   flex-direction: column;
@@ -739,7 +742,8 @@
 
 .progress-bar-column {
   width: 100%;
-  max-width: 210px; /* Reducido 30% de 300px para liberar espacio para la columna de estado */
+  max-width: 210px;
+  /* Reducido 30% de 300px para liberar espacio para la columna de estado */
 }
 
 .progress-bar-labels {
@@ -772,7 +776,8 @@
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
-  white-space: nowrap; /* Evita saltos de línea en estados largos como 'In Progress' */
+  white-space: nowrap;
+  /* Evita saltos de línea en estados largos como 'In Progress' */
 }
 
 .review-pane {
@@ -1078,7 +1083,7 @@
 }
 
 .gato {
-  font-size: 10px;
+  font-size: 8px;
   font-family: italic;
 }
 
