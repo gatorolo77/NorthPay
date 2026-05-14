@@ -132,7 +132,7 @@
       </div>
 
       <!-- Document Review Section -->
-      <div class="glass-panel review-pane" *ngIf="selectedProcessIdForReview && summary.steps[2].status === 'IN_REVIEW'"
+      <div class="glass-panel review-pane" *ngIf="getSelectedContractorForReview()"
         style="margin-top: 25px;">
         <h4 class="font-display text-gradient" style="font-size: 1.2rem; font-weight: 700; margin-bottom: 10px;">{{ dashboardTranslations[selectedLang]['revTitle'] }}</h4>
         <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px;">
@@ -142,9 +142,9 @@
         <div style="display: flex; gap: 20px; align-items: start; margin-bottom: 25px;">
           <div class="glass-panel review-details">
             <h5 style="font-weight: 700; margin-bottom: 10px; color: var(--text-primary);">{{ dashboardTranslations[selectedLang]['extData'] }}</h5>
-            <p>{{ dashboardTranslations[selectedLang]['names'] }}: {{ personalData.firstName || 'Juan' }}</p>
-            <p>{{ dashboardTranslations[selectedLang]['lasts'] }}: {{ personalData.lastName || 'Pérez' }}</p>
-            <p>{{ dashboardTranslations[selectedLang]['country'] }}: {{ personalData.country || 'España' }}</p>
+            <p>{{ dashboardTranslations[selectedLang]['names'] }}: {{ getSelectedContractorForReview()?.name }}</p>
+            <p>{{ dashboardTranslations[selectedLang]['email'] }}: {{ getSelectedContractorForReview()?.email }}</p>
+            <p>{{ dashboardTranslations[selectedLang]['country'] }}: {{ getSelectedContractorForReview()?.country }}</p>
             <p>{{ dashboardTranslations[selectedLang]['docType'] }}: PASAPORTE_INTERNACIONAL</p>
             <p style="margin-top: 15px; color: var(--accent-mint); text-decoration: underline; cursor: pointer;">
               {{ dashboardTranslations[selectedLang]['viewFile'] }} (DOCUMENT_ID.PDF)
@@ -179,6 +179,12 @@
             <span class="audit-dot"
               [style.background-color]="first ? 'var(--accent-cyan)' : 'var(--text-muted)'"></span>
             <span style="color: var(--text-secondary); font-size: 0.85rem;">{{ h }}</span>
+          </div>
+          
+          <!-- Elegant Empty State Message -->
+          <div *ngIf="changeHistory.length === 0"
+            style="color: var(--text-muted); font-style: italic; font-size: 0.82rem; text-align: center; padding: 15px 0; background: rgba(255,255,255,0.01); border-radius: 8px; border: 1px dashed var(--glass-border);">
+            🌌 {{ dashboardTranslations[selectedLang]['auditEmpty'] }}
           </div>
         </div>
       </div>

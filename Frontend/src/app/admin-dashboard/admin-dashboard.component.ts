@@ -73,7 +73,8 @@ export class AdminDashboardComponent implements OnInit {
       payMethod: "Método de Pago",
       amount: "MONTO A TRANSFERIR (USD)",
       cancel: "Cancelar",
-      transferring: "Transfiriendo..."
+      transferring: "Transfiriendo...",
+      auditEmpty: "Sin eventos de auditoría registrados aún en esta sesión."
     },
     en: {
       opTitle: "NorthPay Operator Panel",
@@ -115,7 +116,8 @@ export class AdminDashboardComponent implements OnInit {
       payMethod: "Payment Method",
       amount: "AMOUNT TO TRANSFER (USD)",
       cancel: "Cancel",
-      transferring: "Transferring..."
+      transferring: "Transferring...",
+      auditEmpty: "No audit events recorded yet in this session."
     },
     fr: {
       opTitle: "Panneau des Opérations NorthPay",
@@ -157,7 +159,8 @@ export class AdminDashboardComponent implements OnInit {
       payMethod: "Mode de Paiement",
       amount: "MONTANT À TRANSFÉRER (USD)",
       cancel: "Annuler",
-      transferring: "Transfert en cours..."
+      transferring: "Transfert en cours...",
+      auditEmpty: "Aucun événement d'audit enregistré pour le moment dans cette session."
     },
     pt: {
       opTitle: "Painel de Operações NorthPay",
@@ -199,7 +202,8 @@ export class AdminDashboardComponent implements OnInit {
       payMethod: "Forma de Pagamento",
       amount: "VALOR A TRANSFERIR (USD)",
       cancel: "Cancelar",
-      transferring: "Transferindo..."
+      transferring: "Transferindo...",
+      auditEmpty: "Nenhum evento de auditoria registrado ainda nesta sessão."
     },
     zh: {
       opTitle: "NorthPay 运营商面板",
@@ -241,7 +245,8 @@ export class AdminDashboardComponent implements OnInit {
       payMethod: "付款方式",
       amount: "转账金额 (USD)",
       cancel: "取消",
-      transferring: "正在转账..."
+      transferring: "正在转账...",
+      auditEmpty: "本次会话尚未记录审计事件。"
     },
     it: {
       opTitle: "Pannello Operativo NorthPay",
@@ -283,7 +288,8 @@ export class AdminDashboardComponent implements OnInit {
       payMethod: "Metodo di Pagamento",
       amount: "IMPORTO DA TRASFERIRE (USD)",
       cancel: "Annulla",
-      transferring: "Trasferimento in corso..."
+      transferring: "Trasferimento in corso...",
+      auditEmpty: "Nessun evento di audit registrato ancora in questa sessione."
     }
   };
 
@@ -298,11 +304,7 @@ export class AdminDashboardComponent implements OnInit {
   isProcessingPayment = false;
 
   operatorFilter = 'ALL';
-  changeHistory: string[] = [
-    'Invitación de acceso generada para contractor@northpay.com',
-    'Perfil de contratista registrado con éxito.',
-    'Datos personales completados y validados.'
-  ];
+  changeHistory: string[] = [];
   mockContractors: any[] = [];
   @Input() paidContractorIds: number[] = [];
 
@@ -355,13 +357,23 @@ export class AdminDashboardComponent implements OnInit {
 
   loadOperatorPanel() {
     if (this.isDemoMode) {
-      // 🔒 MODO DEMO: Lista cerrada de simulación
-      this.mockContractors = [
-        { id: 500, name: 'Juan Pérez', country: 'España', email: 'contractor@northpay.com', progress: this.summary.progress, status: this.paidContractorIds.includes(500) ? 'PAID' : (this.summary.steps[2].status === 'IN_REVIEW' ? 'IN_REVIEW' : this.summary.status), date: '07/05/2026', currentStep: this.summary.currentStep || 'COMPLETED', phone: this.whatsappPhone || '+34600123456' },
-        { id: 501, name: 'María Gómez', country: 'Colombia', email: 'maria.gomez@gmail.com', progress: 100, status: this.paidContractorIds.includes(501) ? 'PAID' : 'COMPLETED', date: '05/05/2026', currentStep: 'COMPLETED', phone: '+573001234567' },
-        { id: 502, name: 'Pierre Dubois', country: 'Francia', email: 'pierre.dubois@yahoo.fr', progress: 20, status: this.paidContractorIds.includes(502) ? 'PAID' : 'IN_PROGRESS', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD', phone: '+33612345678' },
-        { id: 503, name: 'Yuki Tanaka', country: 'Japón', email: 'tanaka.yuki@gmail.com', progress: 40, status: this.paidContractorIds.includes(503) ? 'PAID' : 'IN_REVIEW', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD', phone: '+819012345678' }
-      ];
+      // 🔒 MODO DEMO: Lista de simulación persistente por sesión del componente
+      if (!this.mockContractors || this.mockContractors.length === 0) {
+        this.mockContractors = [
+          { id: 500, name: 'Juan Pérez', country: 'España', email: 'contractor@northpay.com', progress: this.summary.progress, status: this.paidContractorIds.includes(500) ? 'PAID' : (this.summary.steps[2].status === 'IN_REVIEW' ? 'IN_REVIEW' : this.summary.status), date: '07/05/2026', currentStep: this.summary.currentStep || 'COMPLETED', phone: this.whatsappPhone || '+34600123456' },
+          { id: 501, name: 'María Gómez', country: 'Colombia', email: 'maria.gomez@gmail.com', progress: 100, status: this.paidContractorIds.includes(501) ? 'PAID' : 'COMPLETED', date: '05/05/2026', currentStep: 'COMPLETED', phone: '+573001234567' },
+          { id: 502, name: 'Pierre Dubois', country: 'Francia', email: 'pierre.dubois@yahoo.fr', progress: 20, status: this.paidContractorIds.includes(502) ? 'PAID' : 'IN_PROGRESS', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD', phone: '+33612345678' },
+          { id: 503, name: 'Yuki Tanaka', country: 'Japón', email: 'tanaka.yuki@gmail.com', progress: 40, status: this.paidContractorIds.includes(503) ? 'PAID' : 'IN_REVIEW', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD', phone: '+819012345678' }
+        ];
+      } else {
+        // Sincronizamos dinámicamente los avances del contratista principal (Juan Pérez)
+        const mainContractor = this.mockContractors.find(c => c.id === 500);
+        if (mainContractor) {
+          mainContractor.progress = this.summary.progress;
+          mainContractor.status = this.paidContractorIds.includes(500) ? 'PAID' : (this.summary.steps[2].status === 'IN_REVIEW' ? 'IN_REVIEW' : this.summary.status);
+          mainContractor.currentStep = this.summary.currentStep || 'COMPLETED';
+        }
+      }
 
       this.operatorProcesses = [
         {
@@ -440,24 +452,48 @@ export class AdminDashboardComponent implements OnInit {
     return this.mockContractors.filter(c => c.status === 'COMPLETED').length;
   }
 
+  getSelectedContractorForReview() {
+    return this.mockContractors.find(c => c.id === this.selectedProcessIdForReview);
+  }
+
   reviewContractorStep(stepType: string, approved: boolean) {
     const feedbackMsg = approved ? 'Documentación válida y certificada.' : this.reviewFeedback || 'Faltan firmas o nitidez.';
     const stepId = 2; // Simulated ID
+    
+    const targetId = this.selectedProcessIdForReview;
     this.selectedProcessIdForReview = null;
 
     if (this.isLocalMock) {
+      const targetContractor = this.mockContractors.find(c => c.id === targetId);
+      
       if (approved) {
-        this.summary.steps[2].status = 'COMPLETED';
-        this.summary.steps[3].status = 'IN_PROGRESS';
-        this.summary.progress = 49;
-        this.summary.currentStep = 'CONTRACT_SIGN';
-        this.changeHistory.unshift('Paso 2 APROBADO: Documentos aceptados por operaciones.');
+        if (targetContractor) {
+          targetContractor.status = 'COMPLETED';
+          targetContractor.progress = 100;
+          targetContractor.currentStep = 'COMPLETED';
+        }
+        this.changeHistory.unshift(`Paso 2 APROBADO para ${targetContractor?.name || 'Contratista'}: Documentos aceptados.`);
+        
+        // Si aprobamos al contratista actual del onboarding (Juan Pérez, ID 500), sincronizamos su progreso real!
+        if (targetId === 500) {
+          this.summary.steps[2].status = 'COMPLETED';
+          this.summary.steps[3].status = 'IN_PROGRESS';
+          this.summary.progress = 49;
+          this.summary.currentStep = 'CONTRACT_SIGN';
+        }
       } else {
-        this.summary.steps[2].status = 'REJECTED';
-        this.changeHistory.unshift('Paso 2 RECHAZADO: Solicitud de corrección enviada.');
+        if (targetContractor) {
+          targetContractor.status = 'IN_PROGRESS'; // O requiere ajustes
+        }
+        this.changeHistory.unshift(`Paso 2 RECHAZADO para ${targetContractor?.name || 'Contratista'}: Solicitud de corrección enviada.`);
+        
+        if (targetId === 500) {
+          this.summary.steps[2].status = 'REJECTED';
+        }
       }
+      
       this.reviewFeedback = '';
-      this.loadOperatorPanel();
+      this.loadOperatorPanel(); // Refresca visualizaciones
       this.reviewCompleted.emit();
     } else {
       this.http.post(`${this.apiBaseUrl}/operator/steps/${stepId}/review?operatorId=1`, {

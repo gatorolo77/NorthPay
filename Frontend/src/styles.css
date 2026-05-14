@@ -59,15 +59,13 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
 
-  /* Blending Image 1 (Metallic floral embossed) and Image 2 (Cyber futuristic) */
+
   background-image:
     radial-gradient(circle at 10% 20%, rgba(0, 245, 230, 0.08) 0%, transparent 40%),
     radial-gradient(circle at 90% 80%, rgba(0, 255, 157, 0.06) 0%, transparent 45%),
-    /* Embossed floral-inspired elegant scroll vector pattern as a subtle background texture */
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M0,60 C15,50 25,65 35,55 C45,45 35,25 50,15 C60,5 75,15 80,30 C85,45 70,55 85,65 C100,75 110,60 120,70' fill='none' stroke='rgba(0, 245, 230, 0.025)' stroke-width='1.5'/%3E%3Cpath d='M30,30 C45,20 50,40 65,30 C75,20 65,0 80,-10' fill='none' stroke='rgba(0, 255, 157, 0.02)' stroke-width='1'/%3E%3Ccircle cx='10' cy='10' r='1.5' fill='rgba(0, 245, 230, 0.03)'/%3E%3Ccircle cx='70' cy='90' r='2' fill='rgba(0, 255, 157, 0.025)'/%3E%3Cpath d='M100,100 C80,95 75,115 60,110' fill='none' stroke='rgba(0, 245, 230, 0.015)' stroke-width='1'/%3E%3C/svg%3E");
 }
 
-/* Scrollbar styles */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -86,7 +84,6 @@ body {
   box-shadow: 0 0 10px var(--accent-cyan-glow);
 }
 
-/* Animations */
 @keyframes cyber-glowing {
   0% {
     box-shadow: 0 0 10px rgba(0, 245, 230, 0.15);
@@ -127,7 +124,6 @@ body {
   }
 }
 
-/* Common Classes */
 .font-display {
   font-family: var(--font-display);
 }
@@ -149,7 +145,7 @@ body {
   -webkit-text-fill-color: transparent;
 }
 
-/* Glassmorphism Premium Cards */
+
 .glass-panel {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
@@ -170,7 +166,7 @@ body {
   box-shadow: 0 0 25px rgba(0, 245, 230, 0.15);
 }
 
-/* Buttons */
+
 .cyber-btn {
   display: inline-flex;
   align-items: center;
@@ -258,10 +254,72 @@ body {
   color: var(--text-muted);
 }
 
-/* Prevent white-on-white options in select dropdowns */
 .cyber-input option {
   background-color: #0a0f1d !important;
   color: #ffffff !important;
   font-family: var(--font-body);
   padding: 10px;
+}
+
+
+.admin-badge-link {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 20px;
+  padding: 5px 14px;
+  color: #ffffff !important;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.admin-badge-link:hover {
+  background: rgba(0, 245, 230, 0.1) !important;
+  border-color: var(--accent-cyan) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 10px rgba(0, 245, 230, 0.2) !important;
+}
+
+[data-theme="light"] .admin-badge-link {
+  background: rgba(0, 82, 204, 0.07) !important;
+  border: 1px solid rgba(0, 82, 204, 0.25) !important;
+  color: var(--accent-mint) !important;
+  /* Pure navy/royal blue in light mode! */
+  font-weight: 600 !important;
+}
+
+[data-theme="light"] .admin-badge-link:hover {
+  background: rgba(0, 82, 204, 0.15) !important;
+  border-color: var(--accent-mint) !important;
+  color: var(--accent-mint) !important;
+  box-shadow: 0 2px 8px rgba(0, 82, 204, 0.2) !important;
+}
+
+
+.landing-hero-desc {
+  color: #00f5e6;
+  font-weight: 500;
+  font-size: 0.95rem;
+  max-width: 580px;
+  margin: 15px auto 25px auto;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.5;
+  transition: color 0.3s ease;
+}
+
+[data-theme="light"] .landing-hero-desc {
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
 }

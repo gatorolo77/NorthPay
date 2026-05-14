@@ -185,7 +185,18 @@ export class AppComponent implements OnInit {
       notifCodeSent: "Código de activación listo: escribe 123456 en pantalla.",
       notifWsSuccess: "WhatsApp verificado correctamente. ¡Onboarding desbloqueado!",
       notifWsFail: "Código incorrecto. Intenta de nuevo.",
-      notifPersSave: "Datos personales guardados con éxito."
+      notifPersSave: "Datos personales guardados con éxito.",
+      btnLogout: "Cerrar Sesión",
+      btnBackToStart: "Volver al Inicio",
+      btnBackToOnboarding: "Volver a Onboarding",
+      loginEntryLink: "Ingreso Operador",
+      loginTitle: "Acceso Operador",
+      loginSubtitle: "Ingresa tus credenciales administrativas de NorthPay",
+      loginUserLabel: "USUARIO O CORREO",
+      loginPassLabel: "CONTRASEÑA",
+      loginBtnBack: "Volver",
+      loginBtnSubmit: "Iniciar Sesión",
+      loginTip: "🔐 Usa admin@northpay.com / admin123"
     },
     en: {
       logoSubtitle: "WELCOME PORTAL",
@@ -241,7 +252,18 @@ export class AppComponent implements OnInit {
       notifCodeSent: "Activation code ready: type 123456 on screen.",
       notifWsSuccess: "WhatsApp verified successfully. Onboarding unlocked!",
       notifWsFail: "Incorrect code. Please try again.",
-      notifPersSave: "Personal data saved successfully."
+      notifPersSave: "Personal data saved successfully.",
+      btnLogout: "Logout",
+      btnBackToStart: "Back to Home",
+      btnBackToOnboarding: "Back to Onboarding",
+      loginEntryLink: "Operator Login",
+      loginTitle: "Operator Access",
+      loginSubtitle: "Enter your NorthPay administrative credentials",
+      loginUserLabel: "USERNAME OR EMAIL",
+      loginPassLabel: "PASSWORD",
+      loginBtnBack: "Back",
+      loginBtnSubmit: "Log In",
+      loginTip: "🔐 Use admin@northpay.com / admin123"
     },
     fr: {
       logoSubtitle: "PORTAIL DE BIENVENUE",
@@ -297,7 +319,18 @@ export class AppComponent implements OnInit {
       notifCodeSent: "Code d'activation prêt : tapez 123456 à l'écran.",
       notifWsSuccess: "WhatsApp vérifié avec succès. Intégration déverrouillée !",
       notifWsFail: "Code incorrect. Veuillez réessayer.",
-      notifPersSave: "Données personnelles enregistrées avec succès."
+      notifPersSave: "Données personnelles enregistrées avec succès.",
+      btnLogout: "Se déconnecter",
+      btnBackToStart: "Retour à l'accueil",
+      btnBackToOnboarding: "Retour à l'intégration",
+      loginEntryLink: "Connexion Opérateur",
+      loginTitle: "Accès Opérateur",
+      loginSubtitle: "Saisissez vos identifiants administratifs NorthPay",
+      loginUserLabel: "UTILISATEUR OU EMAIL",
+      loginPassLabel: "MOT DE PASSE",
+      loginBtnBack: "Retour",
+      loginBtnSubmit: "Se Connecter",
+      loginTip: "🔐 Utilisez admin@northpay.com / admin123"
     },
     pt: {
       logoSubtitle: "PORTAL DE BOAS-VINDAS",
@@ -353,7 +386,18 @@ export class AppComponent implements OnInit {
       notifCodeSent: "Código de ativação pronto: digite 123456 na tela.",
       notifWsSuccess: "WhatsApp verificado com sucesso. Integração desbloqueada!",
       notifWsFail: "Código incorreto. Por favor tente novamente.",
-      notifPersSave: "Dados pessoais salvos com sucesso."
+      notifPersSave: "Dados pessoais salvos com sucesso.",
+      btnLogout: "Sair",
+      btnBackToStart: "Voltar ao Início",
+      btnBackToOnboarding: "Voltar ao Onboarding",
+      loginEntryLink: "Acesso do Operador",
+      loginTitle: "Acesso do Operador",
+      loginSubtitle: "Insira suas credenciais administrativas da NorthPay",
+      loginUserLabel: "USUÁRIO OU E-MAIL",
+      loginPassLabel: "SENHA",
+      loginBtnBack: "Voltar",
+      loginBtnSubmit: "Iniciar Sessão",
+      loginTip: "🔐 Use admin@northpay.com / admin123"
     },
     zh: {
       logoSubtitle: "欢迎门户",
@@ -409,7 +453,18 @@ export class AppComponent implements OnInit {
       notifCodeSent: "激活码已就绪：请在屏幕上输入 123456。",
       notifWsSuccess: "WhatsApp 验证成功。入职流程已解锁！",
       notifWsFail: "代码错误。请再试一次。",
-      notifPersSave: "个人数据已成功保存。"
+      notifPersSave: "个人数据已成功保存。",
+      btnLogout: "注销",
+      btnBackToStart: "返回首页",
+      btnBackToOnboarding: "返回入职",
+      loginEntryLink: "运营商登录",
+      loginTitle: "操作员访问权限",
+      loginSubtitle: "输入您的 NorthPay 管理凭据",
+      loginUserLabel: "用户名或电子邮件",
+      loginPassLabel: "密码",
+      loginBtnBack: "返回",
+      loginBtnSubmit: "登录",
+      loginTip: "🔐 请使用 admin@northpay.com / admin123"
     },
     it: {
       logoSubtitle: "PORTALE DI BENVENUTO",
@@ -465,7 +520,18 @@ export class AppComponent implements OnInit {
       notifCodeSent: "Codice di attivazione pronto: digita 123456 sullo schermo.",
       notifWsSuccess: "WhatsApp verificato con successo. Onboarding sbloccato!",
       notifWsFail: "Codice non corretto. Riprova.",
-      notifPersSave: "Dati personali salvati con successo."
+      notifPersSave: "Dati personali salvati con successo.",
+      btnLogout: "Disconnetti",
+      btnBackToStart: "Torna alla Home",
+      btnBackToOnboarding: "Torna all'Onboarding",
+      loginEntryLink: "Ingresso Operatore",
+      loginTitle: "Accesso Operatore",
+      loginSubtitle: "Inserisci le tue credenziali amministrative NorthPay",
+      loginUserLabel: "UTENTE O E-MAIL",
+      loginPassLabel: "PASSWORD",
+      loginBtnBack: "Indietro",
+      loginBtnSubmit: "Accedi",
+      loginTip: "🔐 Usa admin@northpay.com / admin123"
     }
   };
 
@@ -562,13 +628,13 @@ export class AppComponent implements OnInit {
     if (this.isLocalMock) {
       this.userId = 100;
       this.processId = 500;
-      
+
       // ✨ Warm Default Pre-fill for high-quality Sandbox UX
       if (!this.personalData.firstName) {
         this.personalData.firstName = 'Juan';
         this.personalData.lastName = 'Pérez';
       }
-      
+
       this.addLocalNotification('Usuario registrado con éxito', 'SUCCESS');
       this.summary.status = 'IN_PROGRESS';
       this.currentView = 'onboarding';
@@ -929,7 +995,15 @@ export class AppComponent implements OnInit {
   }
 
   exitOperatorPanel() {
-    this.currentView = this.previousView as any;
+    if (!this.isOperatorDemoMode) {
+      this.currentView = 'landing';
+      this.adminUser = '';
+      this.adminPass = '';
+      // Clean sandbox state upon logout for max realism!
+      this.addLocalNotification(this.selectedLang === 'es' ? 'Sesión cerrada correctamente.' : 'Successfully logged out.', 'INFO');
+    } else {
+      this.currentView = this.previousView as any;
+    }
   }
 
   reviewContractorStep(stepType: string, approved: boolean) {
@@ -1016,7 +1090,7 @@ export class AppComponent implements OnInit {
       if (this.whatsappCode === '123456') {
         this.whatsappVerified = true;
         this.personalData.phone = this.whatsappPhone;
-        
+
         // 🌐 Smart Country Auto-Detection based on verification dial-code
         const cleanNum = this.whatsappPhone.replace(/\D/g, '');
         if (cleanNum.startsWith('54')) {
@@ -1050,7 +1124,7 @@ export class AppComponent implements OnInit {
       this.addLocalNotification('¡Felicidades! Se ha emitido tu pago y el balance ha sido actualizado.', 'SUCCESS');
       this.refreshSummary();
     }
-    
+
     // Persist the state globally in case the operator panel reloads!
     if (!this.globalPaidIds.includes(contractorId)) {
       this.globalPaidIds.push(contractorId);
