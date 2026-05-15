@@ -160,7 +160,7 @@
   flex: 1;
   display: flex;
   justify-content: center;
-  padding: 20px;
+  padding: 5px 20px;
 }
 
 .welcome-card {
@@ -947,7 +947,7 @@
 }
 
 .app-footer {
-  margin: 20px 0px;
+  margin: -5px 0px 15px 0px;
   padding: 12px 30px;
   text-align: center;
   font-size: 0.8rem;

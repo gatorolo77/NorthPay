@@ -1363,6 +1363,11 @@ export class AppComponent implements OnInit {
       createdAt: new Date().toLocaleTimeString()
     };
     this.notifications.unshift(newNotif);
+
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+      newNotif.isRead = true;
+    }, 5000);
   }
 
   getUnreadNotificationsCount() {
