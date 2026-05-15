@@ -99,16 +99,9 @@
     <div *ngIf="currentView === 'landing'" class="landing-wrapper"
       style="display: flex; align-items: center; justify-content: center; gap: 25px; width: 100%; max-width: 860px; margin: auto; animation: slideUp 0.6s ease-out;">
       <section class="glass-panel landing-card"
-        style="width: 720px; min-width: 720px; max-width: 100%; flex-shrink: 0; padding: 25px 35px; text-align: center; margin: 0; position: relative;">
+        style="width: 720px; min-width: 720px; min-height: 520px; max-width: 100%; flex-shrink: 0; padding: 25px 35px; text-align: center; margin: 0; position: relative;">
 
-        <button (click)="currentView = 'login'" class="admin-badge-link" title="Acceso Administrativo Real">
-          <span>🔐</span> {{ translations[selectedLang]['loginEntryLink'] }}
-        </button>
 
-        <button (click)="currentView = 'contractor_login'" class="admin-badge-link"
-          style="top: 52px; right: 20px; border-color: rgba(0, 245, 230, 0.35);" title="Ingreso Directo de Contratista">
-          <span>👤</span> {{ translations[selectedLang]['loginContractorEntry'] }}
-        </button>
 
         <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 15px;">
           <div class="logo-icon"
@@ -132,7 +125,7 @@
         <div class="landing-prop-grid"
           style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; text-align: left;">
           <div class="glass-panel"
-            style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.01); border-color: rgba(0, 245, 230, 0.05); min-height: 135px; display: flex; flex-direction: column; justify-content: flex-start;">
+            style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.01); border-color: rgba(0, 245, 230, 0.05); min-height: 170px; display: flex; flex-direction: column; justify-content: flex-start;">
             <div style="font-size: 1.5rem; margin-bottom: 8px;">💸</div>
             <h4 class="font-display"
               style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">{{
@@ -142,7 +135,7 @@
           </div>
 
           <div class="glass-panel"
-            style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.01); border-color: rgba(0, 245, 230, 0.05); min-height: 135px; display: flex; flex-direction: column; justify-content: flex-start;">
+            style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.01); border-color: rgba(0, 245, 230, 0.05); min-height: 170px; display: flex; flex-direction: column; justify-content: flex-start;">
             <div style="font-size: 1.5rem; margin-bottom: 8px;">✍️</div>
             <h4 class="font-display"
               style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">{{
@@ -152,7 +145,7 @@
           </div>
 
           <div class="glass-panel"
-            style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.01); border-color: rgba(0, 245, 230, 0.05); min-height: 135px; display: flex; flex-direction: column; justify-content: flex-start;">
+            style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.01); border-color: rgba(0, 245, 230, 0.05); min-height: 170px; display: flex; flex-direction: column; justify-content: flex-start;">
             <div style="font-size: 1.5rem; margin-bottom: 8px;">🛡️</div>
             <h4 class="font-display"
               style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">{{
@@ -195,7 +188,7 @@
 
 
       <div class="lang-selector-sidebar"
-        style="display: flex; flex-direction: column; gap: 12px; animation: fadeIn 0.8s ease-in-out;">
+        style="display: flex; flex-direction: column; gap: 12px; align-items: center; animation: fadeIn 0.8s ease-in-out;">
         <button (click)="changeLanguage('en')" class="glass-panel lang-btn"
           [style.border-color]="selectedLang === 'en' ? 'var(--accent-cyan)' : 'var(--glass-border)'"
           style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
@@ -242,6 +235,17 @@
             style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
           <span class="font-display"
             style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">Italiano</span>
+        </button>
+
+        <div style="width: 100%; height: 1px; background: rgba(255, 255, 255, 0.1); margin: 5px 0;"></div>
+
+        <button (click)="currentView = 'login'" class="admin-badge-link" title="Acceso Administrativo Real">
+          <span>🔐</span> {{ translations[selectedLang]['loginEntryLink'] }}
+        </button>
+
+        <button (click)="currentView = 'contractor_login'" class="admin-badge-link"
+          style="border-color: rgba(0, 245, 230, 0.35);" title="Ingreso Directo de Contratista">
+          <span>🔐</span> {{ translations[selectedLang]['loginContractorEntry'] }}
         </button>
       </div>
     </div>
@@ -910,7 +914,11 @@
             se encuentra 100% activo y regulado.</p>
         </div>
         <div style="display: flex; gap: 15px; align-items: center;">
-          <button class="settings-btn" (click)="showContractorSettings = true" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.3rem; padding: 5px; transition: all 0.3s; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.color='var(--accent-cyan)'; this.style.transform='rotate(90deg)'" onmouseout="this.style.color='var(--text-muted)'; this.style.transform='rotate(0deg)'" title="Configuración de Perfil">
+          <button class="settings-btn" (click)="showContractorSettings = true"
+            style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.3rem; padding: 5px; transition: all 0.3s; display: flex; align-items: center; justify-content: center;"
+            onmouseover="this.style.color='var(--accent-cyan)'; this.style.transform='rotate(90deg)'"
+            onmouseout="this.style.color='var(--text-muted)'; this.style.transform='rotate(0deg)'"
+            title="Configuración de Perfil">
             ⚙️
           </button>
           <div class="glass-panel status-badge"
@@ -1040,7 +1048,8 @@
         <div class="glass-panel cyber-modal-card" style="max-width: 480px; border-color: rgba(0, 245, 230, 0.25);">
           <div class="modal-header"
             style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0, 245, 230, 0.15); padding-bottom: 15px; margin-bottom: 20px;">
-            <h3 class="font-display text-gradient" style="font-size: 1.3rem; font-weight: 800; margin: 0; color: var(--accent-cyan) !important;">
+            <h3 class="font-display text-gradient"
+              style="font-size: 1.3rem; font-weight: 800; margin: 0; color: var(--accent-cyan) !important;">
               Configuración de Perfil</h3>
             <button class="modal-close-btn"
               style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem;"
@@ -1050,7 +1059,8 @@
           <div class="modal-body">
             <div class="cyber-input-group" style="margin-bottom: 20px;">
               <label class="cyber-input-label">NÚMERO DE WHATSAPP REGISTRADO</label>
-              <input type="text" class="cyber-input" [(ngModel)]="whatsappPhone" style="border-color: var(--accent-cyan);">
+              <input type="text" class="cyber-input" [(ngModel)]="whatsappPhone"
+                style="border-color: var(--accent-cyan);">
             </div>
 
             <div class="cyber-input-group" style="margin-bottom: 20px;">
@@ -1063,14 +1073,17 @@
                 <option value="CRYPTO">Criptomonedas (USDT/USDC)</option>
               </select>
             </div>
-            
+
             <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px;">
-              * Al cambiar el método de pago, los próximos pagos mensuales se enrutarán automáticamente a la nueva plataforma seleccionada.
+              * Al cambiar el método de pago, los próximos pagos mensuales se enrutarán automáticamente a la nueva
+              plataforma seleccionada.
             </p>
           </div>
 
-          <div class="modal-footer" style="display: flex; justify-content: flex-end; margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
-            <button class="cyber-btn cyber-btn-primary" style="padding: 10px 25px; border-radius: 8px; font-weight: 700; width: 100%;"
+          <div class="modal-footer"
+            style="display: flex; justify-content: flex-end; margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
+            <button class="cyber-btn cyber-btn-primary"
+              style="padding: 10px 25px; border-radius: 8px; font-weight: 700; width: 100%;"
               (click)="showContractorSettings = false; addLocalNotification(translations[selectedLang]['persBtnSave'] || 'Perfil actualizado correctamente', 'SUCCESS')">
               Guardar Cambios
             </button>
