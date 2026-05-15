@@ -85,7 +85,8 @@
   </header>
 
   <div class="alerts-container alerts-view-{{currentView}}" *ngIf="getUnreadNotificationsCount() > 0">
-    <div *ngFor="let n of getUnreadNotifications().slice(0, 1)" class="glass-panel alert-panel"
+    <div *ngFor="let n of getUnreadNotifications().slice(0, 1); trackBy: trackById" class="glass-panel alert-panel"
+      [class.fading-out]="n.isFadingOut"
       [style.border-left-color]="n.type === 'SUCCESS' ? 'var(--accent-mint)' : n.type === 'ERROR' ? 'var(--accent-coral)' : 'var(--accent-cyan)'">
       <div class="alert-content">
         <span>{{ n.type === 'SUCCESS' ? '✅' : n.type === 'ERROR' ? '❌' : 'ℹ️' }}</span>

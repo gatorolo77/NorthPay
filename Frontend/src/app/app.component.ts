@@ -16,6 +16,7 @@ interface Notification {
   message: string;
   type: string;
   isRead: boolean;
+  isFadingOut?: boolean;
   createdAt: string;
 }
 
@@ -1360,14 +1361,18 @@ export class AppComponent implements OnInit {
       message: message,
       type: type,
       isRead: false,
-      createdAt: new Date().toLocaleTimeString()
+      createdAt: new Date().toLocaleTimeString(),
+      isFadingOut: false
     };
     this.notifications.unshift(newNotif);
 
-    // Auto-dismiss after 5 seconds
+    // Two-stage auto-dismiss: Fade out, then remove
     setTimeout(() => {
-      newNotif.isRead = true;
-    }, 5000);
+      newNotif.isFadingOut = true;
+      setTimeout(() => {
+        newNotif.isRead = true;
+      }, 500); // 500ms matches the CSS transition duration
+    }, 4500); // Start fading out after 4.5 seconds
   }
 
   getUnreadNotificationsCount() {
@@ -1376,6 +1381,10 @@ export class AppComponent implements OnInit {
 
   getUnreadNotifications() {
     return this.notifications.filter(n => !n.isRead);
+  }
+
+  trackById(index: number, item: Notification) {
+    return item.id;
   }
 
   markAllNotificationsAsRead(event: Event) {

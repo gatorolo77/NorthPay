@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import Swal from 'sweetalert2';
 
 interface OnboardingSummary {
   status: string;
@@ -706,7 +707,17 @@ export class AdminDashboardComponent implements OnInit {
       this.selectedContractorForDelete = null;
       this.inputWhatsappConfirm = '';
     } else {
-      alert(this.dashboardTranslations[this.selectedLang]['delError']);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error de Validación',
+        text: this.dashboardTranslations[this.selectedLang]['delError'],
+        confirmButtonColor: '#f87171',
+        background: '#1a1f2e',
+        color: '#fff',
+        customClass: {
+          popup: 'glass-panel'
+        }
+      });
     }
   }
 }
