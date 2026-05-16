@@ -1105,6 +1105,13 @@ export class AppComponent implements OnInit {
     }
   }
 
+  openContractorSettings() {
+    this.showContractorSettings = true;
+    if (!this.whatsappPhone) {
+      this.whatsappPhone = this.personalData.phone || '+34 600 000 000';
+    }
+  }
+
   loadOperatorPanel() {
     this.notifications = []; // Clear alerts for cleaner operator interface
     this.previousView = this.currentView as any;

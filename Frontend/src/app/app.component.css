@@ -931,7 +931,7 @@
   -webkit-backdrop-filter: blur(20px);
 
   border: 1px solid var(--accent-cyan-glow);
-  padding: 30px;
+  padding: 20px;
   border-radius: 12px;
   box-shadow: 0 0 30px rgba(0, 245, 230, 0.15);
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -1255,6 +1255,27 @@
   /* Operator View stacking */
   .metrics-grid {
     grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .operator-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px !important;
+  }
+
+  .metric-card {
+    padding: 15px;
+    gap: 15px;
+  }
+
+  .operator-card {
+    padding: 15px;
+  }
+
+  .contractor-dashboard-container {
+    overflow-x: hidden;
+    width: 100%;
   }
 
   .operator-card [style*="display: grid; grid-template-columns: 1.5fr 1fr"] {

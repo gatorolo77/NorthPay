@@ -916,7 +916,7 @@
             se encuentra 100% activo y regulado.</p>
         </div>
         <div style="display: flex; gap: 15px; align-items: center;">
-          <button class="settings-btn" (click)="showContractorSettings = true"
+          <button class="settings-btn" (click)="openContractorSettings()"
             style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.3rem; padding: 5px; transition: all 0.3s; display: flex; align-items: center; justify-content: center;"
             onmouseover="this.style.color='var(--accent-cyan)'; this.style.transform='rotate(90deg)'"
             onmouseout="this.style.color='var(--text-muted)'; this.style.transform='rotate(0deg)'"
@@ -1049,7 +1049,7 @@
       <div class="glass-modal-backdrop" *ngIf="showContractorSettings">
         <div class="glass-panel cyber-modal-card" style="max-width: 480px; border-color: rgba(0, 245, 230, 0.25);">
           <div class="modal-header"
-            style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0, 245, 230, 0.15); padding-bottom: 15px; margin-bottom: 20px;">
+            style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0, 245, 230, 0.15); padding-bottom: 10px; margin-bottom: 15px;">
             <h3 class="font-display text-gradient"
               style="font-size: 1.3rem; font-weight: 800; margin: 0; color: var(--accent-cyan) !important;">
               Configuración de Perfil</h3>
@@ -1059,13 +1059,13 @@
           </div>
 
           <div class="modal-body">
-            <div class="cyber-input-group" style="margin-bottom: 20px;">
+            <div class="cyber-input-group" style="margin-bottom: 12px;">
               <label class="cyber-input-label">NÚMERO DE WHATSAPP REGISTRADO</label>
               <input type="text" class="cyber-input" [(ngModel)]="whatsappPhone"
                 style="border-color: var(--accent-cyan);">
             </div>
 
-            <div class="cyber-input-group" style="margin-bottom: 20px;">
+            <div class="cyber-input-group" style="margin-bottom: 12px;">
               <label class="cyber-input-label">MÉTODO DE PAGO ACTIVO</label>
               <select class="cyber-input" [(ngModel)]="paymentMethod.provider" style="cursor: pointer;">
                 <option value="BANK_TRANSFER">Transferencia Bancaria (SWIFT/IBAN)</option>
@@ -1077,12 +1077,12 @@
             </div>
 
             <!-- Dynamic Fields for Payment Method -->
-            <div *ngIf="paymentMethod.provider === 'BANK_TRANSFER'" class="glass-panel" style="padding: 15px; border-radius: 10px; margin-bottom: 20px; border-color: rgba(0, 245, 230, 0.15); animation: fadeIn 0.3s ease;">
-              <div class="cyber-input-group" style="margin-bottom: 12px;">
+            <div *ngIf="paymentMethod.provider === 'BANK_TRANSFER'" class="glass-panel" style="padding: 10px 15px; border-radius: 10px; margin-bottom: 12px; border-color: rgba(0, 245, 230, 0.15); animation: fadeIn 0.3s ease;">
+              <div class="cyber-input-group" style="margin-bottom: 8px;">
                 <label class="cyber-input-label">Nombre del Banco</label>
                 <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.bankName" placeholder="Ej. Chase Bank">
               </div>
-              <div class="cyber-input-group" style="margin-bottom: 12px;">
+              <div class="cyber-input-group" style="margin-bottom: 8px;">
                 <label class="cyber-input-label">Número de Cuenta / IBAN</label>
                 <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.accountNumber" placeholder="ES91 2100 0418...">
               </div>
@@ -1092,8 +1092,8 @@
               </div>
             </div>
 
-            <div *ngIf="paymentMethod.provider === 'MERCADO_PAGO'" class="glass-panel" style="padding: 15px; border-radius: 10px; margin-bottom: 20px; border-color: rgba(0, 245, 230, 0.15); animation: fadeIn 0.3s ease;">
-              <div class="cyber-input-group" style="margin-bottom: 12px;">
+            <div *ngIf="paymentMethod.provider === 'MERCADO_PAGO'" class="glass-panel" style="padding: 10px 15px; border-radius: 10px; margin-bottom: 12px; border-color: rgba(0, 245, 230, 0.15); animation: fadeIn 0.3s ease;">
+              <div class="cyber-input-group" style="margin-bottom: 8px;">
                 <label class="cyber-input-label">Alias o CVU</label>
                 <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.mpAliasOrCvu" placeholder="tu.alias.mp">
               </div>
@@ -1103,8 +1103,8 @@
               </div>
             </div>
 
-            <div *ngIf="paymentMethod.provider === 'PAYONEER' || paymentMethod.provider === 'PAYPAL'" class="glass-panel" style="padding: 15px; border-radius: 10px; margin-bottom: 20px; border-color: rgba(0, 245, 230, 0.15); animation: fadeIn 0.3s ease;">
-              <div class="cyber-input-group" style="margin-bottom: 12px;">
+            <div *ngIf="paymentMethod.provider === 'PAYONEER' || paymentMethod.provider === 'PAYPAL'" class="glass-panel" style="padding: 10px 15px; border-radius: 10px; margin-bottom: 12px; border-color: rgba(0, 245, 230, 0.15); animation: fadeIn 0.3s ease;">
+              <div class="cyber-input-group" style="margin-bottom: 8px;">
                 <label class="cyber-input-label">Correo Registrado en {{ paymentMethod.provider === 'PAYPAL' ? 'PayPal' : 'Payoneer' }}</label>
                 <input type="email" class="cyber-input" [(ngModel)]="paymentMethod.paypalEmail" placeholder="correo@ejemplo.com">
               </div>
@@ -1114,8 +1114,8 @@
               </div>
             </div>
 
-            <div *ngIf="paymentMethod.provider === 'CRYPTO'" class="glass-panel" style="padding: 15px; border-radius: 10px; margin-bottom: 20px; border-color: rgba(0, 245, 230, 0.15); animation: fadeIn 0.3s ease;">
-              <div class="cyber-input-group" style="margin-bottom: 12px;">
+            <div *ngIf="paymentMethod.provider === 'CRYPTO'" class="glass-panel" style="padding: 10px 15px; border-radius: 10px; margin-bottom: 12px; border-color: rgba(0, 245, 230, 0.15); animation: fadeIn 0.3s ease;">
+              <div class="cyber-input-group" style="margin-bottom: 8px;">
                 <label class="cyber-input-label">Red / Network</label>
                 <select class="cyber-input" [(ngModel)]="paymentMethod.cryptoNetwork">
                   <option value="TRC20">Tron (TRC20)</option>
@@ -1130,14 +1130,14 @@
               </div>
             </div>
 
-            <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px;">
+            <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin-bottom: 5px;">
               * Al cambiar el método de pago, los próximos pagos mensuales se enrutarán automáticamente a la nueva
               plataforma seleccionada.
             </p>
           </div>
 
           <div class="modal-footer"
-            style="display: flex; justify-content: flex-end; margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
+            style="display: flex; justify-content: flex-end; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">
             <button class="cyber-btn cyber-btn-primary"
               style="padding: 10px 25px; border-radius: 8px; font-weight: 700; width: 100%;"
               (click)="showContractorSettings = false; addLocalNotification(translations[selectedLang]['persBtnSave'] || 'Perfil actualizado correctamente', 'SUCCESS')">
