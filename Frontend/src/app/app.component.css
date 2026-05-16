@@ -827,7 +827,13 @@
   display: flex;
   align-items: center;
   gap: 20px;
-  background: rgba(2, 9, 8, 0.4);
+  background:
+    linear-gradient(135deg,
+      #5f6368 0%,
+      #8b8f94 25%,
+      #c7c9cc 50%,
+      #9da1a6 75%,
+      #6b7075 100%);
 }
 
 .metric-icon {
@@ -954,6 +960,7 @@
 }
 
 .app-footer {
+  width: 100%;
   margin: -5px 0px 15px 0px;
   padding: 12px 30px;
   text-align: center;
@@ -962,7 +969,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
   border-color: rgba(0, 245, 230, 0.05);
+}
+
+.footer-offset {
+  transform: translateX(-55px);
+  transition: transform 0.3s ease;
 }
 
 .notifications-dropdown {
@@ -1152,6 +1167,10 @@
 
 /* Mobile Device Breakpoint */
 @media (max-width: 768px) {
+  .footer-offset {
+    transform: none !important;
+  }
+
   .app-header {
     margin: 10px;
     padding: 12px 15px;
