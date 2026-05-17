@@ -54,6 +54,7 @@ export class AppComponent implements OnInit {
   showLoginPassword = false;
   adminUser = 'admin@northpay.com';
   adminPass = 'admin123';
+  showAdminPassword = false;
   userId = 1;
   processId = 1;
   showContractorSettings = false;

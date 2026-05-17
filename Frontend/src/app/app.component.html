@@ -273,8 +273,14 @@
       <div class="cyber-input-group" style="margin-bottom: 0;">
         <label class="cyber-input-label" style="font-size: 0.7rem; margin-bottom: 4px;">{{
           translations[selectedLang]['loginPassLabel'] }}</label>
-        <input type="password" class="cyber-input" [(ngModel)]="adminPass" placeholder="••••••••"
-          style="padding: 10px 12px; font-size: 0.85rem;">
+        <div style="position: relative;">
+          <input [type]="showAdminPassword ? 'text' : 'password'" class="cyber-input" [(ngModel)]="adminPass" placeholder="••••••••"
+            style="padding: 10px 35px 10px 12px; font-size: 0.85rem; width: 100%;">
+          <button class="password-toggle-btn" (click)="showAdminPassword = !showAdminPassword"
+            style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; padding: 0; z-index: 10;">
+            {{ showAdminPassword ? '👁️' : '👁️‍🗨️' }}
+          </button>
+        </div>
       </div>
 
       <div style="display: flex; gap: 15px; margin-top: 18px;">
