@@ -138,7 +138,7 @@ export class OnboardingComponent implements OnInit {
   }
 
   testBackendConnection() {
-    this.http.get(`${this.apiBaseUrl}/onboarding/1/summary`).subscribe({
+    this.http.get(`${this.apiBaseUrl}/auth/health`, { responseType: 'text' }).subscribe({
       next: () => {
         this.isLocalMock = false;
         console.log('[NorthPay] Connected to NorthPay server.');
@@ -155,13 +155,13 @@ export class OnboardingComponent implements OnInit {
     if (this.isLocalMock) {
       this.invitationToken = 'NP_INV_' + Math.random().toString(36).substring(2, 10).toUpperCase();
       this.addLocalNotification('Invitación generada localmente. Usa el token para registrarte.', 'INFO');
-      this.currentView = 'register';
+      this.currentView = 'welcome';
     } else {
       this.http.post<any>(`${this.apiBaseUrl}/operator/invitation?email=${this.invitationEmail}`, {}).subscribe({
         next: (res) => {
           this.invitationToken = res.token;
           this.addLocalNotification('Invitación enviada con éxito.', 'SUCCESS');
-          this.currentView = 'register';
+          this.currentView = 'welcome';
         },
         error: (err) => this.handleError(err)
       });

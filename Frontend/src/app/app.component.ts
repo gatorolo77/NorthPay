@@ -45,6 +45,7 @@ export class AppComponent implements OnInit {
   cloudinaryCloudName = 'northpay-demo';
   cloudinaryUploadPreset = 'northpay_preset';
 
+  initialToken: string | null = null;
   invitationToken = '';
   invitationEmail = 'contractor@northpay.com';
   registerPassword = 'password123';
@@ -705,7 +706,24 @@ export class AppComponent implements OnInit {
     return `${showPlus ? '+' : ''}${symbol}${formatted} ${curr}`;
   }
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+    // Capture token immediately on instantiation before router strips it!
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    
+    let finalToken = token;
+    if (!finalToken && window.location.href.includes('token=')) {
+      const parts = window.location.href.split('token=');
+      if (parts.length > 1) {
+        finalToken = parts[1].split('&')[0];
+      }
+    }
+    
+    if (finalToken) {
+      this.initialToken = finalToken;
+      console.log('[NorthPay] Token capturado sincrónicamente:', this.initialToken);
+    }
+  }
 
   ngOnInit() {
     const savedTheme = localStorage.getItem('northpay-theme') as 'dark' | 'light';
@@ -719,18 +737,50 @@ export class AppComponent implements OnInit {
 
   testBackendConnection() {
 
-    this.http.get(`${this.apiBaseUrl}/onboarding/1/summary`).subscribe({
+    this.http.get(`${this.apiBaseUrl}/auth/health`, { responseType: 'text' }).subscribe({
       next: () => {
         this.isLocalMock = false;
         console.log('[NorthPay] Connected to NorthPay server.');
         this.addLocalNotification('Conectado al servidor de NorthPay', 'SUCCESS');
+        this.checkUrlForToken();
       },
-      error: () => {
+      error: (err) => {
         this.isLocalMock = true;
         console.warn('[NorthPay] Spring Boot offline. Running in premium Local Simulation mode.');
         this.loadMockInitialState();
+        this.checkUrlForToken();
       }
     });
+  }
+
+  checkUrlForToken() {
+    const finalToken = this.initialToken;
+
+    if (finalToken) {
+      console.log('[NorthPay] RUTA DE ACTIVACIÓN DETECTADA. Token:', finalToken);
+      this.http.get(`${this.apiBaseUrl}/invitations/${finalToken}`).subscribe({
+        next: (invitation: any) => {
+          console.log('[NorthPay] Invitación obtenida:', invitation);
+          if (invitation && invitation.status === 'PENDING') {
+            this.invitationToken = invitation.token;
+            this.invitationEmail = invitation.email;
+            this.currentView = 'register';
+            this.addLocalNotification('Token de activación válido detectado. Configura tu contraseña.', 'SUCCESS');
+          } else {
+            this.addLocalNotification('El token de activación ya ha sido utilizado o ha expirado.', 'ERROR');
+          }
+        },
+        error: (err) => {
+          console.error('[NorthPay] Error validando token:', err);
+          this.invitationToken = finalToken!;
+          this.currentView = 'register';
+          this.addLocalNotification('Token detectado. Por favor ingresa tu correo y contraseña.', 'INFO');
+        }
+      });
+      
+      // Clear initialToken so we don't re-trigger it on subsequent connection checks
+      this.initialToken = null;
+    }
   }
 
 
@@ -738,7 +788,7 @@ export class AppComponent implements OnInit {
     if (this.isLocalMock) {
       this.invitationToken = 'NP_INV_' + Math.random().toString(36).substring(2, 10).toUpperCase();
       this.addLocalNotification(`Invitación creada para ${this.invitationEmail}`, 'SUCCESS');
-      this.currentView = 'register';
+      this.currentView = 'landing';
     } else {
       this.http.post(`${this.apiBaseUrl}/invitations/send`, {
         email: this.invitationEmail,
@@ -747,7 +797,7 @@ export class AppComponent implements OnInit {
         next: (res: any) => {
           this.invitationToken = res.token;
           this.addLocalNotification(`Invitación enviada para ${this.invitationEmail}`, 'SUCCESS');
-          this.currentView = 'register';
+          this.currentView = 'landing';
         },
         error: (err) => this.handleError(err)
       });
@@ -1073,7 +1123,7 @@ export class AppComponent implements OnInit {
       }
     } else {
       this.http.post(`${this.apiBaseUrl}/auth/login`, {
-        username: this.adminUser,
+        email: this.adminUser,
         password: this.adminPass
       }).subscribe({
         next: () => {
@@ -1089,20 +1139,56 @@ export class AppComponent implements OnInit {
   }
 
   submitContractorPortalLogin() {
-    const targetEmail = this.invitationEmail || 'contractor@northpay.com';
-    const targetPass = this.registerPassword || 'password123';
-    
-    if (this.loginEmail.toLowerCase() === targetEmail.toLowerCase() && this.loginPassword === targetPass) {
-      this.addLocalNotification('Sesión iniciada correctamente. Cargando tu Dashboard...', 'SUCCESS');
+    if (this.isLocalMock) {
+      const targetEmail = this.invitationEmail || 'contractor@northpay.com';
+      const targetPass = this.registerPassword || 'password123';
       
-      // Sincronizar estados de simulación a COMPLETADO para evitar hacer el onboarding
-      this.summary.status = 'COMPLETED';
-      this.summary.progress = 100;
-      this.summary.steps.forEach(s => s.status = 'COMPLETED');
-      
-      this.currentView = 'onboarding';
+      if (this.loginEmail.toLowerCase() === targetEmail.toLowerCase() && this.loginPassword === targetPass) {
+        this.addLocalNotification('Sesión iniciada correctamente. Cargando tu Dashboard...', 'SUCCESS');
+        
+        // Sincronizar estados de simulación a COMPLETADO para evitar hacer el onboarding
+        this.summary.status = 'COMPLETED';
+        this.summary.progress = 100;
+        this.summary.steps.forEach(s => s.status = 'COMPLETED');
+        
+        this.currentView = 'onboarding';
+      } else {
+        this.addLocalNotification('Credenciales incorrectas. Revisa tu correo y contraseña.', 'ERROR');
+      }
     } else {
-      this.addLocalNotification('Credenciales incorrectas. Revisa tu correo y contraseña.', 'ERROR');
+      this.http.post<any>(`${this.apiBaseUrl}/auth/login`, {
+        email: this.loginEmail,
+        password: this.loginPassword
+      }).subscribe({
+        next: (user) => {
+          this.addLocalNotification('Sesión iniciada correctamente. Cargando tu Dashboard...', 'SUCCESS');
+          this.userId = user.id;
+          
+          this.http.post<any>(`${this.apiBaseUrl}/onboarding/initiate?contractorUserId=${this.userId}`, {}).subscribe({
+            next: (process) => {
+              this.processId = process.id;
+              this.http.get<OnboardingSummary>(`${this.apiBaseUrl}/onboarding/${this.processId}/summary`).subscribe({
+                next: (sum) => {
+                  this.summary = sum;
+                  this.currentView = 'onboarding';
+                },
+                error: (err) => {
+                  console.error('[NorthPay] Failed to load summary:', err);
+                  this.addLocalNotification('Error al cargar resumen de onboarding', 'ERROR');
+                }
+              });
+            },
+            error: (err) => {
+              console.error('[NorthPay] Failed to initiate process:', err);
+              this.addLocalNotification('Error al inicializar proceso de onboarding', 'ERROR');
+            }
+          });
+        },
+        error: (err) => {
+          console.error('[NorthPay] Live contractor login failed:', err);
+          this.addLocalNotification('Credenciales incorrectas o usuario no registrado.', 'ERROR');
+        }
+      });
     }
   }
 
@@ -1111,6 +1197,54 @@ export class AppComponent implements OnInit {
     if (!this.whatsappPhone) {
       this.whatsappPhone = this.personalData.phone || '+34 600 000 000';
     }
+  }
+
+  saveContractorSettings() {
+    const pData: Record<string, any> = {};
+    const provider = this.paymentMethod.provider;
+
+    if (provider === 'BANK_TRANSFER') {
+      pData['bankName'] = this.paymentMethod.bankName;
+      pData['accountNumber'] = this.paymentMethod.accountNumber;
+      pData['swiftCode'] = this.paymentMethod.swiftCode;
+    } else if (provider === 'MERCADO_PAGO') {
+      pData['mpAliasOrCvu'] = this.paymentMethod.mpAliasOrCvu;
+      pData['mpAccountHolder'] = this.paymentMethod.mpAccountHolder;
+    } else if (provider === 'PAYONEER' || provider === 'PAYPAL') {
+      pData['paypalEmail'] = this.paymentMethod.paypalEmail;
+      pData['paypalName'] = this.paymentMethod.paypalName;
+    } else if (provider === 'CRYPTO') {
+      pData['cryptoNetwork'] = this.paymentMethod.cryptoNetwork;
+      pData['cryptoAddress'] = this.paymentMethod.cryptoAddress;
+    }
+
+    const payload = {
+      whatsappPhone: this.whatsappPhone,
+      paymentProvider: provider,
+      paymentData: pData
+    };
+
+    if (this.isLocalMock) {
+      this.personalData.phone = this.whatsappPhone;
+      this.addLocalNotification('Perfil actualizado correctamente (Simulado)', 'SUCCESS');
+      this.showContractorSettings = false;
+      return;
+    }
+
+    this.http.put(`${this.apiBaseUrl}/onboarding/${this.processId}/settings`, payload).subscribe({
+      next: (updatedSummary: any) => {
+        this.addLocalNotification('Perfil y método de pago actualizados con éxito', 'SUCCESS');
+        this.personalData.phone = this.whatsappPhone;
+        if (updatedSummary) {
+          this.summary = updatedSummary;
+        }
+        this.showContractorSettings = false;
+      },
+      error: (err) => {
+        console.error('[NorthPay] Failed to save settings:', err);
+        this.addLocalNotification('Error al guardar ajustes en el servidor', 'ERROR');
+      }
+    });
   }
 
   loadOperatorPanel() {

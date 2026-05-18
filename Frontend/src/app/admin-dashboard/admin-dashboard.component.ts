@@ -417,7 +417,7 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   testBackendConnection() {
-    this.http.get(`${this.apiBaseUrl}/onboarding/1/summary`).subscribe({
+    this.http.get(`${this.apiBaseUrl}/auth/health`, { responseType: 'text' }).subscribe({
       next: () => {
         this.isLocalMock = false;
       },
