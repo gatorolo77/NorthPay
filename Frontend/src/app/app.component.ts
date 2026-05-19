@@ -40,21 +40,20 @@ export class AppComponent implements OnInit {
   currentView: 'landing' | 'welcome' | 'register' | 'onboarding' | 'operator' | 'login' | 'contractor_login' = 'landing';
   previousView: 'landing' | 'welcome' | 'register' | 'onboarding' | 'login' | 'contractor_login' = 'landing';
   apiBaseUrl = 'http://localhost:8080/api';
-  isLocalMock = true;
   isOperatorDemoMode = true;
   cloudinaryCloudName = 'northpay-demo';
   cloudinaryUploadPreset = 'northpay_preset';
 
   initialToken: string | null = null;
   invitationToken = '';
-  invitationEmail = 'contractor@northpay.com';
-  registerPassword = 'password123';
+  invitationEmail = '';
+  registerPassword = '';
   showRegisterPassword = false;
-  loginEmail = 'contractor@northpay.com';
-  loginPassword = 'password123';
+  loginEmail = '';
+  loginPassword = '';
   showLoginPassword = false;
-  adminUser = 'admin@northpay.com';
-  adminPass = 'admin123';
+  adminUser = '';
+  adminPass = '';
   showAdminPassword = false;
   userId = 1;
   processId = 1;
@@ -160,6 +159,7 @@ export class AppComponent implements OnInit {
       propDesc3: "Comprobación de identidad de última generación respaldada por motores biométricos avanzados.",
       btnOperator: "Panel de Operaciones (Demo)",
       btnActivate: "Iniciar Activación ",
+      tooltipActivate: "🛡️ Al iniciar la activación aceptas nuestros Términos de Servicio y Políticas de Privacidad de NorthPay.",
       btnPortalLogin: "Ingresar al Portal",
       preloading: "Precargando recursos...",
       statusReady: "Portal NorthPay listo para operar ⚡",
@@ -244,6 +244,7 @@ export class AppComponent implements OnInit {
       propDesc3: "Next-generation identity verification powered by advanced biometric engines.",
       btnOperator: "Operator Panel (Demo)",
       btnActivate: "Start Activation",
+      tooltipActivate: "🛡️ By starting activation you accept NorthPay’s Terms of Service and Privacy Policy.",
       btnPortalLogin: "Access Portal",
       preloading: "Preloading resources...",
       statusReady: "NorthPay Portal ready to operate ⚡",
@@ -328,6 +329,7 @@ export class AppComponent implements OnInit {
       propDesc3: "Vérification d'identité de pointe optimisée par des moteurs biométriques avancés.",
       btnOperator: "Panneau Opérateur (Démo)",
       btnActivate: "Lancer l'activation ",
+      tooltipActivate: "🛡️ En lançant l’activation, vous acceptez les Conditions d’Utilisation et la Politique de Confidentialité de NorthPay.",
       btnPortalLogin: "Accéder au Portail",
       preloading: "Préchargement des ressources...",
       statusReady: "Portail NorthPay prêt à fonctionner ⚡",
@@ -412,6 +414,7 @@ export class AppComponent implements OnInit {
       propDesc3: "Verificação de identidade de última geração com suporte de motores biométricos avançados.",
       btnOperator: "Painel do Operador (Demo)",
       btnActivate: "Iniciar Ativação ",
+      tooltipActivate: "🛡️ Ao iniciar a ativação você aceita os Termos de Serviço e a Política de Privacidade da NorthPay.",
       btnPortalLogin: "Acessar o Portal",
       preloading: "Pré-carregando recursos...",
       statusReady: "Portal NorthPay pronto para operar ⚡",
@@ -496,6 +499,7 @@ export class AppComponent implements OnInit {
       propDesc3: "由先进 of 生物识别引擎支持的新一代身份验证。",
       btnOperator: "运营商面板 (演示)",
       btnActivate: "开始激活",
+      tooltipActivate: "🛡️ 开始激活即表示您接受 NorthPay 的服务条款和隐私政策。",
       btnPortalLogin: "登录门户",
       preloading: "正在预载资源...",
       statusReady: "NorthPay 门户已准备就绪 ⚡",
@@ -580,6 +584,7 @@ export class AppComponent implements OnInit {
       propDesc3: "Verifica dell'identità di nuova generazione supportata da motori biometrici avanzati.",
       btnOperator: "Pannello Operazioni (Demo)",
       btnActivate: "Avvia Attivazione",
+      tooltipActivate: "🛡️ Avviando l’attivazione accetti i Termini di Servizio e l’Informativa sulla Privacy di NorthPay.",
       btnPortalLogin: "Accedi al Portale",
       preloading: "Precaricamento risorse...",
       statusReady: "Portale NorthPay pronto a operare ⚡",
@@ -700,25 +705,26 @@ export class AppComponent implements OnInit {
     let symbol = '$';
 
     if (curr === 'EUR') {
-      converted = baseAmount * 0.92; // Simulador de Tasa de Cambio EUR/USD
+      if (baseAmount === 2500) {
+        converted = baseAmount * 0.92;
+      }
       symbol = '€';
     } else if (curr === 'USDT') {
       symbol = '₮';
     }
 
-    const formatted = converted.toLocaleString('en-US', { 
-      minimumFractionDigits: 2, 
-      maximumFractionDigits: 2 
+    const formatted = converted.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
     });
 
     return `${showPlus ? '+' : ''}${symbol}${formatted} ${curr}`;
   }
 
   constructor(private http: HttpClient) {
-    // Capture token immediately on instantiation before router strips it!
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
-    
+
     let finalToken = token;
     if (!finalToken && window.location.href.includes('token=')) {
       const parts = window.location.href.split('token=');
@@ -726,7 +732,7 @@ export class AppComponent implements OnInit {
         finalToken = parts[1].split('&')[0];
       }
     }
-    
+
     if (finalToken) {
       this.initialToken = finalToken;
       console.log('[NorthPay] Token capturado sincrónicamente:', this.initialToken);
@@ -744,18 +750,14 @@ export class AppComponent implements OnInit {
   }
 
   testBackendConnection() {
-
     this.http.get(`${this.apiBaseUrl}/auth/health`, { responseType: 'text' }).subscribe({
       next: () => {
-        this.isLocalMock = false;
         console.log('[NorthPay] Connected to NorthPay server.');
         this.addLocalNotification('Conectado al servidor de NorthPay', 'SUCCESS');
         this.checkUrlForToken();
       },
-      error: (err) => {
-        this.isLocalMock = true;
-        console.warn('[NorthPay] Spring Boot offline. Running in premium Local Simulation mode.');
-        this.loadMockInitialState();
+      error: () => {
+        console.warn('[NorthPay] Spring Boot offline.');
         this.checkUrlForToken();
       }
     });
@@ -785,62 +787,40 @@ export class AppComponent implements OnInit {
           this.addLocalNotification('Token detectado. Por favor ingresa tu correo y contraseña.', 'INFO');
         }
       });
-      
-      // Clear initialToken so we don't re-trigger it on subsequent connection checks
+
       this.initialToken = null;
     }
   }
 
 
   generateInvitation() {
-    if (this.isLocalMock) {
-      this.invitationToken = 'NP_INV_' + Math.random().toString(36).substring(2, 10).toUpperCase();
-      this.addLocalNotification(`Invitación creada para ${this.invitationEmail}`, 'SUCCESS');
-      this.currentView = 'landing';
-    } else {
-      this.http.post(`${this.apiBaseUrl}/invitations/send`, {
-        email: this.invitationEmail,
-        operatorId: 1
-      }).subscribe({
-        next: (res: any) => {
-          this.invitationToken = res.token;
-          this.addLocalNotification(`Invitación enviada para ${this.invitationEmail}`, 'SUCCESS');
-          this.currentView = 'landing';
-        },
-        error: (err) => this.handleError(err)
-      });
-    }
+    this.http.post(`${this.apiBaseUrl}/invitations/send`, {
+      email: this.invitationEmail,
+      operatorId: 1
+    }).subscribe({
+      next: (res: any) => {
+        this.invitationToken = res.token;
+        this.addLocalNotification(`Invitación enviada para ${this.invitationEmail}`, 'SUCCESS');
+        this.currentView = 'landing';
+      },
+      error: (err) => this.handleError(err)
+    });
   }
 
 
   register() {
-    if (this.isLocalMock) {
-      this.userId = 100;
-      this.processId = 500;
-
-      // ✨ Warm Default Pre-fill for high-quality Sandbox UX
-      if (!this.personalData.firstName) {
-        this.personalData.firstName = 'Juan';
-        this.personalData.lastName = 'Pérez';
-      }
-
-      this.addLocalNotification('Usuario registrado con éxito', 'SUCCESS');
-      this.summary.status = 'IN_PROGRESS';
-      this.currentView = 'onboarding';
-    } else {
-      this.http.post(`${this.apiBaseUrl}/auth/register`, {
-        email: this.invitationEmail,
-        password: this.registerPassword,
-        token: this.invitationToken
-      }).subscribe({
-        next: (user: any) => {
-          this.userId = user.id;
-          this.addLocalNotification('Registrado correctamente', 'SUCCESS');
-          this.initiateOnboarding();
-        },
-        error: (err) => this.handleError(err)
-      });
-    }
+    this.http.post(`${this.apiBaseUrl}/auth/register`, {
+      email: this.invitationEmail,
+      password: this.registerPassword,
+      token: this.invitationToken
+    }).subscribe({
+      next: (user: any) => {
+        this.userId = user.id;
+        this.addLocalNotification('Registrado correctamente', 'SUCCESS');
+        this.initiateOnboarding();
+      },
+      error: (err) => this.handleError(err)
+    });
   }
 
   initiateOnboarding() {
@@ -855,10 +835,6 @@ export class AppComponent implements OnInit {
   }
 
   refreshSummary() {
-    if (this.isLocalMock) {
-      this.resolveLocalState();
-      return;
-    }
     this.http.get<OnboardingSummary>(`${this.apiBaseUrl}/onboarding/${this.processId}/summary`).subscribe({
       next: (summary) => {
         this.summary = summary;
@@ -870,20 +846,13 @@ export class AppComponent implements OnInit {
 
 
   submitPersonalData() {
-    if (this.isLocalMock) {
-      this.summary.steps[1].status = 'COMPLETED';
-      this.summary.steps[2].status = 'IN_PROGRESS';
-      this.addLocalNotification(this.translations[this.selectedLang]['notifPersSave'], 'SUCCESS');
-      this.refreshSummary();
-    } else {
-      this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/personal-data`, this.personalData).subscribe({
-        next: () => {
-          this.addLocalNotification(this.translations[this.selectedLang]['notifPersSave'], 'SUCCESS');
-          this.refreshSummary();
-        },
-        error: (err) => this.handleError(err)
-      });
-    }
+    this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/personal-data`, this.personalData).subscribe({
+      next: () => {
+        this.addLocalNotification(this.translations[this.selectedLang]['notifPersSave'], 'SUCCESS');
+        this.refreshSummary();
+      },
+      error: (err) => this.handleError(err)
+    });
   }
 
 
@@ -914,58 +883,21 @@ export class AppComponent implements OnInit {
   uploadDocument() {
     if (!this.selectedFile) return;
     this.isUploadingDoc = true;
-
-    if (this.isLocalMock) {
-      const formData = new FormData();
-      formData.append('file', this.selectedFile);
-      formData.append('upload_preset', this.cloudinaryUploadPreset);
-
-      this.http.post(`https://api.cloudinary.com/v1_1/${this.cloudinaryCloudName}/image/upload`, formData).subscribe({
-        next: (res: any) => {
-          this.isUploadingDoc = false;
-          this.uploadedDocs.push({
-            type: this.selectedDocType,
-            filename: this.selectedFile ? this.selectedFile.name : 'doc_id.pdf',
-            fileUrl: res.secure_url
-          });
-          this.summary.steps[2].status = 'IN_REVIEW';
-          this.addLocalNotification(`Documento '${this.selectedDocType}' subido con éxito a Cloudinary.`, 'SUCCESS');
-          this.selectedFile = null;
-          this.refreshSummary();
-        },
-        error: () => {
-          // Graceful fallback to simulation if the Cloudinary preset is not configured yet
-          this.isUploadingDoc = false;
-          const filename = this.selectedFile ? this.selectedFile.name : 'doc_id.pdf';
-          this.uploadedDocs.push({
-            type: this.selectedDocType,
-            filename: filename,
-            fileUrl: 'https://res.cloudinary.com/demo/image/upload/' + filename
-          });
-          this.summary.steps[2].status = 'IN_REVIEW';
-          this.addLocalNotification(`Documento '${this.selectedDocType}' subido (Simulación). Esperando aprobación.`, 'INFO');
-          this.selectedFile = null;
-          this.refreshSummary();
-        }
-      });
-    } else {
-      const formData = new FormData();
-      formData.append('type', this.selectedDocType);
-      formData.append('file', this.selectedFile);
-
-      this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/documents`, formData).subscribe({
-        next: () => {
-          this.isUploadingDoc = false;
-          this.selectedFile = null;
-          this.addLocalNotification('Documento subido.', 'SUCCESS');
-          this.refreshSummary();
-        },
-        error: (err) => {
-          this.isUploadingDoc = false;
-          this.handleError(err);
-        }
-      });
-    }
+    const formData = new FormData();
+    formData.append('type', this.selectedDocType);
+    formData.append('file', this.selectedFile);
+    this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/documents`, formData).subscribe({
+      next: () => {
+        this.isUploadingDoc = false;
+        this.selectedFile = null;
+        this.addLocalNotification('Documento subido.', 'SUCCESS');
+        this.refreshSummary();
+      },
+      error: (err) => {
+        this.isUploadingDoc = false;
+        this.handleError(err);
+      }
+    });
   }
 
 
@@ -974,47 +906,31 @@ export class AppComponent implements OnInit {
     setTimeout(() => {
       this.isSigningContract = false;
       this.signedContractUrl = 'https://res.cloudinary.com/demo/contract/signed_contract_doe.pdf';
-
-      if (this.isLocalMock) {
-        this.summary.steps[3].status = 'COMPLETED';
-        this.summary.steps[4].status = 'IN_PROGRESS';
-        this.addLocalNotification('Contrato firmado digitalmente.', 'SUCCESS');
-        this.refreshSummary();
-      } else {
-        const mockBlob = new Blob(['signed contract'], { type: 'text/plain' });
-        const mockFile = new File([mockBlob], 'signed_contract.txt');
-        const formData = new FormData();
-        formData.append('file', mockFile);
-
-        this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/contract/sign`, formData).subscribe({
-          next: () => {
-            this.addLocalNotification('Contrato enviado y firmado.', 'SUCCESS');
-            this.refreshSummary();
-          },
-          error: (err) => this.handleError(err)
-        });
-      }
-    }, 1500);
-  }
-
-  savePaymentMethod() {
-    if (this.isLocalMock) {
-      this.summary.steps[4].status = 'COMPLETED';
-      this.summary.steps[5].status = 'IN_PROGRESS';
-      this.addLocalNotification('Método de pago configurado con éxito.', 'SUCCESS');
-      this.refreshSummary();
-    } else {
-      this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/payment-method`, {
-        provider: this.paymentMethod.provider,
-        data: this.paymentMethod
-      }).subscribe({
+      const mockBlob = new Blob(['signed contract'], { type: 'text/plain' });
+      const mockFile = new File([mockBlob], 'signed_contract.txt');
+      const formData = new FormData();
+      formData.append('file', mockFile);
+      this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/contract/sign`, formData).subscribe({
         next: () => {
-          this.addLocalNotification('Método de pago guardado.', 'SUCCESS');
+          this.addLocalNotification('Contrato enviado y firmado.', 'SUCCESS');
           this.refreshSummary();
         },
         error: (err) => this.handleError(err)
       });
-    }
+    }, 1500);
+  }
+
+  savePaymentMethod() {
+    this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/payment-method`, {
+      provider: this.paymentMethod.provider,
+      data: this.paymentMethod
+    }).subscribe({
+      next: () => {
+        this.addLocalNotification('Método de pago guardado.', 'SUCCESS');
+        this.refreshSummary();
+      },
+      error: (err) => this.handleError(err)
+    });
   }
 
   startIdentityScanning() {
@@ -1026,37 +942,24 @@ export class AppComponent implements OnInit {
         clearInterval(interval);
         this.isScanningIdentity = false;
 
-        if (this.isLocalMock) {
-          if (this.scanSuccess) {
-            this.summary.steps[5].status = 'COMPLETED';
-            this.summary.status = 'COMPLETED';
-            this.addLocalNotification('Identidad verificada biométricamente. ¡Onboarding completado!', 'SUCCESS');
-          } else {
-            this.summary.steps[5].status = 'REJECTED';
-            this.addLocalNotification('Fallo en escáner facial. Por favor intente nuevamente.', 'ERROR');
-          }
-          this.refreshSummary();
-        } else {
-          this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/identity-verification?provider=${this.identityProvider}&success=${this.scanSuccess}`, {}).subscribe({
+        this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/identity-verification?provider=${this.identityProvider}&success=${this.scanSuccess}`, {}).subscribe({
             next: () => {
               this.addLocalNotification('Verificación biométrica procesada.', 'SUCCESS');
               this.refreshSummary();
             },
             error: (err) => this.handleError(err)
           });
-        }
       }
     }, 300);
   }
 
   startOnboarding() {
-    this.notifications = []; // Remove residual toasts from the landing page
+    this.notifications = [];
     this.currentView = 'welcome';
-    this.playGreetingAudio(); // Activate localized greeting audio
+    this.playGreetingAudio();
   }
 
   playGreetingAudio() {
-    // Resilient format chain: scan sequentially for modern OGG, raw WAV, or universal MP3
     const formats = ['ogg', 'wav', 'mp3'];
     this.playFallbackAudio(formats, 0);
   }
@@ -1071,32 +974,25 @@ export class AppComponent implements OnInit {
     const currentFormat = formats[index];
     audio.src = `assets/audio/greeting_${this.selectedLang}.${currentFormat}`;
 
-    // Apply global master settings from the topbar controls!
     audio.volume = this.audioVolume / 100;
     audio.muted = this.isMuted;
 
-    // Clean reference completely upon track completion
     audio.onended = () => {
       this.currentAudio = null;
     };
 
-    // Hook into errors (file not found or format unsupported) to advance the chain
     audio.onerror = () => {
       this.playFallbackAudio(formats, index + 1);
     };
-
-    // Hook into successfully loaded metadata/buffers to start playback immediately
     audio.oncanplaythrough = () => {
-      this.currentAudio = audio; // Register globally as actively playing
+      this.currentAudio = audio;
       audio.play().catch(e => {
-        // In case play fails, suppress and continue scanning fallback chain
         this.playFallbackAudio(formats, index + 1);
       });
-      // Remove listener once successfully fired to prevent double trigger re-entry
       audio.oncanplaythrough = null;
     };
 
-    audio.load(); // Fire up the network load
+    audio.load();
   }
 
   toggleMute() {
@@ -1111,7 +1007,6 @@ export class AppComponent implements OnInit {
     this.audioVolume = inputVal;
     if (this.currentAudio) {
       this.currentAudio.volume = this.audioVolume / 100;
-      // Automatically unmute if user adjusts volume to give great immediate feedback
       if (this.isMuted && this.audioVolume > 0) {
         this.isMuted = false;
         this.currentAudio.muted = false;
@@ -1120,85 +1015,55 @@ export class AppComponent implements OnInit {
   }
 
   submitAdminLogin() {
-    if (this.isLocalMock) {
-      // Soft Sandbox validation to enable a smooth user trial with realistic feel!
-      if (this.adminUser.toLowerCase() === 'admin@northpay.com' && this.adminPass === 'admin123') {
-        this.addLocalNotification('Acceso Autorizado. Cargando terminal de Operador Real...', 'SUCCESS');
+    this.http.post(`${this.apiBaseUrl}/auth/login`, {
+      email: this.adminUser,
+      password: this.adminPass
+    }).subscribe({
+      next: () => {
+        this.addLocalNotification('Bienvenido de vuelta, Administrador.', 'SUCCESS');
         this.isOperatorDemoMode = false;
         this.loadOperatorPanel();
-      } else {
-        this.addLocalNotification('Error de Acceso: Credenciales incorrectas. Utiliza admin@northpay.com / admin123', 'ERROR');
+      },
+      error: () => {
+        this.addLocalNotification('Acceso Denegado: Verifica usuario y clave.', 'ERROR');
       }
-    } else {
-      this.http.post(`${this.apiBaseUrl}/auth/login`, {
-        email: this.adminUser,
-        password: this.adminPass
-      }).subscribe({
-        next: () => {
-          this.addLocalNotification('Bienvenido de vuelta, Administrador.', 'SUCCESS');
-          this.isOperatorDemoMode = false;
-          this.loadOperatorPanel();
-        },
-        error: (err) => {
-          this.addLocalNotification('Acceso Denegado: Verifica usuario y clave.', 'ERROR');
-        }
-      });
-    }
+    });
   }
 
   submitContractorPortalLogin() {
-    if (this.isLocalMock) {
-      const targetEmail = this.invitationEmail || 'contractor@northpay.com';
-      const targetPass = this.registerPassword || 'password123';
-      
-      if (this.loginEmail.toLowerCase() === targetEmail.toLowerCase() && this.loginPassword === targetPass) {
+    this.http.post<any>(`${this.apiBaseUrl}/auth/login`, {
+      email: this.loginEmail,
+      password: this.loginPassword
+    }).subscribe({
+      next: (user) => {
         this.addLocalNotification('Sesión iniciada correctamente. Cargando tu Dashboard...', 'SUCCESS');
-        
-        // Sincronizar estados de simulación a COMPLETADO para evitar hacer el onboarding
-        this.summary.status = 'COMPLETED';
-        this.summary.progress = 100;
-        this.summary.steps.forEach(s => s.status = 'COMPLETED');
-        
-        this.currentView = 'onboarding';
-      } else {
-        this.addLocalNotification('Credenciales incorrectas. Revisa tu correo y contraseña.', 'ERROR');
+        this.userId = user.id;
+        this.invitationEmail = this.loginEmail;
+        this.http.post<any>(`${this.apiBaseUrl}/onboarding/initiate?contractorUserId=${this.userId}`, {}).subscribe({
+          next: (process) => {
+            this.processId = process.id;
+            this.http.get<OnboardingSummary>(`${this.apiBaseUrl}/onboarding/${this.processId}/summary`).subscribe({
+              next: (sum) => {
+                this.summary = sum;
+                this.currentView = 'onboarding';
+              },
+              error: (err) => {
+                console.error('[NorthPay] Failed to load summary:', err);
+                this.addLocalNotification('Error al cargar resumen de onboarding', 'ERROR');
+              }
+            });
+          },
+          error: (err) => {
+            console.error('[NorthPay] Failed to initiate process:', err);
+            this.addLocalNotification('Error al inicializar proceso de onboarding', 'ERROR');
+          }
+        });
+      },
+      error: (err) => {
+        console.error('[NorthPay] Live contractor login failed:', err);
+        this.addLocalNotification('Credenciales incorrectas o usuario no registrado.', 'ERROR');
       }
-    } else {
-      this.http.post<any>(`${this.apiBaseUrl}/auth/login`, {
-        email: this.loginEmail,
-        password: this.loginPassword
-      }).subscribe({
-        next: (user) => {
-          this.addLocalNotification('Sesión iniciada correctamente. Cargando tu Dashboard...', 'SUCCESS');
-          this.userId = user.id;
-          this.invitationEmail = this.loginEmail;
-          
-          this.http.post<any>(`${this.apiBaseUrl}/onboarding/initiate?contractorUserId=${this.userId}`, {}).subscribe({
-            next: (process) => {
-              this.processId = process.id;
-              this.http.get<OnboardingSummary>(`${this.apiBaseUrl}/onboarding/${this.processId}/summary`).subscribe({
-                next: (sum) => {
-                  this.summary = sum;
-                  this.currentView = 'onboarding';
-                },
-                error: (err) => {
-                  console.error('[NorthPay] Failed to load summary:', err);
-                  this.addLocalNotification('Error al cargar resumen de onboarding', 'ERROR');
-                }
-              });
-            },
-            error: (err) => {
-              console.error('[NorthPay] Failed to initiate process:', err);
-              this.addLocalNotification('Error al inicializar proceso de onboarding', 'ERROR');
-            }
-          });
-        },
-        error: (err) => {
-          console.error('[NorthPay] Live contractor login failed:', err);
-          this.addLocalNotification('Credenciales incorrectas o usuario no registrado.', 'ERROR');
-        }
-      });
-    }
+    });
   }
 
   openContractorSettings() {
@@ -1233,12 +1098,6 @@ export class AppComponent implements OnInit {
       paymentData: pData
     };
 
-    if (this.isLocalMock) {
-      this.personalData.phone = this.whatsappPhone;
-      this.addLocalNotification('Perfil actualizado correctamente (Simulado)', 'SUCCESS');
-      this.showContractorSettings = false;
-      return;
-    }
 
     this.http.put(`${this.apiBaseUrl}/onboarding/${this.processId}/settings`, payload).subscribe({
       next: (updatedSummary: any) => {
@@ -1257,40 +1116,13 @@ export class AppComponent implements OnInit {
   }
 
   loadOperatorPanel() {
-    this.notifications = []; // Clear alerts for cleaner operator interface
+    this.notifications = [];
     this.previousView = this.currentView as any;
     this.currentView = 'operator';
-
-    const currentName = this.personalData.firstName ? `${this.personalData.firstName} ${this.personalData.lastName}` : 'Juan Pérez (Tú)';
-    const currentCountry = this.personalData.country || 'España';
-    const currentStatus = this.summary.steps[2].status === 'IN_REVIEW' ? 'IN_REVIEW' : this.summary.status;
-
-    this.mockContractors = [
-      { id: 500, name: currentName, country: currentCountry, email: this.invitationEmail, progress: this.summary.progress, status: this.paidContractorIds.includes(500) ? 'PAID' : currentStatus, date: '07/05/2026', currentStep: this.summary.currentStep || 'COMPLETED' },
-      { id: 501, name: 'María Gómez', country: 'Colombia', email: 'maria.gomez@gmail.com', progress: 100, status: this.paidContractorIds.includes(501) ? 'PAID' : 'COMPLETED', date: '05/05/2026', currentStep: 'COMPLETED' },
-      { id: 502, name: 'Pierre Dubois', country: 'Francia', email: 'pierre.dubois@yahoo.fr', progress: 20, status: this.paidContractorIds.includes(502) ? 'PAID' : 'IN_PROGRESS', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD' },
-      { id: 503, name: 'Yuki Tanaka', country: 'Japón', email: 'tanaka.yuki@gmail.com', progress: 40, status: this.paidContractorIds.includes(503) ? 'PAID' : 'IN_REVIEW', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD' }
-    ];
-
-    if (this.isLocalMock) {
-      this.operatorProcesses = [
-        {
-          id: 500,
-          contractorUserId: 100,
-          status: currentStatus,
-          currentStep: this.summary.currentStep || 'COMPLETED',
-          progress: this.summary.progress,
-          assignedOperatorId: 1,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }
-      ];
-    } else {
-      this.http.get<OnboardingProcess[]>(`${this.apiBaseUrl}/operator/processes`).subscribe({
-        next: (procs) => this.operatorProcesses = procs,
-        error: (err) => this.handleError(err)
-      });
-    }
+    this.http.get<OnboardingProcess[]>(`${this.apiBaseUrl}/operator/processes`).subscribe({
+      next: (procs) => this.operatorProcesses = procs,
+      error: (err) => this.handleError(err)
+    });
   }
 
   exitOperatorPanel() {
@@ -1298,7 +1130,6 @@ export class AppComponent implements OnInit {
       this.currentView = 'landing';
       this.adminUser = '';
       this.adminPass = '';
-      // Clean sandbox state upon logout for max realism!
       this.addLocalNotification(this.selectedLang === 'es' ? 'Sesión cerrada correctamente.' : 'Successfully logged out.', 'INFO');
     } else {
       this.currentView = this.previousView as any;
@@ -1309,32 +1140,17 @@ export class AppComponent implements OnInit {
     const feedbackMsg = approved ? 'Documentación válida y certificada.' : this.reviewFeedback || 'Faltan firmas o nitidez.';
     const stepId = 2;
     this.selectedProcessIdForReview = null;
-
-    if (this.isLocalMock) {
-      if (approved) {
-        this.summary.steps[2].status = 'COMPLETED';
-        this.summary.steps[3].status = 'IN_PROGRESS';
-        this.addLocalNotification(this.translations[this.selectedLang]['notifStep2App'], 'SUCCESS');
-      } else {
-        this.summary.steps[2].status = 'REJECTED';
-        this.addLocalNotification(this.translations[this.selectedLang]['notifStep2Rej'], 'ERROR');
-      }
-      this.reviewFeedback = '';
-      this.refreshSummary();
-      this.loadOperatorPanel();
-    } else {
-      this.http.post(`${this.apiBaseUrl}/operator/steps/${stepId}/review?operatorId=1`, {
-        approved: approved,
-        feedback: feedbackMsg
-      }).subscribe({
-        next: () => {
-          this.addLocalNotification(`Paso de documentos revisado con éxito.`, 'SUCCESS');
-          this.refreshSummary();
-          this.loadOperatorPanel();
-        },
-        error: (err) => this.handleError(err)
-      });
-    }
+    this.http.post(`${this.apiBaseUrl}/operator/steps/${stepId}/review?operatorId=1`, {
+      approved: approved,
+      feedback: feedbackMsg
+    }).subscribe({
+      next: () => {
+        this.addLocalNotification(`Paso de documentos revisado con éxito.`, 'SUCCESS');
+        this.refreshSummary();
+        this.loadOperatorPanel();
+      },
+      error: (err) => this.handleError(err)
+    });
   }
 
   openPaymentModal(contractor: any) {
@@ -1368,112 +1184,61 @@ export class AppComponent implements OnInit {
 
   sendWhatsappCode() {
     this.isSendingWhatsapp = true;
-    if (this.isLocalMock) {
-      setTimeout(() => {
+    this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/whatsapp/send?phone=${encodeURIComponent(this.whatsappPhone)}`, {}).subscribe({
+      next: () => {
         this.isSendingWhatsapp = false;
-        this.addLocalNotification('Redirigiendo a WhatsApp real...', 'INFO');
-        this.whatsappCode = '123456';
-
-        const cleanPhone = this.whatsappPhone.replace(/[^0-9]/g, '');
-        const text = `¡Hola NorthPay! Confirmo mi identidad para el proceso de Onboarding. Mi código de activación de prueba es: 123456`;
-        const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
-
-        window.open(url, '_blank');
         this.addLocalNotification(this.translations[this.selectedLang]['notifCodeSent'], 'SUCCESS');
-      }, 1200);
-    } else {
-      this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/whatsapp/send?phone=${encodeURIComponent(this.whatsappPhone)}`, {}).subscribe({
-        next: () => {
-          this.isSendingWhatsapp = false;
-          this.addLocalNotification(this.translations[this.selectedLang]['notifCodeSent'], 'SUCCESS');
-          this.refreshSummary();
-        },
-        error: (err) => {
-          this.isSendingWhatsapp = false;
-          this.handleError(err);
-        }
-      });
-    }
+        this.refreshSummary();
+      },
+      error: (err) => {
+        this.isSendingWhatsapp = false;
+        this.handleError(err);
+      }
+    });
   }
 
   verifyWhatsappCode() {
     this.isVerifyingWhatsapp = true;
-    if (this.isLocalMock) {
-      setTimeout(() => {
+    this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/whatsapp/verify?code=${encodeURIComponent(this.whatsappCode)}`, {}).subscribe({
+      next: () => {
         this.isVerifyingWhatsapp = false;
-        if (this.whatsappCode === '123456') {
-          this.whatsappVerified = true;
-          this.personalData.phone = this.whatsappPhone;
-
-          // 🌐 Smart Country Auto-Detection based on verification dial-code
-          const cleanNum = this.whatsappPhone.replace(/\D/g, '');
-          if (cleanNum.startsWith('54')) {
-            this.personalData.country = 'Argentina';
-          } else if (cleanNum.startsWith('34')) {
-            this.personalData.country = 'Spain';
-          } else if (cleanNum.startsWith('52')) {
-            this.personalData.country = 'Mexico';
-          } else if (cleanNum.startsWith('57')) {
-            this.personalData.country = 'Colombia';
-          } else if (cleanNum.startsWith('55')) {
-            this.personalData.country = 'Brazil';
-          } else if (cleanNum.startsWith('56')) {
-            this.personalData.country = 'Chile';
-          } else if (cleanNum.startsWith('1')) {
-            this.personalData.country = 'United States';
-          }
-          this.summary.steps[0].status = 'COMPLETED';
-          this.summary.steps[1].status = 'IN_PROGRESS';
-          this.addLocalNotification(this.translations[this.selectedLang]['notifWsSuccess'], 'SUCCESS');
-          this.refreshSummary();
-        } else {
-          this.addLocalNotification(this.translations[this.selectedLang]['notifWsFail'], 'ERROR');
-        }
-      }, 1200);
-    } else {
-      this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/whatsapp/verify?code=${encodeURIComponent(this.whatsappCode)}`, {}).subscribe({
-        next: () => {
-          this.isVerifyingWhatsapp = false;
-          this.whatsappVerified = true;
-          this.personalData.phone = this.whatsappPhone;
-
-          // 🌐 Smart Country Auto-Detection based on verification dial-code
-          const cleanNum = this.whatsappPhone.replace(/\D/g, '');
-          if (cleanNum.startsWith('54')) {
-            this.personalData.country = 'Argentina';
-          } else if (cleanNum.startsWith('34')) {
-            this.personalData.country = 'Spain';
-          } else if (cleanNum.startsWith('52')) {
-            this.personalData.country = 'Mexico';
-          } else if (cleanNum.startsWith('57')) {
-            this.personalData.country = 'Colombia';
-          } else if (cleanNum.startsWith('55')) {
-            this.personalData.country = 'Brazil';
-          } else if (cleanNum.startsWith('56')) {
-            this.personalData.country = 'Chile';
-          } else if (cleanNum.startsWith('1')) {
-            this.personalData.country = 'United States';
-          }
-
-          this.addLocalNotification(this.translations[this.selectedLang]['notifWsSuccess'], 'SUCCESS');
-          this.refreshSummary();
-        },
-        error: (err) => {
-          this.isVerifyingWhatsapp = false;
-          this.handleError(err);
-        }
-      });
-    }
+        this.whatsappVerified = true;
+        this.personalData.phone = this.whatsappPhone;
+        const cleanNum = this.whatsappPhone.replace(/\D/g, '');
+        if (cleanNum.startsWith('54')) this.personalData.country = 'Argentina';
+        else if (cleanNum.startsWith('34')) this.personalData.country = 'Spain';
+        else if (cleanNum.startsWith('52')) this.personalData.country = 'Mexico';
+        else if (cleanNum.startsWith('57')) this.personalData.country = 'Colombia';
+        else if (cleanNum.startsWith('55')) this.personalData.country = 'Brazil';
+        else if (cleanNum.startsWith('56')) this.personalData.country = 'Chile';
+        else if (cleanNum.startsWith('1')) this.personalData.country = 'United States';
+        this.addLocalNotification(this.translations[this.selectedLang]['notifWsSuccess'], 'SUCCESS');
+        this.refreshSummary();
+      },
+      error: (err) => {
+        this.isVerifyingWhatsapp = false;
+        this.handleError(err);
+      }
+    });
   }
 
-  handlePaymentCompleted(contractorId: number) {
-    if (contractorId === 500) { // 500 is our simulated process ID for the sandbox
+  handlePaymentCompleted(event: any) {
+    const contractorId = typeof event === 'object' ? event.id : event;
+    const amount = typeof event === 'object' ? event.amount : null;
+
+    if (amount !== null) {
+      this.paymentAmount = amount;
+    }
+
+    if (contractorId === 500) {
       this.summary.status = 'PAID';
-      this.addLocalNotification('¡Felicidades! Se ha emitido tu pago y el balance ha sido actualizado.', 'SUCCESS');
+      const curr = this.paymentMethod.currency || 'USD';
+      let symbol = curr === 'EUR' ? '€' : curr === 'USDT' ? '₮' : '$';
+      const formatted = this.paymentAmount.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      this.addLocalNotification(`¡Felicidades! Se ha emitido tu pago de ${symbol}${formatted} ${curr} y el balance ha sido actualizado.`, 'SUCCESS');
       this.refreshSummary();
     }
 
-    // Persist the state globally in case the operator panel reloads!
     if (!this.globalPaidIds.includes(contractorId)) {
       this.globalPaidIds.push(contractorId);
     }
@@ -1485,12 +1250,12 @@ export class AppComponent implements OnInit {
     const blockingIssues: string[] = [];
     let canProceed = true;
 
-    const s0 = this.summary.steps[0].status; // WHATSAPP_VERIFY
-    const s1 = this.summary.steps[1].status; // PERSONAL_DATA
-    const s2 = this.summary.steps[2].status; // DOCUMENT_UPLOAD
-    const s3 = this.summary.steps[3].status; // CONTRACT_SIGN
-    const s4 = this.summary.steps[4].status; // PAYMENT_METHOD
-    const s5 = this.summary.steps[5].status; // IDENTITY_VERIFICATION
+    const s0 = this.summary.steps[0].status;
+    const s1 = this.summary.steps[1].status;
+    const s2 = this.summary.steps[2].status;
+    const s3 = this.summary.steps[3].status;
+    const s4 = this.summary.steps[4].status;
+    const s5 = this.summary.steps[5].status;
 
     if (s0 === 'COMPLETED') progress += 16;
     if (s1 === 'COMPLETED') progress += 16;
@@ -1566,13 +1331,12 @@ export class AppComponent implements OnInit {
     };
     this.notifications.unshift(newNotif);
 
-    // Two-stage auto-dismiss: Fade out, then remove
     setTimeout(() => {
       newNotif.isFadingOut = true;
       setTimeout(() => {
         newNotif.isRead = true;
-      }, 500); // 500ms matches the CSS transition duration
-    }, 4500); // Start fading out after 4.5 seconds
+      }, 500);
+    }, 4500);
   }
 
   getUnreadNotificationsCount() {
@@ -1743,16 +1507,9 @@ export class AppComponent implements OnInit {
   }
 
   markNotificationRead(id: number) {
-    if (this.isLocalMock) {
-      const notif = this.notifications.find(n => n.id === id);
-      if (notif) {
-        notif.isRead = true;
-      }
-    } else {
-      this.http.post(`${this.apiBaseUrl}/notifications/${id}/read`, {}).subscribe({
-        next: () => this.loadNotifications()
-      });
-    }
+    this.http.post(`${this.apiBaseUrl}/notifications/${id}/read`, {}).subscribe({
+      next: () => this.loadNotifications()
+    });
   }
 
   handleError(err: any) {

@@ -20,6 +20,10 @@ interface OnboardingProcess {
   assignedOperatorId: number | null;
   createdAt: string;
   updatedAt: string;
+  contractorName?: string;
+  contractorEmail?: string;
+  contractorCountry?: string;
+  contractorPhone?: string;
 }
 
 @Component({
@@ -367,7 +371,7 @@ export class AdminDashboardComponent implements OnInit {
   @Input() paidContractorIds: number[] = [];
 
   @Output() reviewCompleted = new EventEmitter<void>();
-  @Output() paymentCompleted = new EventEmitter<number>();
+  @Output() paymentCompleted = new EventEmitter<any>();
   @Input() isDemoMode = true;
   @Input() email = 'contractor@northpay.com';
   @Input() realProcessId: number | null = null;
@@ -510,18 +514,18 @@ export class AdminDashboardComponent implements OnInit {
         this.http.get<OnboardingProcess[]>(`${this.apiBaseUrl}/operator/processes`).subscribe({
           next: (procs) => {
             this.operatorProcesses = procs;
-            // Mapeamos procesos reales de BD a la tabla de interfaz
+            // Mapeamos procesos reales de BD a la tabla de interfaz con datos reales enriquecidos
             this.mockContractors = procs.map(p => {
               return {
                 id: p.id,
-                name: `Contratista #${p.contractorUserId}`,
-                country: 'Cargando...',
-                email: `user-${p.contractorUserId}@northpay.com`,
+                name: p.contractorName || `Contratista #${p.contractorUserId}`,
+                country: p.contractorCountry || 'España',
+                email: p.contractorEmail || `user-${p.contractorUserId}@northpay.com`,
                 progress: p.progress,
                 status: this.paidContractorIds.includes(p.id) ? 'PAID' : p.status,
                 date: new Date(p.createdAt).toLocaleDateString(),
                 currentStep: p.currentStep,
-                phone: ''
+                phone: p.contractorPhone || ''
               };
             });
           },
@@ -586,7 +590,6 @@ export class AdminDashboardComponent implements OnInit {
         },
         error: (err) => {
           console.error('[NorthPay Review Docs Error]', err);
-          // Fallback to local mock if request fails
           if (processId === 500) {
             this.reviewDocuments = this.uploadedDocs;
           }
@@ -608,7 +611,7 @@ export class AdminDashboardComponent implements OnInit {
 
     if (this.isLocalMock) {
       const targetContractor = this.mockContractors.find(c => c.id === targetId);
-      
+
       if (approved) {
         if (targetContractor) {
           targetContractor.status = 'COMPLETED';
@@ -618,8 +621,6 @@ export class AdminDashboardComponent implements OnInit {
         const auditMsg = this.dashboardTranslations[this.selectedLang]['auditApp']
           .replace('{name}', targetContractor?.name || 'Contratista');
         this.changeHistory.unshift(auditMsg);
-        
-        // Si aprobamos al contratista actual del onboarding (Juan Pérez, ID 500), sincronizamos su progreso real!
         if (targetId === 500) {
           this.summary.steps[2].status = 'COMPLETED';
           this.summary.steps[3].status = 'IN_PROGRESS';
@@ -628,19 +629,17 @@ export class AdminDashboardComponent implements OnInit {
         }
       } else {
         if (targetContractor) {
-          targetContractor.status = 'IN_PROGRESS'; // O requiere ajustes
+          targetContractor.status = 'IN_PROGRESS';
         }
         const auditMsg = this.dashboardTranslations[this.selectedLang]['auditRej']
           .replace('{name}', targetContractor?.name || 'Contratista');
         this.changeHistory.unshift(auditMsg);
-        
         if (targetId === 500) {
           this.summary.steps[2].status = 'REJECTED';
         }
       }
-      
       this.reviewFeedback = '';
-      this.loadOperatorPanel(); // Refresca visualizaciones
+      this.loadOperatorPanel();
       this.reviewCompleted.emit();
     } else {
       this.http.post(`${this.apiBaseUrl}/operator/processes/${targetProcessId}/steps/DOCUMENT_UPLOAD/review?operatorId=1`, {
@@ -716,8 +715,8 @@ export class AdminDashboardComponent implements OnInit {
         .replace('USD', this.getCurrencyLabel(c));
       this.changeHistory.unshift(auditMsg);
       
-      // Notify the parent shell that payment occurred!
-      this.paymentCompleted.emit(c.id);
+      // Notify the parent shell that payment occurred with correct dynamic amount!
+      this.paymentCompleted.emit({ id: c.id, amount: this.paymentAmount });
     }, 1500);
   }
 
