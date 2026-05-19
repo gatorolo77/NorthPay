@@ -645,53 +645,60 @@
             {{ translations[selectedLang]['step3Desc'] }}
           </p>
 
-          <div *ngIf="isLocalMock" class="glass-panel contract-viewer" style="margin-bottom: 20px;">
-            <h4 style="text-align: center; color: var(--text-primary); margin-bottom: 15px; font-weight: 700;">ACUERDO
-              DE CONTRATACIÓN INDEPENDIENTE</h4>
-            <p>Este acuerdo se celebra el día de hoy entre <strong>NorthPay Ltd.</strong> ("La Compañía") y el
-              Contratista registrado ("El Contratista").</p>
-            <br>
-            <p><strong>1. Servicios:</strong> El Contratista acuerda prestar servicios de desarrollo y soporte bajo
-              demanda a los clientes asignados de NorthPay.</p>
-            <p><strong>2. Compensación:</strong> La Compañía compensará al Contratista según el método de cobro
-              establecido en el Paso 4 del onboarding.</p>
-            <p><strong>3. Confidencialidad:</strong> Toda información sobre clientes, claves API y operaciones internas
-              se considerará Estrictamente Confidencial.</p>
-            <br>
-            <p style="margin-bottom: 20px;"><em>Al hacer clic en el botón de firma digital, certifico que he leído y
-                acepto los términos de este acuerdo legal.</em></p>
+          <!-- Unified Premium Dynamic Contract Viewer -->
+          <div class="glass-panel contract-viewer" style="margin-bottom: 20px; padding: 30px; border-radius: 12px; max-height: 400px; overflow-y: auto; border: 1px solid rgba(0, 255, 157, 0.15); background: rgba(10, 20, 30, 0.7); box-shadow: inset 0 0 20px rgba(0, 255, 157, 0.05); text-align: left;">
+            <div style="text-align: center; margin-bottom: 25px;">
+              <span style="color: var(--accent-mint); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">NorthPay Legal Ledger</span>
+              <h4 style="color: var(--text-primary); font-weight: 800; font-size: 1.3rem; margin-top: 5px; text-transform: uppercase;">ACUERDO DE CONTRATACIÓN INDEPENDIENTE</h4>
+              <div style="width: 50px; height: 2px; background: var(--accent-mint); margin: 15px auto 0 auto;"></div>
+            </div>
 
-            <div style="border-top: 1px dashed var(--glass-border); padding-top: 20px; margin-top: 20px;">
-              <p
-                style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 700; margin-bottom: 10px; letter-spacing: 0.5px;">
-                DEMOSTRACIÓN INTERACTIVA DE DOCUSEAL:</p>
+            <div style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; text-align: justify; display: flex; flex-direction: column; gap: 15px;">
+              <p>
+                Este Acuerdo de Contratación Independiente (en adelante, el "Acuerdo") se celebra el día de hoy, 
+                <strong>{{ currentLocalDateString }}</strong>, por y entre:
+              </p>
+              
+              <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 8px; border-left: 3px solid var(--accent-mint); margin: 5px 0;">
+                <p style="margin: 0 0 8px 0;"><strong>LA COMPAÑÍA:</strong> <strong>NorthPay Ltd.</strong>, con oficinas centrales registradas y operando bajo las leyes vigentes de servicios financieros digitales ("NorthPay").</p>
+                <p style="margin: 0;"><strong>EL CONTRATISTA:</strong> <strong>{{ personalData.firstName ? (personalData.firstName + ' ' + personalData.lastName) : 'Rodrigo Daremberg' }}</strong>, con correo de registro <strong>{{ (invitationEmail === 'contractor@northpay.com' ? loginEmail : invitationEmail) || 'rodrigo.daremberg@gmail.com' }}</strong> y teléfono verificado <strong>{{ whatsappPhone || '+5491160001234' }}</strong>.</p>
+              </div>
 
-              <docuseal-form data-src="https://www.docuseal.com/d/demo"
-                [attr.data-email]="invitationEmail || 'contractor@northpay.com'">
-              </docuseal-form>
+              <p>Ambas partes, reconociendo su capacidad legal para contratar y obligarse, acuerdan las siguientes cláusulas:</p>
+
+              <p><strong>CLÁUSULA PRIMERA - OBJETO:</strong> El Contratista acuerda prestar servicios profesionales independientes de consultoría, soporte operativo o desarrollo tecnológico para el ecosistema global de NorthPay y sus empresas aliadas según la demanda.</p>
+              
+              <p><strong>CLÁUSULA SEGUNDA - COMPENSACIÓN:</strong> NorthPay compensará al Contratista por los servicios efectivamente prestados de acuerdo con las tarifas pactadas y procesadas a través del método de pago que el Contratista declare y verifique en el Paso 5 de este onboarding.</p>
+              
+              <p><strong>CLÁUSULA TERCERA - CONFIDENCIALIDAD:</strong> El Contratista se obliga a mantener estricto secreto y no divulgar a terceros información técnica, comercial, financiera o datos de usuarios procesados dentro de la plataforma de NorthPay (Acuerdo de No Divulgación - NDA).</p>
+              
+              <p><strong>CLÁUSULA CUARTA - DURACIÓN:</strong> Este acuerdo tendrá una duración indefinida a partir de la firma digital del mismo, pudiendo cualquiera de las partes rescindirlo mediante notificación previa por escrito de 15 días.</p>
+
+              <div style="border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px; margin-top: 10px;">
+                <p style="font-size: 0.8rem; color: var(--text-muted); font-style: italic; text-align: center; margin: 0;">
+                  "Al proceder con la firma digital, el Contratista declara bajo juramento haber leído, comprendido y aceptado en su totalidad los términos jurídicos expresados en este instrumento digital."
+                </p>
+              </div>
             </div>
           </div>
 
-          <div *ngIf="!isLocalMock" class="glass-panel contract-viewer" style="margin-bottom: 20px;">
-
-            <docuseal-form [attr.data-src]="docusealEmbedSrc || 'https://www.docuseal.com/d/demo'"
-              [attr.data-email]="invitationEmail || 'contractor@northpay.com'">
-            </docuseal-form>
-          </div>
-
-          <div class="glass-panel signature-box" style="margin-bottom: 20px;">
-            <p class="signature-label">CERTIFICACIÓN CRIPTOGRÁFICA DE DOCUSEAL</p>
-            <div class="signature-text" style="font-size: 14px; text-transform: uppercase;">
-              {{ personalData.firstName ? personalData.firstName + ' ' + personalData.lastName : 'John Doe' }}
+          <!-- Dynamic Holographic Signature Area -->
+          <div class="glass-panel signature-box" style="margin-bottom: 20px; border: 1px solid rgba(0, 255, 157, 0.1); background: rgba(0, 0, 0, 0.3); padding: 20px; border-radius: 8px; text-align: center;">
+            <p class="signature-label" style="font-size: 0.75rem; color: var(--accent-mint); font-weight: 700; letter-spacing: 1.5px; margin-bottom: 12px; text-transform: uppercase;">CERTIFICACIÓN CRIPTOGRÁFICA DE FIRMA DIGITAL</p>
+            
+            <div style="font-family: 'Courier New', monospace; font-size: 1.4rem; color: var(--accent-cyan); font-weight: 700; letter-spacing: 1px; padding: 10px; border: 1px dashed rgba(0, 255, 157, 0.2); background: rgba(0,255,157,0.02); display: inline-block; border-radius: 6px; margin-bottom: 10px; min-width: 250px;">
+              {{ personalData.firstName ? (personalData.firstName + ' ' + personalData.lastName) : 'Rodrigo Daremberg' }}
             </div>
-            <span class="signature-certificate">
-              Certificado Integrado SHA256: NP_DOCUSEAL_948271
-            </span>
+
+            <div style="display: flex; flex-direction: column; gap: 3px; font-size: 0.75rem; color: var(--text-muted); text-align: center;">
+              <span>Firmante: {{ (invitationEmail === 'contractor@northpay.com' ? loginEmail : invitationEmail) || 'rodrigo.daremberg@gmail.com' }}</span>
+              <span>Fecha Local: {{ currentLocalDateString }}</span>
+              <span>Certificado Único SHA256: NP_DOCUSEAL_948271_SECURE</span>
+            </div>
           </div>
 
-          <button class="cyber-btn cyber-btn-primary submit-action-btn" [disabled]="isSigningContract"
-            (click)="signContract()">
-            {{ isSigningContract ? 'Procesando firma...' : 'Confirmar y Firmar Acuerdo Legal de Forma Segura' }}
+          <button class="cyber-btn cyber-btn-primary submit-action-btn" [disabled]="isSigningContract" (click)="signContract()">
+            {{ isSigningContract ? 'Procesando firma...' : '✍️ Confirmar y Firmar Acuerdo Legal de Forma Segura' }}
           </button>
         </div>
 
@@ -1157,6 +1164,7 @@
     <app-admin-dashboard *ngIf="currentView === 'operator'" [summary]="summary" [personalData]="personalData"
       [isLocalMock]="isLocalMock" [selectedLang]="selectedLang" [whatsappPhone]="whatsappPhone"
       [paidContractorIds]="globalPaidIds" [isDemoMode]="isOperatorDemoMode" [paymentMethod]="paymentMethod"
+      [uploadedDocs]="uploadedDocs" [email]="invitationEmail" [realProcessId]="processId"
       (reviewCompleted)="refreshSummary()" (paymentCompleted)="handlePaymentCompleted($event)">
     </app-admin-dashboard>
 

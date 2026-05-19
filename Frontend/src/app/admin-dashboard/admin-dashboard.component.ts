@@ -369,6 +369,10 @@ export class AdminDashboardComponent implements OnInit {
   @Output() reviewCompleted = new EventEmitter<void>();
   @Output() paymentCompleted = new EventEmitter<number>();
   @Input() isDemoMode = true;
+  @Input() email = 'contractor@northpay.com';
+  @Input() realProcessId: number | null = null;
+  @Input() uploadedDocs: any[] = [];
+  reviewDocuments: any[] = [];
 
   @Input() paymentMethod = {
     provider: 'BANK_TRANSFER',
@@ -430,17 +434,24 @@ export class AdminDashboardComponent implements OnInit {
   loadOperatorPanel() {
     if (this.isDemoMode) {
       // 🔒 MODO DEMO: Lista de simulación persistente por sesión del componente
+      const fullName = this.personalData.firstName ? `${this.personalData.firstName} ${this.personalData.lastName}` : 'Juan Pérez';
+      const countryName = this.personalData.country || 'España';
+      const emailAddr = this.email || 'contractor@northpay.com';
+
       if (!this.mockContractors || this.mockContractors.length === 0) {
         this.mockContractors = [
-          { id: 500, name: 'Juan Pérez', country: 'España', email: 'contractor@northpay.com', progress: this.summary.progress, status: this.paidContractorIds.includes(500) ? 'PAID' : (this.summary.steps[2].status === 'IN_REVIEW' ? 'IN_REVIEW' : this.summary.status), date: '07/05/2026', currentStep: this.summary.currentStep || 'COMPLETED', phone: this.whatsappPhone || '+34600123456' },
+          { id: 500, name: fullName, country: countryName, email: emailAddr, progress: this.summary.progress, status: this.paidContractorIds.includes(500) ? 'PAID' : (this.summary.steps[2].status === 'IN_REVIEW' ? 'IN_REVIEW' : this.summary.status), date: '07/05/2026', currentStep: this.summary.currentStep || 'COMPLETED', phone: this.whatsappPhone || '+34600123456' },
           { id: 501, name: 'María Gómez', country: 'Colombia', email: 'maria.gomez@gmail.com', progress: 100, status: this.paidContractorIds.includes(501) ? 'PAID' : 'COMPLETED', date: '05/05/2026', currentStep: 'COMPLETED', phone: '+573001234567' },
           { id: 502, name: 'Pierre Dubois', country: 'Francia', email: 'pierre.dubois@yahoo.fr', progress: 20, status: this.paidContractorIds.includes(502) ? 'PAID' : 'IN_PROGRESS', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD', phone: '+33612345678' },
           { id: 503, name: 'Yuki Tanaka', country: 'Japón', email: 'tanaka.yuki@gmail.com', progress: 40, status: this.paidContractorIds.includes(503) ? 'PAID' : 'IN_REVIEW', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD', phone: '+819012345678' }
         ];
       } else {
-        // Sincronizamos dinámicamente los avances del contratista principal (Juan Pérez)
+        // Sincronizamos dinámicamente los avances del contratista principal
         const mainContractor = this.mockContractors.find(c => c.id === 500);
         if (mainContractor) {
+          mainContractor.name = fullName;
+          mainContractor.country = countryName;
+          mainContractor.email = emailAddr;
           mainContractor.progress = this.summary.progress;
           mainContractor.status = this.paidContractorIds.includes(500) ? 'PAID' : (this.summary.steps[2].status === 'IN_REVIEW' ? 'IN_REVIEW' : this.summary.status);
           mainContractor.currentStep = this.summary.currentStep || 'COMPLETED';
@@ -555,12 +566,45 @@ export class AdminDashboardComponent implements OnInit {
     return this.mockContractors.find(c => c.id === this.selectedProcessIdForReview);
   }
 
+  openReviewModal(processId: number) {
+    this.selectedProcessIdForReview = processId;
+    this.reviewDocuments = [];
+
+    let targetProcessId = processId;
+    if (processId === 500 && this.realProcessId) {
+      targetProcessId = this.realProcessId;
+    }
+
+    if (this.isLocalMock) {
+      if (processId === 500) {
+        this.reviewDocuments = this.uploadedDocs;
+      }
+    } else {
+      this.http.get<any[]>(`${this.apiBaseUrl}/operator/processes/${targetProcessId}/documents`).subscribe({
+        next: (docs) => {
+          this.reviewDocuments = docs;
+        },
+        error: (err) => {
+          console.error('[NorthPay Review Docs Error]', err);
+          // Fallback to local mock if request fails
+          if (processId === 500) {
+            this.reviewDocuments = this.uploadedDocs;
+          }
+        }
+      });
+    }
+  }
+
   reviewContractorStep(stepType: string, approved: boolean) {
     const feedbackMsg = approved ? 'Documentación válida y certificada.' : this.reviewFeedback || 'Faltan firmas o nitidez.';
-    const stepId = 2; // Simulated ID
     
     const targetId = this.selectedProcessIdForReview;
     this.selectedProcessIdForReview = null;
+
+    let targetProcessId = targetId;
+    if (targetId === 500 && this.realProcessId) {
+      targetProcessId = this.realProcessId;
+    }
 
     if (this.isLocalMock) {
       const targetContractor = this.mockContractors.find(c => c.id === targetId);
@@ -599,7 +643,7 @@ export class AdminDashboardComponent implements OnInit {
       this.loadOperatorPanel(); // Refresca visualizaciones
       this.reviewCompleted.emit();
     } else {
-      this.http.post(`${this.apiBaseUrl}/operator/steps/${stepId}/review?operatorId=1`, {
+      this.http.post(`${this.apiBaseUrl}/operator/processes/${targetProcessId}/steps/DOCUMENT_UPLOAD/review?operatorId=1`, {
         approved: approved,
         feedback: feedbackMsg
       }).subscribe({

@@ -99,6 +99,14 @@ export class AppComponent implements OnInit {
   isSigningContract = false;
   docusealEmbedSrc = 'https://www.docuseal.com/d/demo';
 
+  get currentLocalDateString(): string {
+    return new Date().toLocaleDateString(this.selectedLang === 'es' ? 'es-AR' : 'en-US', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  }
+
   @HostListener('document:docuseal:completed', ['$event'])
   onDocuSealCompleted(event: any) {
     this.addLocalNotification('Firma detectada con éxito vía DocuSeal.', 'SUCCESS');
@@ -1163,6 +1171,7 @@ export class AppComponent implements OnInit {
         next: (user) => {
           this.addLocalNotification('Sesión iniciada correctamente. Cargando tu Dashboard...', 'SUCCESS');
           this.userId = user.id;
+          this.invitationEmail = this.loginEmail;
           
           this.http.post<any>(`${this.apiBaseUrl}/onboarding/initiate?contractorUserId=${this.userId}`, {}).subscribe({
             next: (process) => {
@@ -1359,53 +1368,102 @@ export class AppComponent implements OnInit {
 
   sendWhatsappCode() {
     this.isSendingWhatsapp = true;
-    setTimeout(() => {
-      this.isSendingWhatsapp = false;
-      this.addLocalNotification('Redirigiendo a WhatsApp real...', 'INFO');
-      this.whatsappCode = '123456';
+    if (this.isLocalMock) {
+      setTimeout(() => {
+        this.isSendingWhatsapp = false;
+        this.addLocalNotification('Redirigiendo a WhatsApp real...', 'INFO');
+        this.whatsappCode = '123456';
 
-      const cleanPhone = this.whatsappPhone.replace(/[^0-9]/g, '');
-      const text = `¡Hola NorthPay! Confirmo mi identidad para el proceso de Onboarding. Mi código de activación de prueba es: 123456`;
-      const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
+        const cleanPhone = this.whatsappPhone.replace(/[^0-9]/g, '');
+        const text = `¡Hola NorthPay! Confirmo mi identidad para el proceso de Onboarding. Mi código de activación de prueba es: 123456`;
+        const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
 
-      window.open(url, '_blank');
-      this.addLocalNotification(this.translations[this.selectedLang]['notifCodeSent'], 'SUCCESS');
-    }, 1200);
+        window.open(url, '_blank');
+        this.addLocalNotification(this.translations[this.selectedLang]['notifCodeSent'], 'SUCCESS');
+      }, 1200);
+    } else {
+      this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/whatsapp/send?phone=${encodeURIComponent(this.whatsappPhone)}`, {}).subscribe({
+        next: () => {
+          this.isSendingWhatsapp = false;
+          this.addLocalNotification(this.translations[this.selectedLang]['notifCodeSent'], 'SUCCESS');
+          this.refreshSummary();
+        },
+        error: (err) => {
+          this.isSendingWhatsapp = false;
+          this.handleError(err);
+        }
+      });
+    }
   }
 
   verifyWhatsappCode() {
     this.isVerifyingWhatsapp = true;
-    setTimeout(() => {
-      this.isVerifyingWhatsapp = false;
-      if (this.whatsappCode === '123456') {
-        this.whatsappVerified = true;
-        this.personalData.phone = this.whatsappPhone;
+    if (this.isLocalMock) {
+      setTimeout(() => {
+        this.isVerifyingWhatsapp = false;
+        if (this.whatsappCode === '123456') {
+          this.whatsappVerified = true;
+          this.personalData.phone = this.whatsappPhone;
 
-        // 🌐 Smart Country Auto-Detection based on verification dial-code
-        const cleanNum = this.whatsappPhone.replace(/\D/g, '');
-        if (cleanNum.startsWith('54')) {
-          this.personalData.country = 'Argentina';
-        } else if (cleanNum.startsWith('34')) {
-          this.personalData.country = 'Spain';
-        } else if (cleanNum.startsWith('52')) {
-          this.personalData.country = 'Mexico';
-        } else if (cleanNum.startsWith('57')) {
-          this.personalData.country = 'Colombia';
-        } else if (cleanNum.startsWith('55')) {
-          this.personalData.country = 'Brazil';
-        } else if (cleanNum.startsWith('56')) {
-          this.personalData.country = 'Chile';
-        } else if (cleanNum.startsWith('1')) {
-          this.personalData.country = 'United States';
+          // 🌐 Smart Country Auto-Detection based on verification dial-code
+          const cleanNum = this.whatsappPhone.replace(/\D/g, '');
+          if (cleanNum.startsWith('54')) {
+            this.personalData.country = 'Argentina';
+          } else if (cleanNum.startsWith('34')) {
+            this.personalData.country = 'Spain';
+          } else if (cleanNum.startsWith('52')) {
+            this.personalData.country = 'Mexico';
+          } else if (cleanNum.startsWith('57')) {
+            this.personalData.country = 'Colombia';
+          } else if (cleanNum.startsWith('55')) {
+            this.personalData.country = 'Brazil';
+          } else if (cleanNum.startsWith('56')) {
+            this.personalData.country = 'Chile';
+          } else if (cleanNum.startsWith('1')) {
+            this.personalData.country = 'United States';
+          }
+          this.summary.steps[0].status = 'COMPLETED';
+          this.summary.steps[1].status = 'IN_PROGRESS';
+          this.addLocalNotification(this.translations[this.selectedLang]['notifWsSuccess'], 'SUCCESS');
+          this.refreshSummary();
+        } else {
+          this.addLocalNotification(this.translations[this.selectedLang]['notifWsFail'], 'ERROR');
         }
-        this.summary.steps[0].status = 'COMPLETED';
-        this.summary.steps[1].status = 'IN_PROGRESS';
-        this.addLocalNotification(this.translations[this.selectedLang]['notifWsSuccess'], 'SUCCESS');
-        this.refreshSummary();
-      } else {
-        this.addLocalNotification(this.translations[this.selectedLang]['notifWsFail'], 'ERROR');
-      }
-    }, 1200);
+      }, 1200);
+    } else {
+      this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/whatsapp/verify?code=${encodeURIComponent(this.whatsappCode)}`, {}).subscribe({
+        next: () => {
+          this.isVerifyingWhatsapp = false;
+          this.whatsappVerified = true;
+          this.personalData.phone = this.whatsappPhone;
+
+          // 🌐 Smart Country Auto-Detection based on verification dial-code
+          const cleanNum = this.whatsappPhone.replace(/\D/g, '');
+          if (cleanNum.startsWith('54')) {
+            this.personalData.country = 'Argentina';
+          } else if (cleanNum.startsWith('34')) {
+            this.personalData.country = 'Spain';
+          } else if (cleanNum.startsWith('52')) {
+            this.personalData.country = 'Mexico';
+          } else if (cleanNum.startsWith('57')) {
+            this.personalData.country = 'Colombia';
+          } else if (cleanNum.startsWith('55')) {
+            this.personalData.country = 'Brazil';
+          } else if (cleanNum.startsWith('56')) {
+            this.personalData.country = 'Chile';
+          } else if (cleanNum.startsWith('1')) {
+            this.personalData.country = 'United States';
+          }
+
+          this.addLocalNotification(this.translations[this.selectedLang]['notifWsSuccess'], 'SUCCESS');
+          this.refreshSummary();
+        },
+        error: (err) => {
+          this.isVerifyingWhatsapp = false;
+          this.handleError(err);
+        }
+      });
+    }
   }
 
   handlePaymentCompleted(contractorId: number) {

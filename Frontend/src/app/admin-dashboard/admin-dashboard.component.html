@@ -105,7 +105,7 @@
             <div style="display: flex; gap: 10px; align-items: center;">
               <button class="cyber-btn cyber-btn-secondary"
                 style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px;" *ngIf="p.status === 'IN_REVIEW'"
-                (click)="selectedProcessIdForReview = p.id">
+                (click)="openReviewModal(p.id)">
                 {{ dashboardTranslations[selectedLang]['revDocs'] }}
               </button>
               <button class="cyber-btn cyber-btn-primary"
@@ -237,11 +237,17 @@
                 <p style="margin: 0;"><strong>{{ dashboardTranslations[selectedLang]['names'] }}:</strong> {{ getSelectedContractorForReview()?.name }}</p>
                 <p style="margin: 0;"><strong>{{ dashboardTranslations[selectedLang]['email'] }}:</strong> {{ getSelectedContractorForReview()?.email }}</p>
                 <p style="margin: 0;"><strong>{{ dashboardTranslations[selectedLang]['country'] }}:</strong> {{ getSelectedContractorForReview()?.country }}</p>
-                <p style="margin: 0;"><strong>{{ dashboardTranslations[selectedLang]['docType'] }}:</strong> PASAPORTE</p>
                 
-                <p style="margin-top: 15px; color: var(--accent-mint); text-decoration: underline; cursor: pointer; font-weight: 600; font-size: 0.9rem;">
-                  📄 {{ dashboardTranslations[selectedLang]['viewFile'] }} (DOCUMENT_ID.PDF)
-                </p>
+                <div *ngFor="let doc of reviewDocuments" style="margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px;">
+                  <p style="margin: 0 0 5px 0;"><strong>{{ dashboardTranslations[selectedLang]['docType'] }}:</strong> {{ doc.type }}</p>
+                  <a [href]="doc.fileUrl" target="_blank" style="color: var(--accent-mint); text-decoration: underline; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 5px;">
+                    📄 {{ dashboardTranslations[selectedLang]['viewFile'] }} ({{ doc.filename || 'Ver Documento' }})
+                  </a>
+                </div>
+
+                <div *ngIf="reviewDocuments.length === 0" style="margin-top: 10px; color: var(--text-muted); font-style: italic;">
+                  No hay documentos cargados aún.
+                </div>
               </div>
 
               <div class="cyber-input-group" style="margin-bottom: 0; display: flex; flex-direction: column;">
