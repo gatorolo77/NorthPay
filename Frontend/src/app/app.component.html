@@ -127,7 +127,7 @@
           <div class="landing-prop-grid"
             style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; text-align: left;">
             <div class="glass-panel"
-              style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.01); border-color: rgba(0, 245, 230, 0.05); min-height: 170px; display: flex; flex-direction: column; justify-content: flex-start;">
+              style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.07); border-color: rgba(0, 245, 230, 0.18); min-height: 170px; display: flex; flex-direction: column; justify-content: flex-start;">
               <div style="font-size: 1.5rem; margin-bottom: 8px;">💸</div>
               <h4 class="font-display"
                 style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">{{
@@ -137,7 +137,7 @@
             </div>
 
             <div class="glass-panel"
-              style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.01); border-color: rgba(0, 245, 230, 0.05); min-height: 170px; display: flex; flex-direction: column; justify-content: flex-start;">
+              style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.07); border-color: rgba(0, 245, 230, 0.18); min-height: 170px; display: flex; flex-direction: column; justify-content: flex-start;">
               <div style="font-size: 1.5rem; margin-bottom: 8px;">✍️</div>
               <h4 class="font-display"
                 style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">{{
@@ -147,7 +147,7 @@
             </div>
 
             <div class="glass-panel"
-              style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.01); border-color: rgba(0, 245, 230, 0.05); min-height: 170px; display: flex; flex-direction: column; justify-content: flex-start;">
+              style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.07); border-color: rgba(0, 245, 230, 0.18); min-height: 170px; display: flex; flex-direction: column; justify-content: flex-start;">
               <div style="font-size: 1.5rem; margin-bottom: 8px;">✨</div>
               <h4 class="font-display"
                 style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">{{
@@ -159,11 +159,16 @@
 
 
           <div style="display: flex; justify-content: center; gap: 15px;">
-            <button class="cyber-btn cyber-btn-secondary"
-              style="padding: 10px 25px; font-size: 0.85rem; font-weight: 700; border-radius: 8px; cursor: pointer;"
-              (click)="isOperatorDemoMode = true; loadOperatorPanel()">
-              {{ translations[selectedLang]['btnOperator'] }}
-            </button>
+            <div class="np-tooltip-wrapper">
+              <button class="cyber-btn cyber-btn-secondary"
+                style="padding: 10px 25px; font-size: 0.85rem; font-weight: 700; border-radius: 8px; cursor: pointer;"
+                (click)="isOperatorDemoMode = true; loadOperatorPanel()">
+                {{ translations[selectedLang]['btnOperator'] }}
+              </button>
+              <div class="np-tooltip">
+                {{ translations[selectedLang]['tooltipOperator'] }}
+              </div>
+            </div>
             <div class="np-tooltip-wrapper">
               <button class="cyber-btn cyber-btn-primary"
                 style="padding: 10px 30px; font-size: 0.85rem; font-weight: 800; border-radius: 8px; background: linear-gradient(135deg, var(--accent-mint), #00b0ff); color: var(--bg-darker); box-shadow: 0 0 15px rgba(0, 255, 157, 0.35); cursor: pointer;"
