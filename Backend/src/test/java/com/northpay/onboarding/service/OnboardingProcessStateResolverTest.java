@@ -42,7 +42,7 @@ class OnboardingProcessStateResolverTest {
         OnboardingSummaryDto summary = stateResolver.resolve(process, steps);
 
         assertEquals("CREATED", summary.getStatus());
-        assertEquals("PERSONAL_DATA", summary.getCurrentStep());
+        assertEquals("WHATSAPP_VERIFY", summary.getCurrentStep());
         assertEquals(0, summary.getProgress());
         assertTrue(summary.getCanProceed());
         assertTrue(summary.getBlockingIssues().isEmpty());
@@ -51,6 +51,7 @@ class OnboardingProcessStateResolverTest {
     @Test
     void testResolvePersonalDataCompleted() {
         List<OnboardingStep> steps = new ArrayList<>();
+        steps.add(OnboardingStep.builder().processId(1L).type(StepType.WHATSAPP_VERIFY).status(StepStatus.COMPLETED).build());
         steps.add(OnboardingStep.builder().processId(1L).type(StepType.PERSONAL_DATA).status(StepStatus.COMPLETED).build());
         steps.add(OnboardingStep.builder().processId(1L).type(StepType.DOCUMENT_UPLOAD).status(StepStatus.IN_PROGRESS).build());
         steps.add(OnboardingStep.builder().processId(1L).type(StepType.CONTRACT_SIGN).status(StepStatus.NOT_STARTED).build());
@@ -61,7 +62,7 @@ class OnboardingProcessStateResolverTest {
 
         assertEquals("IN_PROGRESS", summary.getStatus());
         assertEquals("DOCUMENT_UPLOAD", summary.getCurrentStep());
-        assertEquals(20, summary.getProgress());
+        assertEquals(32, summary.getProgress());
         assertTrue(summary.getCanProceed());
         assertFalse(summary.getBlockingIssues().isEmpty()); // because document upload has no documents approved yet
     }
@@ -69,6 +70,7 @@ class OnboardingProcessStateResolverTest {
     @Test
     void testResolveDocumentUnderReview() {
         List<OnboardingStep> steps = new ArrayList<>();
+        steps.add(OnboardingStep.builder().processId(1L).type(StepType.WHATSAPP_VERIFY).status(StepStatus.COMPLETED).build());
         steps.add(OnboardingStep.builder().processId(1L).type(StepType.PERSONAL_DATA).status(StepStatus.COMPLETED).build());
         steps.add(OnboardingStep.builder().processId(1L).type(StepType.DOCUMENT_UPLOAD).status(StepStatus.IN_REVIEW).build());
         steps.add(OnboardingStep.builder().processId(1L).type(StepType.CONTRACT_SIGN).status(StepStatus.NOT_STARTED).build());
@@ -79,7 +81,7 @@ class OnboardingProcessStateResolverTest {
 
         assertEquals("IN_PROGRESS", summary.getStatus());
         assertEquals("DOCUMENT_UPLOAD", summary.getCurrentStep());
-        assertEquals(20, summary.getProgress());
+        assertEquals(32, summary.getProgress());
         assertFalse(summary.getCanProceed()); // Cannot proceed while under review
         assertTrue(summary.getBlockingIssues().contains("Uploaded documents are under review by the operations team."));
     }

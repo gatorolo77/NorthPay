@@ -118,4 +118,16 @@ public class OnboardingController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @PutMapping("/{id}/settings")
+    public ResponseEntity<?> updateSettings(
+            @PathVariable("id") Long processId,
+            @RequestBody ContractorSettingsDto dto) {
+        try {
+            OnboardingSummaryDto summary = onboardingService.updateContractorSettings(processId, dto);
+            return ResponseEntity.ok(summary);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

@@ -23,19 +23,13 @@ public class AuthService {
 
     @Transactional
     public Invitation createInvitation(String email, Long createdBy) {
-        // Deactivate existing invitation for same email if any
-        invitationRepository.findByEmail(email).ifPresent(inv -> {
-            inv.setStatus(InvitationStatus.EXPIRED);
-            invitationRepository.save(inv);
-        });
+        Invitation invitation = invitationRepository.findByEmail(email)
+                .orElseGet(() -> Invitation.builder().email(email).build());
 
-        Invitation invitation = Invitation.builder()
-                .email(email)
-                .token(UUID.randomUUID().toString())
-                .status(InvitationStatus.PENDING)
-                .createdBy(createdBy)
-                .expiresAt(LocalDateTime.now().plusDays(3)) // 3-day activation timeframe limit
-                .build();
+        invitation.setToken(UUID.randomUUID().toString());
+        invitation.setStatus(InvitationStatus.PENDING);
+        invitation.setCreatedBy(createdBy);
+        invitation.setExpiresAt(LocalDateTime.now().plusDays(3)); // 3-day activation timeframe limit
 
         Invitation saved = invitationRepository.save(invitation);
 
@@ -62,6 +56,10 @@ public class AuthService {
             throw new IllegalArgumentException("Email does not match invitation recipient");
         }
 
+        if (userRepository.findByEmail(email.toLowerCase()).isPresent()) {
+            throw new IllegalArgumentException("El usuario con este correo electrónico ya se encuentra registrado.");
+        }
+
         // Register user
         User user = User.builder()
                 .email(email.toLowerCase())
@@ -86,5 +84,9 @@ public class AuthService {
             throw new IllegalArgumentException("Invalid email or password");
         }
         return user;
+    }
+
+    public Optional<Invitation> getInvitationByToken(String token) {
+        return invitationRepository.findByToken(token);
     }
 }
