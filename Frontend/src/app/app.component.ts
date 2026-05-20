@@ -47,13 +47,17 @@ export class AppComponent implements OnInit {
   initialToken: string | null = null;
   invitationToken = '';
   invitationEmail = '';
+  invitationRole = 'CONTRACTOR';
   registerPassword = '';
+  registerConfirmPassword = '';
   showRegisterPassword = false;
   loginEmail = '';
   loginPassword = '';
   showLoginPassword = false;
   adminUser = '';
   adminPass = '';
+  adminSetupKey = '';
+  isOperatorRegisterMode = false;
   showAdminPassword = false;
   userId = 1;
   processId = 1;
@@ -214,7 +218,7 @@ export class AppComponent implements OnInit {
       persCountry: "PAÍS DE RESIDENCIA FISCAL",
       persBtnSave: "Guardar y Siguiente Paso",
       navOperator: "Panel de Operaciones",
-      notifCodeSent: "Código de activación listo: escribe 123456 en pantalla.",
+      notifCodeSent: "📧 Código de verificación enviado a tu correo electrónico. Revisá tu bandeja de entrada.",
       notifWsSuccess: "WhatsApp verificado correctamente. ¡Onboarding desbloqueado!",
       notifWsFail: "Código incorrecto. Intenta de nuevo.",
       notifPersSave: "Datos personales guardados con éxito.",
@@ -300,7 +304,7 @@ export class AppComponent implements OnInit {
       persCountry: "TAX RESIDENCE COUNTRY",
       persBtnSave: "Save and Next Step",
       navOperator: "Operator Panel",
-      notifCodeSent: "Activation code ready: type 123456 on screen.",
+      notifCodeSent: "📧 Verification code sent to your email address. Check your inbox.",
       notifWsSuccess: "WhatsApp verified successfully. Onboarding unlocked!",
       notifWsFail: "Incorrect code. Please try again.",
       notifPersSave: "Personal data saved successfully.",
@@ -386,7 +390,7 @@ export class AppComponent implements OnInit {
       persCountry: "PAYS DE RÉSIDENCE FISCALE",
       persBtnSave: "Enregistrer et Étape Suivante",
       navOperator: "Panneau Opérateur",
-      notifCodeSent: "Code d'activation prêt : tapez 123456 à l'écran.",
+      notifCodeSent: "📧 Code de vérification envoyé à votre adresse e-mail. Vérifiez votre boîte de réception.",
       notifWsSuccess: "WhatsApp vérifié avec succès. Intégration déverrouillée !",
       notifWsFail: "Code incorrect. Veuillez réessayer.",
       notifPersSave: "Données personnelles enregistrées avec succès.",
@@ -472,7 +476,7 @@ export class AppComponent implements OnInit {
       persCountry: "PAÍS DE RESIDÊNCIA FISCAL",
       persBtnSave: "Salvar e Próxima Etapa",
       navOperator: "Painel de Operações",
-      notifCodeSent: "Código de ativação pronto: digite 123456 na tela.",
+      notifCodeSent: "📧 Código de verificação enviado ao seu e-mail. Verifique sua caixa de entrada.",
       notifWsSuccess: "WhatsApp verificado com sucesso. Integração desbloqueada!",
       notifWsFail: "Código incorreto. Por favor tente novamente.",
       notifPersSave: "Dados pessoais salvos com sucesso.",
@@ -558,7 +562,7 @@ export class AppComponent implements OnInit {
       persCountry: "税务居留国",
       persBtnSave: "保存并下一步",
       navOperator: "操作面板",
-      notifCodeSent: "激活码已就绪：请在屏幕上输入 123456。",
+      notifCodeSent: "📧 验证码已发送至您的电子邮件。请查看收件筱。",
       notifWsSuccess: "WhatsApp 验证成功。入职流程已解锁！",
       notifWsFail: "代码错误。请再试一次。",
       notifPersSave: "个人数据已成功保存。",
@@ -644,7 +648,7 @@ export class AppComponent implements OnInit {
       persCountry: "PAESE DI RESIDENZA FISCALE",
       persBtnSave: "Salva e Prossimo Passo",
       navOperator: "Pannello Operazioni",
-      notifCodeSent: "Codice di attivazione pronto: digita 123456 sullo schermo.",
+      notifCodeSent: "📧 Codice di verifica inviato alla tua email. Controlla la posta in arrivo.",
       notifWsSuccess: "WhatsApp verificato con successo. Onboarding sbloccato!",
       notifWsFail: "Codice non corretto. Riprova.",
       notifPersSave: "Dati personali salvati con successo.",
@@ -780,6 +784,7 @@ export class AppComponent implements OnInit {
           if (invitation && invitation.status === 'PENDING') {
             this.invitationToken = invitation.token;
             this.invitationEmail = invitation.email;
+            this.invitationRole = invitation.role || 'CONTRACTOR';
             this.currentView = 'register';
             this.addLocalNotification('Token de activación válido detectado. Configura tu contraseña.', 'SUCCESS');
           } else {
@@ -789,6 +794,7 @@ export class AppComponent implements OnInit {
         error: (err) => {
           console.error('[NorthPay] Error validando token:', err);
           this.invitationToken = finalToken!;
+          this.invitationRole = 'CONTRACTOR';
           this.currentView = 'register';
           this.addLocalNotification('Token detectado. Por favor ingresa tu correo y contraseña.', 'INFO');
         }
@@ -814,16 +820,52 @@ export class AppComponent implements OnInit {
   }
 
 
+  sendOperatorInvitation() {
+    if (!this.adminUser || !this.adminUser.includes('@')) {
+      this.addLocalNotification('Por favor ingresa un correo electrónico válido.', 'ERROR');
+      return;
+    }
+    this.http.post(`${this.apiBaseUrl}/auth/invite-operator`, {
+      email: this.adminUser
+    }).subscribe({
+      next: () => {
+        this.addLocalNotification(`Enlace de registro enviado a ${this.adminUser}. Revisá tu correo.`, 'SUCCESS');
+        this.isOperatorRegisterMode = false;
+        this.adminUser = '';
+      },
+      error: (err) => this.handleError(err)
+    });
+  }
+
+
   register() {
+    if (this.registerPassword !== this.registerConfirmPassword) {
+      this.addLocalNotification('Las contraseñas no coinciden. Por favor verificalas.', 'ERROR');
+      return;
+    }
+    if (this.registerPassword.length < 6) {
+      this.addLocalNotification('La contraseña debe tener al menos 6 caracteres.', 'ERROR');
+      return;
+    }
+
     this.http.post(`${this.apiBaseUrl}/auth/register`, {
       email: this.invitationEmail,
       password: this.registerPassword,
       token: this.invitationToken
     }).subscribe({
       next: (user: any) => {
-        this.userId = user.id;
         this.addLocalNotification('Registrado correctamente', 'SUCCESS');
-        this.initiateOnboarding();
+        this.registerPassword = '';
+        this.registerConfirmPassword = '';
+        
+        if (this.invitationRole === 'OPERATOR') {
+          this.adminUser = this.invitationEmail;
+          this.currentView = 'login'; // Redirect to operator login
+          this.addLocalNotification('Tu cuenta de operador ha sido activada. Ya podés iniciar sesión.', 'SUCCESS');
+        } else {
+          this.userId = user.id;
+          this.initiateOnboarding();
+        }
       },
       error: (err) => this.handleError(err)
     });
@@ -1032,6 +1074,24 @@ export class AppComponent implements OnInit {
       },
       error: () => {
         this.addLocalNotification('Acceso Denegado: Verifica usuario y clave.', 'ERROR');
+      }
+    });
+  }
+
+  submitOperatorRegister() {
+    this.http.post(`${this.apiBaseUrl}/auth/register-operator`, {
+      email: this.adminUser,
+      password: this.adminPass,
+      setupKey: this.adminSetupKey
+    }).subscribe({
+      next: () => {
+        this.addLocalNotification('¡Operador registrado con éxito! Ahora podés iniciar sesión.', 'SUCCESS');
+        this.isOperatorRegisterMode = false;
+        this.adminSetupKey = '';
+      },
+      error: (err) => {
+        const msg = err?.error || 'Error al registrar operador. Verificá la clave de configuración.';
+        this.addLocalNotification(msg, 'ERROR');
       }
     });
   }

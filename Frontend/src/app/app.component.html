@@ -3,7 +3,7 @@
   <header class="glass-panel app-header" *ngIf="currentView !== 'landing'">
     <div class="logo-container">
       <div class="logo-icon">
-        <span class="logo-letter">N</span>
+        <span class="logo-letter" style="line-height: 1; position: relative;">N<sup style="font-size: 0.65em; font-weight: 800; vertical-align: super; position: relative; top: -3px; letter-spacing: 0;">p</sup></span>
       </div>
       <div>
         <h1 class="font-display text-mint-gradient logo-title">NorthPay</h1>
@@ -13,8 +13,7 @@
 
     <div class="header-nav">
       <div class="glass-panel status-badge" *ngIf="currentView !== 'register'">
-        <span class="status-bullet"
-          style="background-color: var(--accent-mint); color: var(--accent-mint);">
+        <span class="status-bullet" style="background-color: var(--accent-mint); color: var(--accent-mint);">
         </span>
         <span style="color: var(--text-secondary);">
           Servidor NorthPay
@@ -106,8 +105,10 @@
 
           <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 15px;">
             <div class="logo-icon"
-              style="width: 45px; height: 45px; border-radius: 10px; box-shadow: 0 0 20px var(--accent-cyan-glow); margin: 0; display: flex; align-items: center; justify-content: center;">
-              <span class="logo-letter" style="font-size: 1.5rem; display: block; height: auto; width: auto;">N</span>
+              style="width: 45px; height: 45px; border-radius: 10px; box-shadow: 0 0 20px var(--accent-cyan-glow); margin: 0; display: flex; align-items: center; justify-content: center; padding-left: 7px; padding-right: 0;">
+              <span class="logo-letter"
+                style="font-size: 1.5rem; display: block; height: auto; width: auto; line-height: 1; position: relative;">N<sup
+                  style="font-size: 0.95rem; font-weight: 800; vertical-align: super; position: relative; top: -6px; letter-spacing: 0;">p</sup></span>
             </div>
             <h2 class="font-display text-mint-gradient"
               style="font-size: 2rem; font-weight: 800; margin: 0; letter-spacing: -0.5px; line-height: 1;">NorthPay
@@ -274,46 +275,78 @@
         <div class="logo-icon" style="width: 40px; height: 40px; border-radius: 10px; margin: 0 auto 10px auto;">
           <span class="logo-letter" style="font-size: 1.4rem;">A</span>
         </div>
-        <h2 class="font-display text-gradient" style="font-size: 1.4rem; font-weight: 800; margin-bottom: 4px;">{{
-          translations[selectedLang]['loginTitle'] }}</h2>
-        <p style="color: var(--text-secondary); font-size: 0.8rem;">{{ translations[selectedLang]['loginSubtitle'] }}
+        <h2 class="font-display text-gradient" style="font-size: 1.4rem; font-weight: 800; margin-bottom: 4px;">
+          {{ isOperatorRegisterMode ? 'Registrar Operador' : translations[selectedLang]['loginTitle'] }}
+        </h2>
+        <p style="color: var(--text-secondary); font-size: 0.8rem;">
+          {{ isOperatorRegisterMode ? 'Ingresá tu correo corporativo para recibir un enlace de registro seguro.' : translations[selectedLang]['loginSubtitle'] }}
         </p>
       </div>
 
-      <div class="cyber-input-group" style="margin-bottom: 12px;">
-        <label class="cyber-input-label" style="font-size: 0.7rem; margin-bottom: 4px;">{{
-          translations[selectedLang]['loginUserLabel'] }}</label>
-        <input type="text" class="cyber-input" [(ngModel)]="adminUser" placeholder="admin@northpay.com"
-          style="padding: 10px 12px; font-size: 0.85rem;">
-      </div>
+      <!-- Modo Invitación/Registro de Operador -->
+      <div *ngIf="isOperatorRegisterMode">
+        <div class="cyber-input-group" style="margin-bottom: 12px;">
+          <label class="cyber-input-label" style="font-size: 0.7rem; margin-bottom: 4px;">CORREO ELECTRÓNICO DEL OPERADOR</label>
+          <input type="email" class="cyber-input" [(ngModel)]="adminUser" placeholder="operador@empresa.com"
+            style="padding: 10px 12px; font-size: 0.85rem;">
+        </div>
 
-      <div class="cyber-input-group" style="margin-bottom: 0;">
-        <label class="cyber-input-label" style="font-size: 0.7rem; margin-bottom: 4px;">{{
-          translations[selectedLang]['loginPassLabel'] }}</label>
-        <div style="position: relative;">
-          <input [type]="showAdminPassword ? 'text' : 'password'" class="cyber-input" [(ngModel)]="adminPass"
-            placeholder="••••••••" style="padding: 10px 35px 10px 12px; font-size: 0.85rem; width: 100%;">
-          <button class="password-toggle-btn" (click)="showAdminPassword = !showAdminPassword"
-            style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; padding: 0; z-index: 10;">
-            {{ showAdminPassword ? '👁️' : '👁️‍🗨️' }}
+        <div style="display: flex; gap: 15px; margin-top: 18px;">
+          <button class="cyber-btn cyber-btn-secondary"
+            style="flex: 1; border-radius: 8px; padding: 9px; font-size: 0.85rem;" (click)="currentView = 'landing'; isOperatorRegisterMode = false;">
+            {{ translations[selectedLang]['loginBtnBack'] }}
+          </button>
+          <button class="cyber-btn cyber-btn-primary"
+            style="flex: 2; border-radius: 8px; padding: 9px; background: linear-gradient(135deg, var(--accent-cyan), #0080ff); color: var(--bg-darker); font-weight: 700; font-size: 0.85rem;"
+            (click)="sendOperatorInvitation()">
+            Enviar Enlace de Registro
           </button>
         </div>
       </div>
 
-      <div style="display: flex; gap: 15px; margin-top: 18px;">
-        <button class="cyber-btn cyber-btn-secondary"
-          style="flex: 1; border-radius: 8px; padding: 9px; font-size: 0.85rem;" (click)="currentView = 'landing'">
-          {{ translations[selectedLang]['loginBtnBack'] }}
-        </button>
-        <button class="cyber-btn cyber-btn-primary"
-          style="flex: 2; border-radius: 8px; padding: 9px; background: linear-gradient(135deg, var(--accent-cyan), #0080ff); color: var(--bg-darker); font-weight: 700; font-size: 0.85rem;"
-          (click)="submitAdminLogin()">
-          {{ translations[selectedLang]['loginBtnSubmit'] }}
+      <!-- Modo Login de Operador -->
+      <div *ngIf="!isOperatorRegisterMode">
+        <div class="cyber-input-group" style="margin-bottom: 12px;">
+          <label class="cyber-input-label" style="font-size: 0.7rem; margin-bottom: 4px;">{{ translations[selectedLang]['loginUserLabel'] }}</label>
+          <input type="text" class="cyber-input" [(ngModel)]="adminUser" placeholder="operador@empresa.com"
+            style="padding: 10px 12px; font-size: 0.85rem;">
+        </div>
+
+        <div class="cyber-input-group" style="margin-bottom: 0;">
+          <label class="cyber-input-label" style="font-size: 0.7rem; margin-bottom: 4px;">{{ translations[selectedLang]['loginPassLabel'] }}</label>
+          <div style="position: relative;">
+            <input [type]="showAdminPassword ? 'text' : 'password'" class="cyber-input" [(ngModel)]="adminPass"
+              placeholder="••••••••" style="padding: 10px 35px 10px 12px; font-size: 0.85rem; width: 100%;">
+            <button class="password-toggle-btn" (click)="showAdminPassword = !showAdminPassword"
+              style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; padding: 0; z-index: 10;">
+              {{ showAdminPassword ? '👁️' : '👁️‍🗨️' }}
+            </button>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 15px; margin-top: 18px;">
+          <button class="cyber-btn cyber-btn-secondary"
+            style="flex: 1; border-radius: 8px; padding: 9px; font-size: 0.85rem;" (click)="currentView = 'landing';">
+            {{ translations[selectedLang]['loginBtnBack'] }}
+          </button>
+          <button class="cyber-btn cyber-btn-primary"
+            style="flex: 2; border-radius: 8px; padding: 9px; background: linear-gradient(135deg, var(--accent-cyan), #0080ff); color: var(--bg-darker); font-weight: 700; font-size: 0.85rem;"
+            (click)="submitAdminLogin()">
+            {{ translations[selectedLang]['loginBtnSubmit'] }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Toggle between login and register -->
+      <div style="text-align: center; margin-top: 14px; border-top: 1px solid var(--glass-border); padding-top: 12px;">
+        <button style="background: none; border: none; cursor: pointer; font-size: 0.75rem; color: var(--accent-cyan); text-decoration: underline;"
+          (click)="isOperatorRegisterMode = !isOperatorRegisterMode;">
+          {{ isOperatorRegisterMode ? '← Ya tengo cuenta. Iniciar sesión' : '¿Primera vez? Solicitar enlace de acceso para operador' }}
         </button>
       </div>
 
-
     </section>
+
 
 
     <section *ngIf="currentView === 'contractor_login'" class="glass-panel admin-login-card"
@@ -369,7 +402,7 @@
     <section *ngIf="currentView === 'welcome'" class="glass-panel welcome-card">
       <div class="envelope-wrapper">
         <div class="logo-icon" style="width: 45px; height: 45px; border-radius: 10px;">
-          <span class="logo-letter" style="font-size: 1.5rem;">N</span>
+          <span class="logo-letter" style="font-size: 1.5rem; line-height: 1; position: relative;">N<sup style="font-size: 0.65em; font-weight: 800; vertical-align: super; position: relative; top: -3px; letter-spacing: 0;">p</sup></span>
         </div>
       </div>
       <h2 class="font-display text-gradient welcome-title">{{ translations[selectedLang]['onboardingPortalTitle'] }}
@@ -390,9 +423,11 @@
 
 
     <section *ngIf="currentView === 'register'" class="glass-panel register-card">
-      <h2 class="font-display text-mint-gradient register-title">{{ translations[selectedLang]['registerTitle'] }}</h2>
+      <h2 class="font-display text-mint-gradient register-title">
+        {{ invitationRole === 'OPERATOR' ? 'Completar Registro de Operador' : translations[selectedLang]['registerTitle'] }}
+      </h2>
       <p class="register-text">
-        {{ translations[selectedLang]['regDesc'] }}
+        {{ invitationRole === 'OPERATOR' ? 'Se ha detectado una invitación de operador válida. Configura tu contraseña de acceso.' : translations[selectedLang]['regDesc'] }}
       </p>
 
       <div class="cyber-input-group">
@@ -432,8 +467,16 @@
         </div>
       </div>
 
+      <div class="cyber-input-group">
+        <label class="cyber-input-label">CONFIRMAR CONTRASEÑA</label>
+        <div style="position: relative; width: 100%;">
+          <input [type]="showRegisterPassword ? 'text' : 'password'" class="cyber-input" [(ngModel)]="registerConfirmPassword"
+            placeholder="••••••••" style="padding-right: 45px; width: 100%;">
+        </div>
+      </div>
+
       <button class="cyber-btn cyber-btn-primary register-submit-btn" (click)="register()">
-        {{ translations[selectedLang]['regBtnStart'] }}
+        {{ invitationRole === 'OPERATOR' ? 'Confirmar y Guardar Operador' : translations[selectedLang]['regBtnStart'] }}
       </button>
     </section>
 
@@ -1220,10 +1263,10 @@
     </div>
 
     <app-admin-dashboard *ngIf="currentView === 'operator'" [summary]="summary" [personalData]="personalData"
-      [selectedLang]="selectedLang" [whatsappPhone]="whatsappPhone"
-      [paidContractorIds]="globalPaidIds" [isDemoMode]="isOperatorDemoMode" [paymentMethod]="paymentMethod"
-      [uploadedDocs]="uploadedDocs" [email]="invitationEmail" [realProcessId]="processId"
-      (reviewCompleted)="refreshSummary()" (paymentCompleted)="handlePaymentCompleted($event)">
+      [selectedLang]="selectedLang" [whatsappPhone]="whatsappPhone" [paidContractorIds]="globalPaidIds"
+      [isDemoMode]="isOperatorDemoMode" [paymentMethod]="paymentMethod" [uploadedDocs]="uploadedDocs"
+      [email]="invitationEmail" [realProcessId]="processId" (reviewCompleted)="refreshSummary()"
+      (paymentCompleted)="handlePaymentCompleted($event)">
     </app-admin-dashboard>
 
 
