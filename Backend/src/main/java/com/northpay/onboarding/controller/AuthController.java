@@ -30,6 +30,27 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/register-operator")
+    public ResponseEntity<?> registerOperator(@RequestBody RegisterOperatorRequest request) {
+        try {
+            User user = authService.registerOperator(request.getEmail(), request.getPassword(), request.getSetupKey());
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/invite-operator")
+    public ResponseEntity<?> inviteOperator(@RequestBody InviteOperatorRequest request) {
+        try {
+            Invitation invitation = authService.createOperatorInvitation(request.getEmail());
+            return ResponseEntity.ok(invitation);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
@@ -48,8 +69,20 @@ public class AuthController {
     }
 
     @Data
+    public static class RegisterOperatorRequest {
+        private String email;
+        private String password;
+        private String setupKey;
+    }
+
+    @Data
     public static class LoginRequest {
         private String email;
         private String password;
+    }
+
+    @Data
+    public static class InviteOperatorRequest {
+        private String email;
     }
 }

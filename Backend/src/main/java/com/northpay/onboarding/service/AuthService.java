@@ -64,7 +64,7 @@ public class AuthService {
         User user = User.builder()
                 .email(email.toLowerCase())
                 .password(password) // In a real production app we would encrypt this password
-                .role(Role.CONTRACTOR)
+                .role(invitation.getRole())
                 .build();
         User savedUser = userRepository.save(user);
 
@@ -72,8 +72,50 @@ public class AuthService {
         invitation.setStatus(InvitationStatus.USED);
         invitationRepository.save(invitation);
 
-        log.info("User registered successfully via invitation token: {}", email);
+        log.info("User registered successfully via invitation token: {} | Role: {}", email, invitation.getRole());
         return savedUser;
+    }
+
+    @Transactional
+    public Invitation createOperatorInvitation(String email) {
+        Invitation invitation = invitationRepository.findByEmail(email)
+                .orElseGet(() -> Invitation.builder().email(email).build());
+
+        invitation.setToken(UUID.randomUUID().toString());
+        invitation.setStatus(InvitationStatus.PENDING);
+        invitation.setCreatedBy(0L); // System level
+        invitation.setExpiresAt(LocalDateTime.now().plusDays(3)); // 3-day activation limit
+        invitation.setRole(Role.OPERATOR);
+
+        Invitation saved = invitationRepository.save(invitation);
+
+        // Send email
+        emailService.sendOperatorInvitationEmail(email, saved.getToken());
+
+        return saved;
+    }
+
+    @Transactional
+    public User registerOperator(String email, String password, String setupKey) {
+        // Setup key prevents unauthorized operator self-registration
+        if (!"NP_SETUP_2026".equals(setupKey)) {
+            throw new IllegalArgumentException("Clave de configuración incorrecta. Contactá al administrador de NorthPay.");
+        }
+        if (email == null || email.isBlank() || password == null || password.length() < 6) {
+            throw new IllegalArgumentException("Correo y contraseña (mínimo 6 caracteres) son obligatorios.");
+        }
+        if (userRepository.findByEmail(email.toLowerCase()).isPresent()) {
+            throw new IllegalArgumentException("Ya existe un operador registrado con ese correo electrónico.");
+        }
+
+        User operator = User.builder()
+                .email(email.toLowerCase())
+                .password(password)
+                .role(Role.OPERATOR)
+                .build();
+        User saved = userRepository.save(operator);
+        log.info("Operator registered successfully: {}", email);
+        return saved;
     }
 
     public User login(String email, String password) {

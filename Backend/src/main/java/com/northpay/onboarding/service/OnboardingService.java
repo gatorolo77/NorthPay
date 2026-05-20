@@ -336,13 +336,13 @@ public class OnboardingService {
         step.setData(data);
         stepRepository.save(step);
 
-        // Send code to the contractor's real email address via our configured SMTP mailer!
+        // Send code to the contractor's registered email address
         userRepository.findById(process.getContractorUserId()).ifPresent(user -> {
             emailService.sendVerificationCodeEmail(user.getEmail(), code);
         });
 
-        notificationService.sendNotification(process.getContractorUserId(), 
-                "Código de activación enviado por WhatsApp al " + phone, "SUCCESS");
+        notificationService.sendNotification(process.getContractorUserId(),
+                "Código de verificación enviado al correo electrónico registrado. Revésalo e ingresálo aquí.", "SUCCESS");
 
         return getOnboardingSummary(processId);
     }
@@ -355,13 +355,13 @@ public class OnboardingService {
         OnboardingStep step = stepRepository.findByProcessIdAndType(processId, StepType.WHATSAPP_VERIFY)
                 .orElseThrow(() -> new IllegalArgumentException("Step not found"));
 
-        // Get saved code, fallback to "123456" for local/offline mock compatibility
-        String savedCode = (step.getData() != null) ? (String) step.getData().get("sentCode") : "123456";
+        // Get saved code from the step data
+        String savedCode = (step.getData() != null) ? (String) step.getData().get("sentCode") : null;
         if (savedCode == null) {
-            savedCode = "123456";
+            throw new IllegalStateException("No se encontró un código de verificación activo. Por favor solicita uno nuevo.");
         }
 
-        if (savedCode.equals(code) || "123456".equals(code)) {
+        if (savedCode.equals(code)) {
             step.setStatus(StepStatus.COMPLETED);
             stepRepository.save(step);
 
