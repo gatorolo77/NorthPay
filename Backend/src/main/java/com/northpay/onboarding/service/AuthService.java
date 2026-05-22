@@ -2,6 +2,7 @@ package com.northpay.onboarding.service;
 
 import com.northpay.onboarding.model.*;
 import com.northpay.onboarding.repository.InvitationRepository;
+import com.northpay.onboarding.repository.OperatorKeyRepository;
 import com.northpay.onboarding.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,6 +21,8 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final InvitationRepository invitationRepository;
+    private final OperatorKeyRepository operatorKeyRepository;
+    private final NotificationService notificationService;
     private final EmailService emailService;
 
     @Transactional
@@ -40,7 +44,7 @@ public class AuthService {
     }
 
     @Transactional
-    public User registerWithToken(String email, String password, String token) {
+    public User registerWithToken(String email, String password, String token, String secretKey) {
         Invitation invitation = invitationRepository.findByToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid invitation token"));
 
@@ -58,6 +62,26 @@ public class AuthService {
 
         if (userRepository.findByEmail(email.toLowerCase()).isPresent()) {
             throw new IllegalArgumentException("El usuario con este correo electrónico ya se encuentra registrado.");
+        }
+
+        // Validate operator secret key if role is OPERATOR
+        if (invitation.getRole() == Role.OPERATOR) {
+            if (secretKey == null || secretKey.trim().isEmpty()) {
+                throw new IllegalArgumentException("Se requiere una clave secreta autorizada por el Propietario (Owner) para registrar un operador.");
+            }
+            String cleanKey = secretKey.trim().toUpperCase();
+            OperatorKey opKey = operatorKeyRepository.findBySecretKey(cleanKey)
+                    .orElseThrow(() -> new IllegalArgumentException("Clave secreta inválida. Contactá al administrador de NorthPay."));
+
+            if (opKey.getUsed()) {
+                throw new IllegalArgumentException("La clave secreta ingresada ya ha sido utilizada.");
+            }
+
+            // Consume secret key
+            opKey.setUsed(true);
+            opKey.setUsedByEmail(email.toLowerCase());
+            opKey.setUsedAt(LocalDateTime.now());
+            operatorKeyRepository.save(opKey);
         }
 
         // Register user
@@ -89,6 +113,15 @@ public class AuthService {
 
         Invitation saved = invitationRepository.save(invitation);
 
+        // Send notification to Owner under their notification bell
+        userRepository.findByEmail("owner@northpay.com").ifPresent(owner -> {
+            notificationService.sendNotification(
+                    owner.getId(),
+                    "El operador " + email + " solicitó acceso con el token: " + saved.getToken(),
+                    "INFO"
+            );
+        });
+
         // Send email
         emailService.sendOperatorInvitationEmail(email, saved.getToken());
 
@@ -97,16 +130,27 @@ public class AuthService {
 
     @Transactional
     public User registerOperator(String email, String password, String setupKey) {
-        // Setup key prevents unauthorized operator self-registration
-        if (!"NP_SETUP_2026".equals(setupKey)) {
-            throw new IllegalArgumentException("Clave de configuración incorrecta. Contactá al administrador de NorthPay.");
+        String cleanKey = setupKey != null ? setupKey.trim().toUpperCase() : "";
+        // Find if setupKey exists in our database
+        OperatorKey opKey = operatorKeyRepository.findBySecretKey(cleanKey)
+                .orElseThrow(() -> new IllegalArgumentException("Clave secreta inválida. Contactá al administrador de NorthPay."));
+
+        if (opKey.getUsed()) {
+            throw new IllegalArgumentException("La clave secreta ingresada ya ha sido utilizada.");
         }
+
         if (email == null || email.isBlank() || password == null || password.length() < 6) {
             throw new IllegalArgumentException("Correo y contraseña (mínimo 6 caracteres) son obligatorios.");
         }
         if (userRepository.findByEmail(email.toLowerCase()).isPresent()) {
             throw new IllegalArgumentException("Ya existe un operador registrado con ese correo electrónico.");
         }
+
+        // Consume secret key
+        opKey.setUsed(true);
+        opKey.setUsedByEmail(email.toLowerCase());
+        opKey.setUsedAt(LocalDateTime.now());
+        operatorKeyRepository.save(opKey);
 
         User operator = User.builder()
                 .email(email.toLowerCase())
@@ -121,14 +165,22 @@ public class AuthService {
     public User login(String email, String password) {
         User user = userRepository.findByEmail(email.toLowerCase())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
-        
+
         if (!user.getPassword().equals(password)) {
             throw new IllegalArgumentException("Invalid email or password");
         }
         return user;
     }
 
+    public List<OperatorKey> getAllOperatorKeys() {
+        return operatorKeyRepository.findAll();
+    }
+
     public Optional<Invitation> getInvitationByToken(String token) {
         return invitationRepository.findByToken(token);
+    }
+
+    public List<User> getAllOperators() {
+        return userRepository.findByRole(Role.OPERATOR);
     }
 }

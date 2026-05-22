@@ -122,6 +122,12 @@ public class OnboardingProcessStateResolver {
             resolvedStatus = OnboardingStatus.PENDING_VERIFICATION;
         }
 
+        OnboardingStep whatsappStep = stepsMap.get(StepType.WHATSAPP_VERIFY);
+        String whatsappCode = null;
+        if (whatsappStep != null && whatsappStep.getData() != null) {
+            whatsappCode = (String) whatsappStep.getData().get("sentCode");
+        }
+
         return OnboardingSummaryDto.builder()
                 .status(resolvedStatus.name())
                 .currentStep(currentStep != null ? currentStep.name() : null)
@@ -129,6 +135,7 @@ public class OnboardingProcessStateResolver {
                 .steps(stepsSummaryList)
                 .canProceed(canProceed)
                 .blockingIssues(blockingIssues)
+                .whatsappVerificationCode(whatsappCode)
                 .build();
     }
 

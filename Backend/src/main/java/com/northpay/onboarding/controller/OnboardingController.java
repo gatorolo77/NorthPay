@@ -106,6 +106,20 @@ public class OnboardingController {
         }
     }
 
+    @PostMapping("/whatsapp/webhook")
+    public ResponseEntity<?> receiveWhatsappMessage(@RequestBody WhatsappWebhookDto dto) {
+        try {
+            boolean success = onboardingService.processWhatsappWebhook(dto.getPhone(), dto.getMessage());
+            if (success) {
+                return ResponseEntity.ok(java.util.Map.of("status", "success", "message", "WhatsApp step verified successfully."));
+            } else {
+                return ResponseEntity.ok(java.util.Map.of("status", "ignored", "message", "Message received but did not match any active process."));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("status", "error", "message", e.getMessage()));
+        }
+    }
+
     @PostMapping("/{id}/identity-verification")
     public ResponseEntity<?> completeIdentityVerification(
             @PathVariable("id") Long processId,

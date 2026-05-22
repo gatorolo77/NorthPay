@@ -327,8 +327,8 @@ public class OnboardingService {
         OnboardingStep step = stepRepository.findByProcessIdAndType(processId, StepType.WHATSAPP_VERIFY)
                 .orElseThrow(() -> new IllegalArgumentException("Step not found"));
 
-        // Generate dynamic 6-digit verification code
-        String code = String.format("%06d", new Random().nextInt(1000000));
+        // Generate dynamic NP-XXXX verification code (NP- + 4 random digits)
+        String code = "NP-" + String.format("%04d", new Random().nextInt(10000));
 
         Map<String, Object> data = new HashMap<>();
         data.put("phone", phone);
@@ -336,13 +336,8 @@ public class OnboardingService {
         step.setData(data);
         stepRepository.save(step);
 
-        // Send code to the contractor's registered email address
-        userRepository.findById(process.getContractorUserId()).ifPresent(user -> {
-            emailService.sendVerificationCodeEmail(user.getEmail(), code);
-        });
-
         notificationService.sendNotification(process.getContractorUserId(),
-                "Código de verificación enviado al correo electrónico registrado. Revésalo e ingresálo aquí.", "SUCCESS");
+                "Código de verificación de WhatsApp generado con éxito. Procede a enviar el mensaje desde tu celular.", "SUCCESS");
 
         return getOnboardingSummary(processId);
     }
@@ -361,9 +356,18 @@ public class OnboardingService {
             throw new IllegalStateException("No se encontró un código de verificación activo. Por favor solicita uno nuevo.");
         }
 
-        if (savedCode.equals(code)) {
+        if (savedCode.equalsIgnoreCase(code)) {
             step.setStatus(StepStatus.COMPLETED);
             stepRepository.save(step);
+
+            // Save phone to contractor profile
+            String savedPhone = (String) step.getData().get("phone");
+            if (savedPhone != null) {
+                ContractorProfile profile = profileRepository.findByUserId(process.getContractorUserId())
+                        .orElseGet(() -> ContractorProfile.builder().userId(process.getContractorUserId()).build());
+                profile.setPhone(savedPhone);
+                profileRepository.save(profile);
+            }
 
             // Activate next step: PERSONAL_DATA
             stepRepository.findByProcessIdAndType(processId, StepType.PERSONAL_DATA)
@@ -382,6 +386,92 @@ public class OnboardingService {
         }
 
         return getOnboardingSummary(processId);
+    }
+
+    private boolean phoneNumbersMatch(String phone1, String phone2) {
+        if (phone1 == null || phone2 == null) return false;
+        String clean1 = phone1.replaceAll("\\D", "");
+        String clean2 = phone2.replaceAll("\\D", "");
+        if (clean1.isEmpty() || clean2.isEmpty()) return false;
+        
+        if (clean1.equals(clean2)) return true;
+        
+        int len1 = clean1.length();
+        int len2 = clean2.length();
+        if (len1 >= 8 && len2 >= 8) {
+            String suffix1 = clean1.substring(len1 - 8);
+            String suffix2 = clean2.substring(len2 - 8);
+            return suffix1.equals(suffix2);
+        }
+        return false;
+    }
+
+    @Transactional
+    public boolean processWhatsappWebhook(String senderPhone, String messageText) {
+        if (senderPhone == null || messageText == null) {
+            log.warn("Invalid webhook payload: senderPhone={} messageText={}", senderPhone, messageText);
+            return false;
+        }
+
+        log.info("Processing WhatsApp webhook for phone: {} with message: {}", senderPhone, messageText);
+
+        // Extract code from message using regex: NP-[0-9]{4}
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("NP-[0-9]{4}");
+        java.util.regex.Matcher matcher = pattern.matcher(messageText.toUpperCase());
+        if (!matcher.find()) {
+            log.warn("No verification code found in WhatsApp message: {}", messageText);
+            return false;
+        }
+        String extractedCode = matcher.group();
+
+        log.info("Extracted code from WhatsApp webhook: {}", extractedCode);
+
+        // Find all in-progress WhatsApp verification steps
+        List<OnboardingStep> steps = stepRepository.findAll().stream()
+                .filter(step -> step.getType() == StepType.WHATSAPP_VERIFY && step.getStatus() == StepStatus.IN_PROGRESS)
+                .toList();
+
+        for (OnboardingStep step : steps) {
+            if (step.getData() != null) {
+                String savedCode = (String) step.getData().get("sentCode");
+                String savedPhone = (String) step.getData().get("phone");
+                
+                if (extractedCode.equalsIgnoreCase(savedCode) && phoneNumbersMatch(senderPhone, savedPhone)) {
+                    log.info("Matching step found for code: {} and phone: {}. Completing step.", extractedCode, savedPhone);
+                    
+                    // Mark step as completed
+                    step.setStatus(StepStatus.COMPLETED);
+                    stepRepository.save(step);
+                    
+                    // Save phone to contractor profile
+                    OnboardingProcess process = processRepository.findById(step.getProcessId())
+                            .orElseThrow(() -> new IllegalArgumentException("Process not found"));
+                            
+                    ContractorProfile profile = profileRepository.findByUserId(process.getContractorUserId())
+                            .orElseGet(() -> ContractorProfile.builder().userId(process.getContractorUserId()).build());
+                    profile.setPhone(savedPhone);
+                    profileRepository.save(profile);
+                    
+                    // Activate next step: PERSONAL_DATA
+                    stepRepository.findByProcessIdAndType(process.getId(), StepType.PERSONAL_DATA)
+                            .ifPresent(nextStep -> {
+                                if (nextStep.getStatus() == StepStatus.NOT_STARTED) {
+                                    nextStep.setStatus(StepStatus.IN_PROGRESS);
+                                    stepRepository.save(nextStep);
+                                }
+                            });
+                            
+                    updateProcessOverallState(process.getId());
+                    notificationService.sendNotification(process.getContractorUserId(), 
+                            "¡WhatsApp verificado automáticamente! Onboarding desbloqueado.", "SUCCESS");
+                    
+                    return true;
+                }
+            }
+        }
+        
+        log.warn("No matching onboarding process found for code {} and phone {}", extractedCode, senderPhone);
+        return false;
     }
 
     @Transactional

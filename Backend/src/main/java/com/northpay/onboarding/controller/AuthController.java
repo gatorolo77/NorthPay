@@ -1,6 +1,6 @@
 package com.northpay.onboarding.controller;
 
-import com.northpay.onboarding.model.User;
+import com.northpay.onboarding.model.*;
 import com.northpay.onboarding.service.AuthService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +20,33 @@ public class AuthController {
         return ResponseEntity.ok("OK");
     }
 
+    @GetMapping("/operator-keys")
+    public ResponseEntity<?> getOperatorKeys() {
+        try {
+            return ResponseEntity.ok(authService.getAllOperatorKeys());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/operators")
+    public ResponseEntity<?> getOperators() {
+        try {
+            return ResponseEntity.ok(authService.getAllOperators());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
-            User user = authService.registerWithToken(request.getEmail(), request.getPassword(), request.getToken());
+            User user = authService.registerWithToken(
+                request.getEmail(), 
+                request.getPassword(), 
+                request.getToken(), 
+                request.getSecretKey()
+            );
             return ResponseEntity.ok(user);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -66,6 +89,7 @@ public class AuthController {
         private String email;
         private String password;
         private String token;
+        private String secretKey;
     }
 
     @Data
