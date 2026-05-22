@@ -101,6 +101,17 @@
         <section class="glass-panel landing-card"
           style="width: 720px; min-width: 720px; min-height: 520px; max-width: 100%; flex-shrink: 0; padding: 25px 35px; text-align: center; margin: 0; position: relative;">
 
+          <button (click)="openOwnerDirectLogin()"
+            style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); outline: none; z-index: 10;"
+            onmouseover="this.style.color='var(--accent-cyan)'; this.style.transform='rotate(90deg) scale(1.15)'; this.style.background='rgba(0, 245, 230, 0.08)'; this.style.boxShadow='0 0 12px rgba(0, 245, 230, 0.25)';"
+            onmouseout="this.style.color='var(--text-muted)'; this.style.transform='rotate(0deg) scale(1)'; this.style.background='transparent'; this.style.boxShadow='none';"
+            title="Acceso Propietario (Owner)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 2px currentColor);">
+              <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+              <line x1="12" y1="2" x2="12" y2="12"></line>
+            </svg>
+          </button>
+
 
 
           <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 15px;">
@@ -217,60 +228,37 @@
       </div>
 
 
-      <div class="lang-selector-sidebar"
-        style="display: flex; flex-direction: column; gap: 12px; align-items: center; animation: fadeIn 0.8s ease-in-out;">
-        <button (click)="changeLanguage('en')" class="glass-panel lang-btn"
-          [style.border-color]="selectedLang === 'en' ? 'var(--accent-cyan)' : 'var(--glass-border)'"
-          style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-          <img src="https://flagcdn.com/us.svg" alt="USA Flag"
-            style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
-          <span class="font-display"
-            style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">English</span>
+      <div class="lang-carousel-wrapper" style="animation: fadeIn 0.8s ease-in-out;">
+        <button class="lang-nav-btn up-btn" (click)="scrollLanguages('up')" aria-label="Scroll Up">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+          </svg>
         </button>
-        <button (click)="changeLanguage('es')" class="glass-panel lang-btn"
-          [style.border-color]="selectedLang === 'es' ? 'var(--accent-cyan)' : 'var(--glass-border)'"
-          style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-          <img src="https://flagcdn.com/es.svg" alt="Spain Flag"
-            style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
-          <span class="font-display"
-            style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">Español</span>
+        
+        <div class="lang-carousel-track" (wheel)="onLangWheel($event)">
+          <button *ngFor="let lang of languagesList" 
+                  (click)="changeLanguage(lang.code)"
+                  class="glass-panel lang-btn"
+                  [class.active]="selectedLang === lang.code"
+                  [style.pointer-events]="getAbsD(lang.code) > 2 ? 'none' : 'auto'"
+                  [style.--d]="getD(lang.code)"
+                  [style.--abs-d]="getAbsD(lang.code)">
+            <img [src]="lang.flag" [alt]="lang.name" />
+            <span class="font-display">{{ lang.name }}</span>
+          </button>
+        </div>
+        
+        <button class="lang-nav-btn down-btn" (click)="scrollLanguages('down')" aria-label="Scroll Down">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
         </button>
-        <button (click)="changeLanguage('fr')" class="glass-panel lang-btn"
-          [style.border-color]="selectedLang === 'fr' ? 'var(--accent-cyan)' : 'var(--glass-border)'"
-          style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-          <img src="https://flagcdn.com/fr.svg" alt="France Flag"
-            style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
-          <span class="font-display"
-            style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">Français</span>
-        </button>
-        <button (click)="changeLanguage('pt')" class="glass-panel lang-btn"
-          [style.border-color]="selectedLang === 'pt' ? 'var(--accent-cyan)' : 'var(--glass-border)'"
-          style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-          <img src="https://flagcdn.com/pt.svg" alt="Portugal Flag"
-            style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
-          <span class="font-display"
-            style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">Português</span>
-        </button>
-        <button (click)="changeLanguage('zh')" class="glass-panel lang-btn"
-          [style.border-color]="selectedLang === 'zh' ? 'var(--accent-cyan)' : 'var(--glass-border)'"
-          style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-          <img src="https://flagcdn.com/cn.svg" alt="China Flag"
-            style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
-          <span class="font-display" style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">中文</span>
-        </button>
-        <button (click)="changeLanguage('it')" class="glass-panel lang-btn"
-          [style.border-color]="selectedLang === 'it' ? 'var(--accent-cyan)' : 'var(--glass-border)'"
-          style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-          <img src="https://flagcdn.com/it.svg" alt="Italy Flag"
-            style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
-          <span class="font-display"
-            style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">Italiano</span>
-        </button>
-
       </div>
     </div>
 
-    <section *ngIf="currentView === 'login'" class="glass-panel admin-login-card">
+    <section *ngIf="currentView === 'login'" class="glass-panel admin-login-card"
+      [style.border-color]="isOwnerMode ? 'rgba(255, 215, 0, 0.45)' : 'var(--glass-border)'"
+      [style.box-shadow]="isOwnerMode ? '0 0 25px rgba(255, 215, 0, 0.18)' : 'none'">
       <div style="text-align: center; margin-bottom: 12px;">
         <div class="logo-icon" style="width: 40px; height: 40px; border-radius: 10px; margin: 0 auto 10px auto;">
           <span class="logo-letter" style="font-size: 1.4rem;">A</span>
@@ -293,7 +281,7 @@
 
         <div style="display: flex; gap: 15px; margin-top: 18px;">
           <button class="cyber-btn cyber-btn-secondary"
-            style="flex: 1; border-radius: 8px; padding: 9px; font-size: 0.85rem;" (click)="currentView = 'landing'; isOperatorRegisterMode = false;">
+            style="flex: 1; border-radius: 8px; padding: 9px; font-size: 0.85rem;" (click)="goBackToLanding()">
             {{ translations[selectedLang]['loginBtnBack'] }}
           </button>
           <button class="cyber-btn cyber-btn-primary"
@@ -304,7 +292,6 @@
         </div>
       </div>
 
-      <!-- Modo Login de Operador -->
       <div *ngIf="!isOperatorRegisterMode">
         <div class="cyber-input-group" style="margin-bottom: 12px;">
           <label class="cyber-input-label" style="font-size: 0.7rem; margin-bottom: 4px;">{{ translations[selectedLang]['loginUserLabel'] }}</label>
@@ -326,7 +313,7 @@
 
         <div style="display: flex; gap: 15px; margin-top: 18px;">
           <button class="cyber-btn cyber-btn-secondary"
-            style="flex: 1; border-radius: 8px; padding: 9px; font-size: 0.85rem;" (click)="currentView = 'landing';">
+            style="flex: 1; border-radius: 8px; padding: 9px; font-size: 0.85rem;" (click)="goBackToLanding()">
             {{ translations[selectedLang]['loginBtnBack'] }}
           </button>
           <button class="cyber-btn cyber-btn-primary"
@@ -337,7 +324,6 @@
         </div>
       </div>
 
-      <!-- Toggle between login and register -->
       <div style="text-align: center; margin-top: 14px; border-top: 1px solid var(--glass-border); padding-top: 12px;">
         <button style="background: none; border: none; cursor: pointer; font-size: 0.75rem; color: var(--accent-cyan); text-decoration: underline;"
           (click)="isOperatorRegisterMode = !isOperatorRegisterMode;">
@@ -438,6 +424,13 @@
       <div class="cyber-input-group">
         <label class="cyber-input-label">{{ translations[selectedLang]['regTokenLabel'] }}</label>
         <input type="text" class="cyber-input" [(ngModel)]="invitationToken" disabled class="cyber-input token-code">
+      </div>
+
+      
+      <div class="cyber-input-group" *ngIf="invitationRole === 'OPERATOR'">
+        <label class="cyber-input-label" style="color: #ffd700;">CLAVE SECRETA DE OPERADOR (PROPORCIONADA POR EL OWNER)</label>
+        <input type="text" class="cyber-input" [(ngModel)]="registerSecretKey" placeholder="NP-XXXX-XXXX"
+          style="border-color: rgba(255, 215, 0, 0.35); font-family: monospace; font-weight: 700; text-transform: uppercase;">
       </div>
 
       <div class="cyber-input-group">
@@ -1265,7 +1258,7 @@
     <app-admin-dashboard *ngIf="currentView === 'operator'" [summary]="summary" [personalData]="personalData"
       [selectedLang]="selectedLang" [whatsappPhone]="whatsappPhone" [paidContractorIds]="globalPaidIds"
       [isDemoMode]="isOperatorDemoMode" [paymentMethod]="paymentMethod" [uploadedDocs]="uploadedDocs"
-      [email]="invitationEmail" [realProcessId]="processId" (reviewCompleted)="refreshSummary()"
+      [email]="invitationEmail" [realProcessId]="processId" [userRole]="userRole" (reviewCompleted)="refreshSummary()"
       (paymentCompleted)="handlePaymentCompleted($event)">
     </app-admin-dashboard>
 

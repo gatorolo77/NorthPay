@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 interface OnboardingSummary {
@@ -37,10 +37,22 @@ interface OnboardingProcess {
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+  @ViewChild('langCarousel') langCarousel!: ElementRef;
+
+  languagesList = [
+    { code: 'en', name: 'English', flag: 'https://flagcdn.com/us.svg' },
+    { code: 'es', name: 'Español', flag: 'https://flagcdn.com/es.svg' },
+    { code: 'fr', name: 'Français', flag: 'https://flagcdn.com/fr.svg' },
+    { code: 'pt', name: 'Português', flag: 'https://flagcdn.com/pt.svg' },
+    { code: 'zh', name: '中文', flag: 'https://flagcdn.com/cn.svg' },
+    { code: 'it', name: 'Italiano', flag: 'https://flagcdn.com/it.svg' }
+  ];
+
   currentView: 'landing' | 'welcome' | 'register' | 'onboarding' | 'operator' | 'login' | 'contractor_login' = 'landing';
   previousView: 'landing' | 'welcome' | 'register' | 'onboarding' | 'login' | 'contractor_login' = 'landing';
   apiBaseUrl = 'http://localhost:8080/api';
   isOperatorDemoMode = true;
+  userRole = 'OPERATOR';
   cloudinaryCloudName = 'northpay-demo';
   cloudinaryUploadPreset = 'northpay_preset';
 
@@ -50,6 +62,7 @@ export class AppComponent implements OnInit {
   invitationRole = 'CONTRACTOR';
   registerPassword = '';
   registerConfirmPassword = '';
+  registerSecretKey = '';
   showRegisterPassword = false;
   loginEmail = '';
   loginPassword = '';
@@ -58,6 +71,7 @@ export class AppComponent implements OnInit {
   adminPass = '';
   adminSetupKey = '';
   isOperatorRegisterMode = false;
+  isOwnerMode = false;
   showAdminPassword = false;
   userId = 1;
   processId = 1;
@@ -851,12 +865,14 @@ export class AppComponent implements OnInit {
     this.http.post(`${this.apiBaseUrl}/auth/register`, {
       email: this.invitationEmail,
       password: this.registerPassword,
-      token: this.invitationToken
+      token: this.invitationToken,
+      secretKey: this.registerSecretKey ? this.registerSecretKey.trim().toUpperCase() : ''
     }).subscribe({
       next: (user: any) => {
         this.addLocalNotification('Registrado correctamente', 'SUCCESS');
         this.registerPassword = '';
         this.registerConfirmPassword = '';
+        this.registerSecretKey = '';
         
         if (this.invitationRole === 'OPERATOR') {
           this.adminUser = this.invitationEmail;
@@ -1063,19 +1079,43 @@ export class AppComponent implements OnInit {
   }
 
   submitAdminLogin() {
-    this.http.post(`${this.apiBaseUrl}/auth/login`, {
+    this.http.post<any>(`${this.apiBaseUrl}/auth/login`, {
       email: this.adminUser,
       password: this.adminPass
     }).subscribe({
-      next: () => {
-        this.addLocalNotification('Bienvenido de vuelta, Administrador.', 'SUCCESS');
+      next: (user) => {
+        this.userId = user.id;
+        this.userRole = user.role;
         this.isOperatorDemoMode = false;
+        this.isOwnerMode = false;
+        if (user.role === 'OWNER') {
+          this.addLocalNotification('Bienvenido de vuelta, Propietario (Owner).', 'SUCCESS');
+        } else {
+          this.addLocalNotification('Bienvenido de vuelta, Operador.', 'SUCCESS');
+        }
         this.loadOperatorPanel();
       },
       error: () => {
         this.addLocalNotification('Acceso Denegado: Verifica usuario y clave.', 'ERROR');
       }
     });
+  }
+
+  openOwnerDirectLogin() {
+    this.currentView = 'login';
+    this.isOperatorRegisterMode = false;
+    this.isOwnerMode = true;
+    this.adminUser = 'owner@northpay.com';
+    this.adminPass = '';
+    this.addLocalNotification('Terminal de Propietario: Por favor ingresá tu Llave de Oro.', 'INFO');
+  }
+
+  goBackToLanding() {
+    this.currentView = 'landing';
+    this.isOperatorRegisterMode = false;
+    this.isOwnerMode = false;
+    this.adminUser = '';
+    this.adminPass = '';
   }
 
   submitOperatorRegister() {
@@ -1185,6 +1225,10 @@ export class AppComponent implements OnInit {
     this.notifications = [];
     this.previousView = this.currentView as any;
     this.currentView = 'operator';
+    if (this.isOperatorDemoMode) {
+      this.userRole = 'OPERATOR';
+      return;
+    }
     this.http.get<OnboardingProcess[]>(`${this.apiBaseUrl}/operator/processes`).subscribe({
       next: (procs) => this.operatorProcesses = procs,
       error: (err) => this.handleError(err)
@@ -1196,6 +1240,8 @@ export class AppComponent implements OnInit {
       this.currentView = 'landing';
       this.adminUser = '';
       this.adminPass = '';
+      this.isOperatorDemoMode = true;
+      this.userRole = 'OPERATOR';
       this.addLocalNotification(this.selectedLang === 'es' ? 'Sesión cerrada correctamente.' : 'Successfully logged out.', 'INFO');
     } else {
       this.currentView = this.previousView as any;
@@ -1565,6 +1611,48 @@ export class AppComponent implements OnInit {
     }
   }
 
+  getD(langCode: string): number {
+    const targetIndex = this.languagesList.findIndex(l => l.code === langCode);
+    const activeIndex = this.languagesList.findIndex(l => l.code === this.selectedLang);
+    if (targetIndex === -1 || activeIndex === -1) return 0;
+    
+    let diff = targetIndex - activeIndex;
+    const n = this.languagesList.length;
+    
+    if (diff > n / 2) {
+      diff -= n;
+    } else if (diff < -n / 2) {
+      diff += n;
+    }
+    return diff;
+  }
+
+  getAbsD(langCode: string): number {
+    return Math.abs(this.getD(langCode));
+  }
+
+  onLangWheel(event: WheelEvent) {
+    event.preventDefault();
+    if (event.deltaY < 0) {
+      this.scrollLanguages('up');
+    } else if (event.deltaY > 0) {
+      this.scrollLanguages('down');
+    }
+  }
+
+  scrollLanguages(direction: 'up' | 'down') {
+    const activeIndex = this.languagesList.findIndex(l => l.code === this.selectedLang);
+    if (activeIndex === -1) return;
+    
+    let newIndex = activeIndex;
+    if (direction === 'up') {
+      newIndex = (activeIndex - 1 + this.languagesList.length) % this.languagesList.length;
+    } else {
+      newIndex = (activeIndex + 1) % this.languagesList.length;
+    }
+    this.changeLanguage(this.languagesList[newIndex].code);
+  }
+
   loadNotifications() {
     this.http.get<Notification[]>(`${this.apiBaseUrl}/notifications?userId=${this.userId}`).subscribe({
       next: (notifs) => this.notifications = notifs,
@@ -1580,6 +1668,16 @@ export class AppComponent implements OnInit {
 
   handleError(err: any) {
     console.error('[NorthPay Error]', err);
-    this.addLocalNotification('Error de conexión o validación en el servidor.', 'ERROR');
+    let errorMsg = 'Error de conexión o validación en el servidor.';
+    if (err) {
+      if (typeof err.error === 'string' && err.error.trim().length > 0) {
+        errorMsg = err.error;
+      } else if (err.error && typeof err.error.message === 'string' && err.error.message.trim().length > 0) {
+        errorMsg = err.error.message;
+      } else if (err.message && typeof err.message === 'string' && err.message.trim().length > 0) {
+        errorMsg = err.message;
+      }
+    }
+    this.addLocalNotification(errorMsg, 'ERROR');
   }
 }

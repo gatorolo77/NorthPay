@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 interface OnboardingSummary {
@@ -8,6 +8,7 @@ interface OnboardingSummary {
   steps: { type: string; status: string }[];
   canProceed: boolean;
   blockingIssues: string[];
+  whatsappVerificationCode?: string;
 }
 
 interface Notification {
@@ -24,7 +25,7 @@ interface Notification {
   templateUrl: './onboarding.component.html',
   styleUrls: ['./onboarding.component.css']
 })
-export class OnboardingComponent implements OnInit {
+export class OnboardingComponent implements OnInit, OnDestroy {
   currentView: 'welcome' | 'register' | 'onboarding' = 'welcome';
   apiBaseUrl = 'http://localhost:8080/api';
   isLocalMock = true;
@@ -61,6 +62,7 @@ export class OnboardingComponent implements OnInit {
   isSendingWhatsapp = false;
   isVerifyingWhatsapp = false;
   whatsappVerified = false;
+  whatsappInterval: any;
 
   personalData = {
     firstName: '',
@@ -135,6 +137,10 @@ export class OnboardingComponent implements OnInit {
 
   ngOnInit() {
     this.testBackendConnection();
+  }
+
+  ngOnDestroy() {
+    this.stopWhatsappPolling();
   }
 
   testBackendConnection() {
@@ -392,52 +398,132 @@ export class OnboardingComponent implements OnInit {
 
   sendWhatsappCode() {
     this.isSendingWhatsapp = true;
-    setTimeout(() => {
-      this.isSendingWhatsapp = false;
-      this.addLocalNotification('Redirigiendo a WhatsApp real...', 'INFO');
-      this.whatsappCode = '123456';
-
-      const cleanPhone = this.whatsappPhone.replace(/[^0-9]/g, '');
-      const text = `¡Hola NorthPay! Confirmo mi identidad para el proceso de Onboarding. Mi código de activación de prueba es: 123456`;
-      const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
-
-      window.open(url, '_blank');
-      this.addLocalNotification('Código de activación listo: escribe 123456 en pantalla.', 'SUCCESS');
-    }, 1200);
+    if (this.isLocalMock) {
+      setTimeout(() => {
+        this.isSendingWhatsapp = false;
+        const code = "NP-" + String(Math.floor(1000 + Math.random() * 9000));
+        this.summary.whatsappVerificationCode = code;
+        this.addLocalNotification('Código de simulación generado: ' + code, 'SUCCESS');
+        this.refreshSummary();
+      }, 1000);
+    } else {
+      this.http.post<OnboardingSummary>(`${this.apiBaseUrl}/onboarding/${this.processId}/whatsapp/send?phone=${encodeURIComponent(this.whatsappPhone)}`, {}).subscribe({
+        next: (sum) => {
+          this.isSendingWhatsapp = false;
+          this.summary = sum;
+          this.addLocalNotification('Código de verificación de WhatsApp generado con éxito.', 'SUCCESS');
+          this.startWhatsappPolling();
+        },
+        error: (err) => {
+          this.isSendingWhatsapp = false;
+          this.handleError(err);
+        }
+      });
+    }
   }
 
   verifyWhatsappCode() {
     this.isVerifyingWhatsapp = true;
-    setTimeout(() => {
-      this.isVerifyingWhatsapp = false;
-      if (this.whatsappCode === '123456') {
-        this.whatsappVerified = true;
-        this.personalData.phone = this.whatsappPhone;
-        
-        // 🌐 Smart Country Auto-Detection based on verification dial-code
-        const cleanNum = this.whatsappPhone.replace(/\D/g, '');
-        if (cleanNum.startsWith('54')) {
-          this.personalData.country = 'Argentina';
-        } else if (cleanNum.startsWith('34')) {
-          this.personalData.country = 'Spain';
-        } else if (cleanNum.startsWith('52')) {
-          this.personalData.country = 'Mexico';
-        } else if (cleanNum.startsWith('57')) {
-          this.personalData.country = 'Colombia';
-        } else if (cleanNum.startsWith('55')) {
-          this.personalData.country = 'Brazil';
-        } else if (cleanNum.startsWith('56')) {
-          this.personalData.country = 'Chile';
-        } else if (cleanNum.startsWith('1')) {
-          this.personalData.country = 'United States';
+    if (this.isLocalMock) {
+      setTimeout(() => {
+        this.isVerifyingWhatsapp = false;
+        const expectedCode = this.summary.whatsappVerificationCode || 'NP-9999';
+        if (this.whatsappCode.trim().toUpperCase() === expectedCode.toUpperCase()) {
+          this.whatsappVerified = true;
+          this.personalData.phone = this.whatsappPhone;
+          this.autoDetectCountry(this.whatsappPhone);
+          this.summary.steps[0].status = 'COMPLETED';
+          this.summary.steps[1].status = 'IN_PROGRESS';
+          this.addLocalNotification('WhatsApp verificado correctamente. ¡Onboarding desbloqueado!', 'SUCCESS');
+          this.refreshSummary();
+        } else {
+          this.addLocalNotification('Código incorrecto. Intenta de nuevo.', 'ERROR');
         }
-        this.summary.steps[0].status = 'COMPLETED';
-        this.summary.steps[1].status = 'IN_PROGRESS';
-        this.addLocalNotification('WhatsApp verificado correctamente. ¡Onboarding desbloqueado!', 'SUCCESS');
-        this.refreshSummary();
-      } else {
-        this.addLocalNotification('Código incorrecto. Intenta de nuevo.', 'ERROR');
+      }, 1000);
+    } else {
+      this.http.post<OnboardingSummary>(`${this.apiBaseUrl}/onboarding/${this.processId}/whatsapp/verify?code=${encodeURIComponent(this.whatsappCode)}`, {}).subscribe({
+        next: (sum) => {
+          this.isVerifyingWhatsapp = false;
+          this.summary = sum;
+          this.addLocalNotification('¡WhatsApp verificado correctamente!', 'SUCCESS');
+          this.personalData.phone = this.whatsappPhone;
+          this.autoDetectCountry(this.whatsappPhone);
+          this.stopWhatsappPolling();
+        },
+        error: (err) => {
+          this.isVerifyingWhatsapp = false;
+          this.handleError(err);
+        }
+      });
+    }
+  }
+
+  getWhatsAppLink(): string {
+    const companyPhone = '5493415109918';
+    const code = this.summary.whatsappVerificationCode || 'NP-XXXX';
+    const text = `Hola NorthPay, mi código de verificación es: ${code}`;
+    return `https://wa.me/${companyPhone}?text=${encodeURIComponent(text)}`;
+  }
+
+  startWhatsappPolling() {
+    this.stopWhatsappPolling();
+    this.whatsappInterval = setInterval(() => {
+      if (this.isLocalMock) {
+        return;
       }
+      this.http.get<OnboardingSummary>(`${this.apiBaseUrl}/onboarding/${this.processId}/summary`).subscribe({
+        next: (sum) => {
+          this.summary = sum;
+          const step0 = sum.steps.find(s => s.type === 'WHATSAPP_VERIFY');
+          if (sum.currentStep !== 'WHATSAPP_VERIFY' || (step0 && step0.status === 'COMPLETED')) {
+            this.stopWhatsappPolling();
+            this.addLocalNotification('¡WhatsApp verificado! Avance automático al Paso 1.', 'SUCCESS');
+            this.personalData.phone = this.whatsappPhone;
+            this.autoDetectCountry(this.whatsappPhone);
+          }
+        },
+        error: (err) => console.error('[NorthPay] Error polling WhatsApp step status:', err)
+      });
+    }, 4000);
+  }
+
+  stopWhatsappPolling() {
+    if (this.whatsappInterval) {
+      clearInterval(this.whatsappInterval);
+      this.whatsappInterval = null;
+    }
+  }
+
+  autoDetectCountry(phone: string) {
+    if (!phone) return;
+    const cleanNum = phone.replace(/\D/g, '');
+    if (cleanNum.startsWith('54')) {
+      this.personalData.country = 'Argentina';
+    } else if (cleanNum.startsWith('34')) {
+      this.personalData.country = 'Spain';
+    } else if (cleanNum.startsWith('52')) {
+      this.personalData.country = 'Mexico';
+    } else if (cleanNum.startsWith('57')) {
+      this.personalData.country = 'Colombia';
+    } else if (cleanNum.startsWith('55')) {
+      this.personalData.country = 'Brazil';
+    } else if (cleanNum.startsWith('56')) {
+      this.personalData.country = 'Chile';
+    } else if (cleanNum.startsWith('1')) {
+      this.personalData.country = 'United States';
+    }
+  }
+
+  simulateWhatsappWebhookReceived() {
+    if (!this.isLocalMock) return;
+    this.addLocalNotification('Simulando recepción de mensaje de WhatsApp en backend...', 'INFO');
+    setTimeout(() => {
+      this.summary.steps[0].status = 'COMPLETED';
+      this.summary.steps[1].status = 'IN_PROGRESS';
+      this.personalData.phone = this.whatsappPhone;
+      this.autoDetectCountry(this.whatsappPhone);
+      this.addLocalNotification('¡WhatsApp verificado correctamente! (Simulación de Webhook)', 'SUCCESS');
+      this.refreshSummary();
     }, 1200);
   }
 

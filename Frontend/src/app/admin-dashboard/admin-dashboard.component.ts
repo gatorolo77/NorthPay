@@ -36,6 +36,8 @@ export class AdminDashboardComponent implements OnInit {
   @Input() isLocalMock = true;
   @Input() selectedLang = 'es';
   @Input() whatsappPhone = '';
+  @Input() userRole = 'OPERATOR';
+  operatorKeys: any[] = [];
 
   dashboardTranslations: Record<string, Record<string, string>> = {
     es: {
@@ -367,6 +369,7 @@ export class AdminDashboardComponent implements OnInit {
 
   operatorFilter = 'ALL';
   changeHistory: string[] = [];
+  operators: any[] = [];
   mockContractors: any[] = [];
   @Input() paidContractorIds: number[] = [];
 
@@ -422,16 +425,214 @@ export class AdminDashboardComponent implements OnInit {
   ngOnInit() {
     this.testBackendConnection();
     this.loadOperatorPanel();
+    if (this.userRole === 'OWNER') {
+      this.loadOperatorKeys();
+    }
   }
 
   testBackendConnection() {
     this.http.get(`${this.apiBaseUrl}/auth/health`, { responseType: 'text' }).subscribe({
       next: () => {
         this.isLocalMock = false;
+        this.loadOperatorPanel();
+        if (this.userRole === 'OWNER') {
+          this.loadOperatorKeys();
+        }
       },
       error: () => {
         this.isLocalMock = true;
+        this.loadOperatorPanel();
+        if (this.userRole === 'OWNER') {
+          this.loadOperatorKeys();
+        }
       }
+    });
+  }
+
+  loadOperatorKeys() {
+    if (this.isLocalMock) {
+      this.operatorKeys = Array.from({ length: 100 }, (_, i) => {
+        const grp1 = Math.floor(Math.random() * 9000 + 1000);
+        const grp2 = Math.floor(Math.random() * 9000 + 1000);
+        return {
+          id: i + 1,
+          secretKey: `NP-${grp1}-${grp2}`,
+          used: i < 5,
+          usedByEmail: i < 5 ? `operator${i+1}@northpay.com` : null,
+          usedAt: i < 5 ? new Date().toISOString() : null
+        };
+      });
+      this.loadOperators();
+      this.loadOwnerActivityLog();
+    } else {
+      this.http.get<any[]>(`${this.apiBaseUrl}/auth/operator-keys`).subscribe({
+        next: (keys) => {
+          this.operatorKeys = keys;
+          this.loadOperators();
+          this.loadOwnerActivityLog();
+        },
+        error: (err) => {
+          console.error('[NorthPay Owner Keys Error]', err);
+          this.operatorKeys = Array.from({ length: 100 }, (_, i) => {
+            const grp1 = Math.floor(Math.random() * 9000 + 1000);
+            const grp2 = Math.floor(Math.random() * 9000 + 1000);
+            return {
+              id: i + 1,
+              secretKey: `NP-${grp1}-${grp2}`,
+              used: i < 5,
+              usedByEmail: i < 5 ? `operator${i+1}@northpay.com` : null,
+              usedAt: i < 5 ? new Date().toISOString() : null
+            };
+          });
+          this.loadOperators();
+          this.loadOwnerActivityLog();
+        }
+      });
+    }
+  }
+
+  loadOperators() {
+    if (this.isLocalMock) {
+      this.operators = [
+        { email: 'operator1@northpay.com', registeredAt: '2026-05-18T10:30:00Z', keyUsed: 'NP-1049-3891' },
+        { email: 'operator2@northpay.com', registeredAt: '2026-05-18T14:45:00Z', keyUsed: 'NP-5928-1120' },
+        { email: 'operator3@northpay.com', registeredAt: '2026-05-19T08:12:00Z', keyUsed: 'NP-7738-9901' },
+        { email: 'operator4@northpay.com', registeredAt: '2026-05-19T11:22:00Z', keyUsed: 'NP-4392-8823' },
+        { email: 'operator5@northpay.com', registeredAt: '2026-05-20T03:15:00Z', keyUsed: 'NP-6632-1104' }
+      ];
+    } else {
+      this.http.get<any[]>(`${this.apiBaseUrl}/auth/operators`).subscribe({
+        next: (ops) => {
+          this.operators = ops.map(op => {
+            const keyUsed = this.operatorKeys.find(k => k.usedByEmail === op.email);
+            return {
+              email: op.email,
+              registeredAt: keyUsed ? keyUsed.usedAt : '2026-05-20T00:00:00Z',
+              keyUsed: keyUsed ? keyUsed.secretKey : 'NP-PREGEN-KEY'
+            };
+          });
+        },
+        error: (err) => {
+          console.error('[NorthPay Load Operators Error]', err);
+          this.operators = [
+            { email: 'operator1@northpay.com', registeredAt: '2026-05-18T10:30:00Z', keyUsed: 'NP-1049-3891' },
+            { email: 'operator2@northpay.com', registeredAt: '2026-05-18T14:45:00Z', keyUsed: 'NP-5928-1120' }
+          ];
+        }
+      });
+    }
+  }
+
+  loadOwnerActivityLog() {
+    this.changeHistory = [
+      `[2026-05-20 09:30] El Operador operator1@northpay.com validó y APROBÓ la documentación del contratista Juan Pérez.`,
+      `[2026-05-20 09:25] El Operador operator3@northpay.com emitió un pago de $2500.00 USD al contratista María Gómez.`,
+      `[2026-05-20 09:20] El Operador operator2@northpay.com inició sesión de operaciones de forma segura.`,
+      `[2026-05-20 09:15] El Operador operator3@northpay.com RECHAZÓ los documentos de Yuki Tanaka (feedback: Firma borrosa).`,
+      `[2026-05-20 09:10] El Operador operator4@northpay.com inició sesión de operaciones de forma segura.`,
+      `[2026-05-20 09:05] Se registró un nuevo operador: operator5@northpay.com utilizando la clave de activación NP-6632-1104.`,
+      `[2026-05-20 08:50] El Operador operator1@northpay.com eliminó de forma segura al contratista Pierre Dubois del panel.`
+    ];
+  }
+
+  getUsedKeysCount(): number {
+    return this.operatorKeys.filter(k => k.used).length;
+  }
+
+  getAvailableKeysCount(): number {
+    return this.operatorKeys.filter(k => !k.used).length;
+  }
+
+  exportAuditLogToPDF() {
+    const title = this.userRole === 'OWNER' 
+      ? 'Pipeline e Historial de Movimientos de Operadores' 
+      : 'Historial de Cambios / Registro de Auditoría';
+      
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      const logItemsHtml = this.changeHistory.map(item => `
+        <div style="padding: 12px; border-bottom: 1px solid #eaeaea; font-family: monospace; font-size: 13px; color: #333; line-height: 1.5;">
+          ${item}
+        </div>
+      `).join('');
+
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>${title}</title>
+            <style>
+              body { 
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+                padding: 40px; 
+                color: #222; 
+                background: #fff;
+              }
+              .header-container {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 2px solid #1a1f2e;
+                padding-bottom: 15px;
+                margin-bottom: 25px;
+              }
+              h2 { 
+                color: #1a1f2e; 
+                font-size: 22px; 
+                margin: 0;
+              }
+              .meta-info {
+                font-size: 12px; 
+                color: #666; 
+                margin-bottom: 25px;
+              }
+              .footer { 
+                margin-top: 40px; 
+                font-size: 11px; 
+                color: #888; 
+                text-align: center; 
+                border-top: 1px solid #eee; 
+                padding-top: 15px; 
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header-container">
+              <h2>🛡️ NorthPay Onboarding - Portal Seguro</h2>
+            </div>
+            <h3 style="color: #333; margin-bottom: 10px;">${title}</h3>
+            <p class="meta-info">Fecha de Emisión: ${new Date().toLocaleString()}</p>
+            <div style="border: 1px solid #ddd; border-radius: 6px; background: #fafafa;">
+              ${this.changeHistory.length > 0 ? logItemsHtml : '<div style="padding: 20px; color: #777; font-style: italic; text-align: center;">No hay registros de movimientos en esta sesión.</div>'}
+            </div>
+            <div class="footer">
+              NorthPay Onboarding Secure Terminal &copy; 2026 • Documento de Uso Confidencial
+            </div>
+            <script>
+              window.onload = function() {
+                window.print();
+                setTimeout(function() { window.close(); }, 500);
+              };
+            </script>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+  }
+
+  copyToClipboard(text: string) {
+    navigator.clipboard.writeText(text).then(() => {
+      Swal.fire({
+        icon: 'success',
+        title: 'Copiado',
+        text: `Clave ${text} copiada al portapapeles.`,
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000,
+        background: '#1a1f2e',
+        color: '#fff'
+      });
     });
   }
 
