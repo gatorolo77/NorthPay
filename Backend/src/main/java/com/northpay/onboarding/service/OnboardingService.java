@@ -337,7 +337,7 @@ public class OnboardingService {
         stepRepository.save(step);
 
         notificationService.sendNotification(process.getContractorUserId(),
-                "Código de verificación de WhatsApp generado con éxito. Procede a enviar el mensaje desde tu celular.", "SUCCESS");
+                "Tu código de verificación de WhatsApp de NorthPay es: " + code, "SUCCESS");
 
         return getOnboardingSummary(processId);
     }

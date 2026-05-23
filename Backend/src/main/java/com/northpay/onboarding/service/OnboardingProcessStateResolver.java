@@ -124,8 +124,10 @@ public class OnboardingProcessStateResolver {
 
         OnboardingStep whatsappStep = stepsMap.get(StepType.WHATSAPP_VERIFY);
         String whatsappCode = null;
+        String whatsappPhone = null;
         if (whatsappStep != null && whatsappStep.getData() != null) {
             whatsappCode = (String) whatsappStep.getData().get("sentCode");
+            whatsappPhone = (String) whatsappStep.getData().get("phone");
         }
 
         return OnboardingSummaryDto.builder()
@@ -136,6 +138,7 @@ public class OnboardingProcessStateResolver {
                 .canProceed(canProceed)
                 .blockingIssues(blockingIssues)
                 .whatsappVerificationCode(whatsappCode)
+                .whatsappPhone(whatsappPhone)
                 .build();
     }
 

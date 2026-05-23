@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 interface OnboardingSummary {
@@ -8,6 +8,8 @@ interface OnboardingSummary {
   steps: { type: string; status: string }[];
   canProceed: boolean;
   blockingIssues: string[];
+  whatsappVerificationCode?: string;
+  whatsappPhone?: string;
 }
 
 interface Notification {
@@ -36,7 +38,7 @@ interface OnboardingProcess {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   @ViewChild('langCarousel') langCarousel!: ElementRef;
 
   languagesList = [
@@ -93,6 +95,7 @@ export class AppComponent implements OnInit {
     blockingIssues: []
   };
 
+  whatsappInterval: any;
   whatsappPhone = '';
   whatsappCode = '';
   isSendingWhatsapp = false;
@@ -232,7 +235,7 @@ export class AppComponent implements OnInit {
       persCountry: "PAÍS DE RESIDENCIA FISCAL",
       persBtnSave: "Guardar y Siguiente Paso",
       navOperator: "Panel de Operaciones",
-      notifCodeSent: "📧 Código de verificación enviado a tu correo electrónico. Revisá tu bandeja de entrada.",
+      notifCodeSent: "✅ Código de WhatsApp generado con éxito. Se abrirá WhatsApp para enviar el código.",
       notifWsSuccess: "WhatsApp verificado correctamente. ¡Onboarding desbloqueado!",
       notifWsFail: "Código incorrecto. Intenta de nuevo.",
       notifPersSave: "Datos personales guardados con éxito.",
@@ -318,7 +321,7 @@ export class AppComponent implements OnInit {
       persCountry: "TAX RESIDENCE COUNTRY",
       persBtnSave: "Save and Next Step",
       navOperator: "Operator Panel",
-      notifCodeSent: "📧 Verification code sent to your email address. Check your inbox.",
+      notifCodeSent: "✅ WhatsApp verification code generated. WhatsApp will open to send the code.",
       notifWsSuccess: "WhatsApp verified successfully. Onboarding unlocked!",
       notifWsFail: "Incorrect code. Please try again.",
       notifPersSave: "Personal data saved successfully.",
@@ -404,7 +407,7 @@ export class AppComponent implements OnInit {
       persCountry: "PAYS DE RÉSIDENCE FISCALE",
       persBtnSave: "Enregistrer et Étape Suivante",
       navOperator: "Panneau Opérateur",
-      notifCodeSent: "📧 Code de vérification envoyé à votre adresse e-mail. Vérifiez votre boîte de réception.",
+      notifCodeSent: "✅ Code WhatsApp généré. WhatsApp s'ouvrira pour envoyer le code.",
       notifWsSuccess: "WhatsApp vérifié avec succès. Intégration déverrouillée !",
       notifWsFail: "Code incorrect. Veuillez réessayer.",
       notifPersSave: "Données personnelles enregistrées avec succès.",
@@ -490,7 +493,7 @@ export class AppComponent implements OnInit {
       persCountry: "PAÍS DE RESIDÊNCIA FISCAL",
       persBtnSave: "Salvar e Próxima Etapa",
       navOperator: "Painel de Operações",
-      notifCodeSent: "📧 Código de verificação enviado ao seu e-mail. Verifique sua caixa de entrada.",
+      notifCodeSent: "✅ Código do WhatsApp gerado com sucesso. O WhatsApp abrirá para enviar o código.",
       notifWsSuccess: "WhatsApp verificado com sucesso. Integração desbloqueada!",
       notifWsFail: "Código incorreto. Por favor tente novamente.",
       notifPersSave: "Dados pessoais salvos com sucesso.",
@@ -576,7 +579,7 @@ export class AppComponent implements OnInit {
       persCountry: "税务居留国",
       persBtnSave: "保存并下一步",
       navOperator: "操作面板",
-      notifCodeSent: "📧 验证码已发送至您的电子邮件。请查看收件筱。",
+      notifCodeSent: "✅ 已生成 WhatsApp 验证码。将自动打开 WhatsApp 并发送消息。",
       notifWsSuccess: "WhatsApp 验证成功。入职流程已解锁！",
       notifWsFail: "代码错误。请再试一次。",
       notifPersSave: "个人数据已成功保存。",
@@ -662,7 +665,7 @@ export class AppComponent implements OnInit {
       persCountry: "PAESE DI RESIDENZA FISCALE",
       persBtnSave: "Salva e Prossimo Passo",
       navOperator: "Pannello Operazioni",
-      notifCodeSent: "📧 Codice di verifica inviato alla tua email. Controlla la posta in arrivo.",
+      notifCodeSent: "✅ Codice di verifica WhatsApp generato con successo. Si aprirà WhatsApp per inviare il messaggio.",
       notifWsSuccess: "WhatsApp verificato con successo. Onboarding sbloccato!",
       notifWsFail: "Codice non corretto. Riprova.",
       notifPersSave: "Dati personali salvati con successo.",
@@ -902,6 +905,9 @@ export class AppComponent implements OnInit {
     this.http.get<OnboardingSummary>(`${this.apiBaseUrl}/onboarding/${this.processId}/summary`).subscribe({
       next: (summary) => {
         this.summary = summary;
+        if (summary.whatsappPhone) {
+          this.whatsappPhone = summary.whatsappPhone;
+        }
         this.loadNotifications();
       },
       error: (err) => this.handleError(err)
@@ -1296,14 +1302,33 @@ export class AppComponent implements OnInit {
 
   sendWhatsappCode() {
     this.isSendingWhatsapp = true;
-    this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/whatsapp/send?phone=${encodeURIComponent(this.whatsappPhone)}`, {}).subscribe({
-      next: () => {
+    // Open a blank tab synchronously to prevent popup blocker from blocking it
+    const waWindow = window.open('', '_blank');
+    
+    this.http.post<OnboardingSummary>(`${this.apiBaseUrl}/onboarding/${this.processId}/whatsapp/send?phone=${encodeURIComponent(this.whatsappPhone)}`, {}).subscribe({
+      next: (summary) => {
         this.isSendingWhatsapp = false;
+        this.summary = summary;
         this.addLocalNotification(this.translations[this.selectedLang]['notifCodeSent'], 'SUCCESS');
+        
+        // Generate the WhatsApp Link dynamically and navigate the tab
+        const companyPhone = '5493415109918';
+        const code = summary.whatsappVerificationCode || 'NP-XXXX';
+        const text = `Hola NorthPay, mi código de verificación es: ${code}`;
+        const waLink = `https://wa.me/${companyPhone}?text=${encodeURIComponent(text)}`;
+        
+        if (waWindow) {
+          waWindow.location.href = waLink;
+        }
+        
         this.refreshSummary();
+        this.startWhatsappPolling();
       },
       error: (err) => {
         this.isSendingWhatsapp = false;
+        if (waWindow) {
+          waWindow.close();
+        }
         this.handleError(err);
       }
     });
@@ -1326,12 +1351,66 @@ export class AppComponent implements OnInit {
         else if (cleanNum.startsWith('1')) this.personalData.country = 'United States';
         this.addLocalNotification(this.translations[this.selectedLang]['notifWsSuccess'], 'SUCCESS');
         this.refreshSummary();
+        this.stopWhatsappPolling();
       },
       error: (err) => {
         this.isVerifyingWhatsapp = false;
         this.handleError(err);
       }
     });
+  }
+
+  getWhatsAppLink(): string {
+    const companyPhone = '5493415109918';
+    const code = this.summary.whatsappVerificationCode || 'NP-XXXX';
+    const text = `Hola NorthPay, mi código de verificación es: ${code}`;
+    return `https://wa.me/${companyPhone}?text=${encodeURIComponent(text)}`;
+  }
+
+  startWhatsappPolling() {
+    this.stopWhatsappPolling();
+    this.whatsappInterval = setInterval(() => {
+      this.http.get<OnboardingSummary>(`${this.apiBaseUrl}/onboarding/${this.processId}/summary`).subscribe({
+        next: (sum) => {
+          this.summary = sum;
+          const step0 = sum.steps.find(s => s.type === 'WHATSAPP_VERIFY');
+          if (sum.currentStep !== 'WHATSAPP_VERIFY' || (step0 && step0.status === 'COMPLETED')) {
+            this.stopWhatsappPolling();
+            this.addLocalNotification('¡WhatsApp verificado! Avance automático al Paso 1.', 'SUCCESS');
+            this.personalData.phone = this.whatsappPhone;
+            const cleanNum = this.whatsappPhone.replace(/\D/g, '');
+            if (cleanNum.startsWith('54')) this.personalData.country = 'Argentina';
+            else if (cleanNum.startsWith('34')) this.personalData.country = 'Spain';
+            else if (cleanNum.startsWith('52')) this.personalData.country = 'Mexico';
+            else if (cleanNum.startsWith('57')) this.personalData.country = 'Colombia';
+            else if (cleanNum.startsWith('55')) this.personalData.country = 'Brazil';
+            else if (cleanNum.startsWith('56')) this.personalData.country = 'Chile';
+            else if (cleanNum.startsWith('1')) this.personalData.country = 'United States';
+          }
+        },
+        error: (err) => console.error('[NorthPay] Error polling WhatsApp step status:', err)
+      });
+    }, 4000);
+  }
+
+  stopWhatsappPolling() {
+    if (this.whatsappInterval) {
+      clearInterval(this.whatsappInterval);
+      this.whatsappInterval = null;
+    }
+  }
+
+  simulateOtpReceived() {
+    if (this.summary.whatsappVerificationCode) {
+      this.whatsappCode = this.summary.whatsappVerificationCode;
+      this.addLocalNotification('Código de prueba recibido (Simulación). Presiona Verificar.', 'INFO');
+    } else {
+      this.addLocalNotification('No se ha generado ningún código aún.', 'ERROR');
+    }
+  }
+
+  ngOnDestroy() {
+    this.stopWhatsappPolling();
   }
 
   handlePaymentCompleted(event: any) {

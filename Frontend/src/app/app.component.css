@@ -1573,3 +1573,163 @@
     letter-spacing: -0.3px;
   }
 }
+
+/* --- WhatsApp Verification Flow --- */
+.whatsapp-verification-flow {
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.instruction-box {
+  background: rgba(10, 14, 28, 0.4);
+  border: 1px solid rgba(0, 245, 230, 0.15);
+  box-shadow: inset 0 0 12px rgba(0, 245, 230, 0.03);
+  backdrop-filter: blur(8px);
+}
+
+.instruction-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 12px;
+}
+
+.instruction-step:last-child {
+  margin-bottom: 0;
+}
+
+.instruction-step .step-badge {
+  background: rgba(0, 245, 230, 0.1);
+  border: 1px solid rgba(0, 245, 230, 0.3);
+  color: var(--accent-cyan);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+  box-shadow: 0 0 8px rgba(0, 245, 230, 0.15);
+}
+
+.instruction-step .step-text {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.code-display-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2, 9, 8, 0.6);
+  border: 1px solid rgba(0, 255, 157, 0.15);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 15px;
+  box-shadow: 0 0 20px rgba(0, 255, 157, 0.05);
+}
+
+.code-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.glowing-code {
+  font-family: 'Outfit', 'Courier New', monospace;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--accent-mint);
+  letter-spacing: 4px;
+  text-shadow: 0 0 15px rgba(0, 255, 157, 0.4);
+}
+
+.whatsapp-verify-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+  padding: 14px 28px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3), 0 0 10px rgba(37, 211, 102, 0.15);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+.whatsapp-verify-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.6s ease;
+}
+
+.whatsapp-verify-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4), 0 0 15px rgba(37, 211, 102, 0.25);
+}
+
+.whatsapp-verify-btn:hover::before {
+  left: 100%;
+}
+
+.whatsapp-verify-btn:active {
+  transform: translateY(1px);
+}
+
+.waiting-indicator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-top: 10px;
+}
+
+.cyber-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(0, 245, 230, 0.1);
+  border-top-color: var(--accent-cyan);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  box-shadow: 0 0 8px rgba(0, 245, 230, 0.3);
+}
+
+.sim-webhook-box {
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transition: border-color 0.3s ease;
+}
+
+.sim-webhook-box:hover {
+  border-color: rgba(255, 190, 26, 0.4) !important;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
