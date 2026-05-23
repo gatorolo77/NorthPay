@@ -10,6 +10,10 @@ interface OnboardingSummary {
   blockingIssues: string[];
   whatsappVerificationCode?: string;
   whatsappPhone?: string;
+  firstName?: string;
+  lastName?: string;
+  personalPhone?: string;
+  country?: string;
 }
 
 interface Notification {
@@ -908,6 +912,28 @@ export class AppComponent implements OnInit, OnDestroy {
         if (summary.whatsappPhone) {
           this.whatsappPhone = summary.whatsappPhone;
         }
+
+        // Populate personal data fields if they exist in the summary
+        if (summary.firstName) this.personalData.firstName = summary.firstName;
+        if (summary.lastName) this.personalData.lastName = summary.lastName;
+
+        // Load personal phone or fallback to verified WhatsApp phone
+        this.personalData.phone = summary.personalPhone || summary.whatsappPhone || '';
+
+        if (summary.country) {
+          this.personalData.country = summary.country;
+        } else if (this.personalData.phone) {
+          // Detect country if country is empty or Spain by default but phone prefix doesn't match
+          const cleanNum = this.personalData.phone.replace(/\D/g, '');
+          if (cleanNum.startsWith('54')) this.personalData.country = 'Argentina';
+          else if (cleanNum.startsWith('34')) this.personalData.country = 'Spain';
+          else if (cleanNum.startsWith('52')) this.personalData.country = 'Mexico';
+          else if (cleanNum.startsWith('57')) this.personalData.country = 'Colombia';
+          else if (cleanNum.startsWith('55')) this.personalData.country = 'Brazil';
+          else if (cleanNum.startsWith('56')) this.personalData.country = 'Chile';
+          else if (cleanNum.startsWith('1')) this.personalData.country = 'United States';
+        }
+
         this.loadNotifications();
       },
       error: (err) => this.handleError(err)

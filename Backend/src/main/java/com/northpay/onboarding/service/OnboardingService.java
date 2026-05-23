@@ -63,7 +63,16 @@ public class OnboardingService {
         OnboardingProcess process = processRepository.findById(processId)
                 .orElseThrow(() -> new IllegalArgumentException("Process not found with ID: " + processId));
         List<OnboardingStep> steps = stepRepository.findByProcessId(processId);
-        return stateResolver.resolve(process, steps);
+        OnboardingSummaryDto summary = stateResolver.resolve(process, steps);
+
+        profileRepository.findByUserId(process.getContractorUserId()).ifPresent(profile -> {
+            summary.setFirstName(profile.getFirstName());
+            summary.setLastName(profile.getLastName());
+            summary.setPersonalPhone(profile.getPhone());
+            summary.setCountry(profile.getCountry());
+        });
+
+        return summary;
     }
 
     @Transactional
