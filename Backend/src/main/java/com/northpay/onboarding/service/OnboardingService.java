@@ -541,4 +541,27 @@ public class OnboardingService {
                 .orElseThrow(() -> new IllegalArgumentException("Step not found"));
         return reviewStep(step.getId(), operatorId, dto);
     }
+
+    public void sendMessageToOperator(Long processId, String messageText) {
+        OnboardingProcess process = processRepository.findById(processId)
+                .orElseThrow(() -> new IllegalArgumentException("Process not found"));
+
+        ContractorProfile profile = profileRepository.findByUserId(process.getContractorUserId()).orElse(null);
+        String name = (profile != null && profile.getFirstName() != null) ? profile.getFirstName() : "Contratista #" + process.getContractorUserId();
+
+        String formattedMessage = "💬 Mensaje de " + name + ": " + messageText;
+
+        if (process.getAssignedOperatorId() != null) {
+            notificationService.sendNotification(process.getAssignedOperatorId(), formattedMessage, "INFO");
+        } else {
+            List<User> operators = userRepository.findByRole(Role.OPERATOR);
+            if (operators != null && !operators.isEmpty()) {
+                for (User op : operators) {
+                    notificationService.sendNotification(op.getId(), formattedMessage, "INFO");
+                }
+            } else {
+                notificationService.sendNotification(1L, formattedMessage, "INFO");
+            }
+        }
+    }
 }

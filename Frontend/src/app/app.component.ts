@@ -70,8 +70,15 @@ export class AppComponent implements OnInit, OnDestroy {
   registerConfirmPassword = '';
   registerSecretKey = '';
   showRegisterPassword = false;
+  loginPass = '';
   loginEmail = '';
   loginPassword = '';
+
+  contractorMessage = '';
+  isSendingMessage = false;
+  isSignModalOpen = false;
+
+  userId = 1;
   showLoginPassword = false;
   adminUser = '';
   adminPass = '';
@@ -79,7 +86,6 @@ export class AppComponent implements OnInit, OnDestroy {
   isOperatorRegisterMode = false;
   isOwnerMode = false;
   showAdminPassword = false;
-  userId = 1;
   processId = 1;
   showContractorSettings = false;
 
@@ -997,6 +1003,29 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
 
+  showSignModal() {
+    this.isSignModalOpen = true;
+  }
+
+  sendMessageToOperator() {
+    if (!this.contractorMessage || this.contractorMessage.trim() === '') return;
+    this.isSendingMessage = true;
+    this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/operator-message`, {
+      message: this.contractorMessage
+    }).subscribe({
+      next: () => {
+        this.addLocalNotification('Mensaje enviado al operador', 'SUCCESS');
+        this.contractorMessage = '';
+        this.isSendingMessage = false;
+      },
+      error: (err) => {
+        this.addLocalNotification('Error al enviar mensaje', 'ERROR');
+        console.error(err);
+        this.isSendingMessage = false;
+      }
+    });
+  }
+
   signContract() {
     this.isSigningContract = true;
     setTimeout(() => {
@@ -1180,16 +1209,8 @@ export class AppComponent implements OnInit, OnDestroy {
         this.http.post<any>(`${this.apiBaseUrl}/onboarding/initiate?contractorUserId=${this.userId}`, {}).subscribe({
           next: (process) => {
             this.processId = process.id;
-            this.http.get<OnboardingSummary>(`${this.apiBaseUrl}/onboarding/${this.processId}/summary`).subscribe({
-              next: (sum) => {
-                this.summary = sum;
-                this.currentView = 'onboarding';
-              },
-              error: (err) => {
-                console.error('[NorthPay] Failed to load summary:', err);
-                this.addLocalNotification('Error al cargar resumen de onboarding', 'ERROR');
-              }
-            });
+            this.refreshSummary();
+            this.currentView = 'onboarding';
           },
           error: (err) => {
             console.error('[NorthPay] Failed to initiate process:', err);
@@ -1391,6 +1412,16 @@ export class AppComponent implements OnInit, OnDestroy {
     const code = this.summary.whatsappVerificationCode || 'NP-XXXX';
     const text = `Hola NorthPay, mi código de verificación es: ${code}`;
     return `https://wa.me/${companyPhone}?text=${encodeURIComponent(text)}`;
+  }
+
+  getContractorFullName(): string {
+    if (this.personalData.firstName && this.personalData.firstName.trim() !== '') {
+      return this.personalData.firstName + ' ' + (this.personalData.lastName || '');
+    }
+    if (this.summary && this.summary.firstName && this.summary.firstName.trim() !== '') {
+      return this.summary.firstName + ' ' + (this.summary.lastName || '');
+    }
+    return 'Rodrigo Daremberg';
   }
 
   startWhatsappPolling() {

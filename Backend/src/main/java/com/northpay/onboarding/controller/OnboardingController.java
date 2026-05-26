@@ -144,4 +144,17 @@ public class OnboardingController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @PostMapping("/{id}/operator-message")
+    public ResponseEntity<?> sendOperatorMessage(
+            @PathVariable("id") Long processId,
+            @RequestBody MessageDto dto) {
+        try {
+            onboardingService.sendMessageToOperator(processId, dto.getMessage());
+            return ResponseEntity.ok(java.util.Map.of("status", "success", "message", "Message sent to operator"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("status", "error", "message", e.getMessage()));
+        }
+    }
 }
+

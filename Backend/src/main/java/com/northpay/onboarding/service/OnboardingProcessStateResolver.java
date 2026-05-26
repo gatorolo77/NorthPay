@@ -120,6 +120,8 @@ public class OnboardingProcessStateResolver {
             resolvedStatus = OnboardingStatus.COMPLETED;
         } else if (currentStep == StepType.IDENTITY_VERIFICATION) {
             resolvedStatus = OnboardingStatus.PENDING_VERIFICATION;
+        } else if (currentStep == StepType.DOCUMENT_UPLOAD && stepsMap.get(StepType.DOCUMENT_UPLOAD) != null && stepsMap.get(StepType.DOCUMENT_UPLOAD).getStatus() == StepStatus.IN_REVIEW) {
+            resolvedStatus = OnboardingStatus.IN_REVIEW;
         }
 
         OnboardingStep whatsappStep = stepsMap.get(StepType.WHATSAPP_VERIFY);

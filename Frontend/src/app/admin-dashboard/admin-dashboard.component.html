@@ -49,7 +49,6 @@
         </div>
       </div>
 
-      <!-- Métricas del Owner (Propietario) -->
       <div class="metrics-grid" *ngIf="userRole === 'OWNER'">
         <div class="glass-panel metric-card" style="border-color: rgba(255, 215, 0, 0.25);">
           <span class="metric-icon">⚡</span>
@@ -81,7 +80,7 @@
         </div>
       </div>
 
-      <!-- Panel de Contratistas (Solo visible para Operadores) -->
+     
       <div class="glass-panel operator-card" *ngIf="userRole !== 'OWNER'">
         <div class="dashboard-list-header">
           <h4 class="font-display" style="font-size: 1.1rem; font-weight: 600;">{{ dashboardTranslations[selectedLang]['onbProcs'] }}</h4>

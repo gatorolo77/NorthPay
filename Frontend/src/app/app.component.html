@@ -753,8 +753,7 @@
                 <p style="margin: 0 0 8px 0;"><strong>LA COMPAÑÍA:</strong> <strong>NorthPay Ltd.</strong>, con oficinas
                   centrales registradas y operando bajo las leyes vigentes de servicios financieros digitales
                   ("NorthPay").</p>
-                <p style="margin: 0;"><strong>EL CONTRATISTA:</strong> <strong>{{ personalData.firstName ?
-                    (personalData.firstName + ' ' + personalData.lastName) : 'Rodrigo Daremberg' }}</strong>, con correo
+                <p style="margin: 0;"><strong>EL CONTRATISTA:</strong> <strong>{{ getContractorFullName() }}</strong>, con correo
                   de registro <strong>{{ (invitationEmail === 'contractor@northpay.com' ? loginEmail : invitationEmail)
                     || 'rodrigo.daremberg@gmail.com' }}</strong> y teléfono verificado <strong>{{ whatsappPhone ||
                     '+5491160001234' }}</strong>.</p>
@@ -798,8 +797,7 @@
 
             <div
               style="font-family: 'Courier New', monospace; font-size: 1.4rem; color: var(--accent-cyan); font-weight: 700; letter-spacing: 1px; padding: 10px; border: 1px dashed rgba(0, 255, 157, 0.2); background: rgba(0,255,157,0.02); display: inline-block; border-radius: 6px; margin-bottom: 10px; min-width: 250px;">
-              {{ personalData.firstName ? (personalData.firstName + ' ' + personalData.lastName) : 'Rodrigo Daremberg'
-              }}
+              {{ getContractorFullName() }}
             </div>
 
             <div
@@ -1038,7 +1036,7 @@
       <div class="operator-header" style="margin-bottom: 25px;">
         <div>
           <h2 class="font-display text-mint-gradient" style="font-size: 1.8rem; font-weight: 800; margin-bottom: 5px;">
-            ¡Bienvenido, {{ personalData.firstName || 'Contratista' }}!
+            ¡Bienvenido, {{ getContractorFullName() }}!
           </h2>
           <p style="color: var(--text-secondary); font-size: 0.95rem;">Tu perfil de cobro y cumplimiento internacional
             se encuentra 100% activo y regulado.</p>
@@ -1171,6 +1169,22 @@
             Descargar Contrato Firmado (PDF)
           </button>
         </div>
+      </div>
+
+      <div class="glass-panel support-card" style="padding: 25px; margin-bottom: 30px; border-color: rgba(255, 126, 103, 0.2);">
+        <h4 class="font-display text-gradient" style="font-size: 1.2rem; font-weight: 700; margin-bottom: 15px;">
+          Centro de Soporte Operativo</h4>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px;">
+          ¿Tienes alguna duda sobre tus pagos o configuración? Envía un mensaje directo a tu operador asignado.
+        </p>
+        <textarea class="cyber-input" [(ngModel)]="contractorMessage" rows="3" placeholder="Escribe tu consulta aquí..."
+          style="width: 100%; border-color: var(--glass-border); margin-bottom: 15px; resize: none;"></textarea>
+        <button class="cyber-btn cyber-btn-primary" [disabled]="!contractorMessage.trim() || isSendingMessage"
+          (click)="sendMessageToOperator()"
+          style="width: 100%; padding: 12px; font-size: 0.95rem; display: flex; justify-content: center; align-items: center; gap: 8px;">
+          <span *ngIf="isSendingMessage" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Enviar Mensaje al Operador
+        </button>
       </div>
 
 
