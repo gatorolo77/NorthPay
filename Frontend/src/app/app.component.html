@@ -1309,13 +1309,28 @@
     </app-admin-dashboard>
 
 
-
-
-
   </main>
   <footer class="glass-panel app-footer">
     <div [class.footer-offset]="currentView === 'landing'">
       <span>&copy; 2026 NorthPay Global Payments & Compliance Inc.<p class="gato">Gatorolo</p></span>
     </div>
   </footer>
+</div>
+
+<div class="disclaimer-side" [class.is-open]="showDisclaimer">
+  <button class="disclaimer-tab" (click)="toggleDisclaimer()" [class.hint-anim]="!showDisclaimer">
+    <span>LEGALES</span>
+  </button>
+  <div class="disclaimer-content">
+    <h3>1. Términos de Uso</h3>
+    <p>Al acceder y utilizar la plataforma NorthPay, usted acepta cumplir con estos términos en su totalidad. El servicio es proporcionado "tal cual" para facilitar la gestión de pagos y onboarding de contratistas internacionales. Nos reservamos el derecho de actualizar la plataforma o suspender el servicio temporalmente por mantenimiento.</p>
+    <p>El usuario se compromete a proporcionar información veraz, actual y completa durante el registro y activación de la cuenta, incluyendo, pero no limitándose a, su número de WhatsApp, documentos de identidad e información bancaria o de pago.</p>
+    <p>NorthPay se reserva el derecho de rechazar la activación de cuentas o de suspender usuarios que incumplan con normativas internacionales o locales, especialmente aquellas vinculadas a la prevención de lavado de dinero y cumplimiento (Compliance).</p>
+
+    <h3>2. Política de Privacidad</h3>
+    <p>En NorthPay valoramos su privacidad y protegemos sus datos. Recopilamos información personal estrictamente necesaria para facilitar la activación de su cuenta de contratista remoto, validar su identidad y procesar los pagos de forma segura y transparente.</p>
+    <p><strong style="color: var(--accent-mint);">Uso de la Información:</strong> Utilizamos su número de WhatsApp para la verificación de identidad mediante códigos OTP y para el envío de notificaciones relevantes de pagos y estado de cuenta. Sus documentos se utilizan únicamente para el proceso KYC (Know Your Customer).</p>
+    <p><strong style="color: var(--accent-mint);">Protección de Datos:</strong> Mantenemos estándares rigurosos de cifrado de extremo a extremo y seguridad de la información. No compartimos su información con terceros sin su consentimiento explícito, excepto cuando sea requerido por obligaciones legales o autoridades competentes.</p>
+    <p><strong style="color: var(--accent-mint);">Retención y Derechos:</strong> Sus documentos y datos se retienen el tiempo que su cuenta permanezca activa. Usted tiene el derecho de solicitar la revisión, modificación o eliminación de sus datos. En caso de solicitar la eliminación, procesaremos la baja de sus datos en un plazo de 30 días, salvo información retenida por mandato de regulaciones financieras.</p>
+  </div>
 </div>

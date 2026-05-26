@@ -54,11 +54,13 @@ export class AppComponent implements OnInit, OnDestroy {
     { code: 'it', name: 'Italiano', flag: 'https://flagcdn.com/it.svg' }
   ];
 
-  currentView: 'landing' | 'welcome' | 'register' | 'onboarding' | 'operator' | 'login' | 'contractor_login' = 'landing';
-  previousView: 'landing' | 'welcome' | 'register' | 'onboarding' | 'login' | 'contractor_login' = 'landing';
+  currentView: 'landing' | 'welcome' | 'register' | 'onboarding' | 'operator' | 'login' | 'contractor_login' | 'legal' = 'landing';
+  previousView: 'landing' | 'welcome' | 'register' | 'onboarding' | 'login' | 'contractor_login' | 'legal' = 'landing';
   apiBaseUrl = 'http://localhost:8080/api';
   isOperatorDemoMode = true;
   userRole = 'OPERATOR';
+  
+  showDisclaimer: boolean = false;
   cloudinaryCloudName = 'northpay-demo';
   cloudinaryUploadPreset = 'northpay_preset';
 
@@ -1815,5 +1817,18 @@ export class AppComponent implements OnInit, OnDestroy {
       }
     }
     this.addLocalNotification(errorMsg, 'ERROR');
+  }
+
+  openLegalView() {
+    this.previousView = this.currentView as any;
+    this.currentView = 'legal';
+  }
+
+  closeLegalView() {
+    this.currentView = this.previousView as any || 'landing';
+  }
+
+  toggleDisclaimer() {
+    this.showDisclaimer = !this.showDisclaimer;
   }
 }
