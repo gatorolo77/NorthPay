@@ -264,7 +264,8 @@ export class AppComponent implements OnInit, OnDestroy {
       loginPassLabel: "CONTRASEÑA",
       loginBtnBack: "Volver",
       loginBtnSubmit: "Iniciar Sesión",
-      loginTip: "🔐 Usa admin@northpay.com / admin123"
+      loginTip: "🔐 Usa admin@northpay.com / admin123",
+      btnLegales: "LEGALES"
     },
     en: {
       logoSubtitle: "WELCOME PORTAL",
@@ -350,7 +351,8 @@ export class AppComponent implements OnInit, OnDestroy {
       loginPassLabel: "PASSWORD",
       loginBtnBack: "Back",
       loginBtnSubmit: "Log In",
-      loginTip: "🔐 Use admin@northpay.com / admin123"
+      loginTip: "🔐 Use admin@northpay.com / admin123",
+      btnLegales: "LEGAL"
     },
     fr: {
       logoSubtitle: "PORTAIL DE BIENVENUE",
@@ -436,7 +438,8 @@ export class AppComponent implements OnInit, OnDestroy {
       loginPassLabel: "MOT DE PASSE",
       loginBtnBack: "Retour",
       loginBtnSubmit: "Se Connecter",
-      loginTip: "🔐 Utilisez admin@northpay.com / admin123"
+      loginTip: "🔐 Utilisez admin@northpay.com / admin123",
+      btnLegales: "LÉGAL"
     },
     pt: {
       logoSubtitle: "PORTAL DE BOAS-VINDAS",
@@ -522,7 +525,8 @@ export class AppComponent implements OnInit, OnDestroy {
       loginPassLabel: "SENHA",
       loginBtnBack: "Voltar",
       loginBtnSubmit: "Iniciar Sessão",
-      loginTip: "🔐 Use admin@northpay.com / admin123"
+      loginTip: "🔐 Use admin@northpay.com / admin123",
+      btnLegales: "LEGAIS"
     },
     zh: {
       logoSubtitle: "欢迎门户",
@@ -608,7 +612,8 @@ export class AppComponent implements OnInit, OnDestroy {
       loginPassLabel: "密码",
       loginBtnBack: "返回",
       loginBtnSubmit: "登录",
-      loginTip: "🔐 请使用 admin@northpay.com / admin123"
+      loginTip: "🔐 请使用 admin@northpay.com / admin123",
+      btnLegales: "法律条款"
     },
     it: {
       logoSubtitle: "PORTALE DI BENVENUTO",
@@ -694,7 +699,8 @@ export class AppComponent implements OnInit, OnDestroy {
       loginPassLabel: "PASSWORD",
       loginBtnBack: "Indietro",
       loginBtnSubmit: "Accedi",
-      loginTip: "🔐 Usa admin@northpay.com / admin123"
+      loginTip: "🔐 Usa admin@northpay.com / admin123",
+      btnLegales: "LEGALI"
     }
   };
 

@@ -1319,7 +1319,7 @@
 
 <div class="disclaimer-side" [class.is-open]="showDisclaimer">
   <button class="disclaimer-tab" (click)="toggleDisclaimer()" [class.hint-anim]="!showDisclaimer">
-    <span>LEGALES</span>
+    <span>{{ translations[selectedLang]['btnLegales'] }}</span>
   </button>
   <div class="disclaimer-content">
     <h3>1. Términos de Uso</h3>
