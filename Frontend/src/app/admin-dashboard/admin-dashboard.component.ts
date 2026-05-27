@@ -32,7 +32,7 @@ interface OnboardingProcess {
   styleUrls: ['./admin-dashboard.component.css']
 })
 export class AdminDashboardComponent implements OnInit {
-  apiBaseUrl = 'http://localhost:8080/api';
+  apiBaseUrl = window.location.hostname === 'localhost' ? 'http://localhost:8080/api' : 'https://northpay-production.up.railway.app/api';
   @Input() isLocalMock = true;
   @Input() selectedLang = 'es';
   @Input() whatsappPhone = '';
