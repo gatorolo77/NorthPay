@@ -33,21 +33,29 @@ public class OnboardingProcessStateResolver {
         List<StepSummaryDto> stepsSummaryList = new ArrayList<>();
 
         // Evaluate step completion
+        boolean step0Comp = isStepCompleted(stepsMap.get(StepType.WHATSAPP_VERIFY));
         boolean step1Comp = isStepCompleted(stepsMap.get(StepType.PERSONAL_DATA));
         boolean step2Comp = isStepCompleted(stepsMap.get(StepType.DOCUMENT_UPLOAD));
         boolean step3Comp = isStepCompleted(stepsMap.get(StepType.CONTRACT_SIGN));
         boolean step4Comp = isStepCompleted(stepsMap.get(StepType.PAYMENT_METHOD));
         boolean step5Comp = isStepCompleted(stepsMap.get(StepType.IDENTITY_VERIFICATION));
 
-        // Progress increments (20% per completed step)
-        if (step1Comp) progress += 20;
-        if (step2Comp) progress += 20;
-        if (step3Comp) progress += 20;
-        if (step4Comp) progress += 20;
-        if (step5Comp) progress += 20;
+        // Progress increments
+        if (step0Comp) progress += 16;
+        if (step1Comp) progress += 16;
+        if (step2Comp) progress += 17;
+        if (step3Comp) progress += 17;
+        if (step4Comp) progress += 17;
+        if (step5Comp) progress += 17;
 
         // Resolve current step context and blockages
-        if (!step1Comp) {
+        if (!step0Comp) {
+            currentStep = StepType.WHATSAPP_VERIFY;
+            OnboardingStep step = stepsMap.get(StepType.WHATSAPP_VERIFY);
+            if (step != null && step.getStatus() == StepStatus.REJECTED) {
+                blockingIssues.add("WhatsApp verification failed. Please request a new code.");
+            }
+        } else if (!step1Comp) {
             currentStep = StepType.PERSONAL_DATA;
             OnboardingStep step = stepsMap.get(StepType.PERSONAL_DATA);
             if (step != null && step.getStatus() == StepStatus.REJECTED) {
@@ -112,6 +120,16 @@ public class OnboardingProcessStateResolver {
             resolvedStatus = OnboardingStatus.COMPLETED;
         } else if (currentStep == StepType.IDENTITY_VERIFICATION) {
             resolvedStatus = OnboardingStatus.PENDING_VERIFICATION;
+        } else if (currentStep == StepType.DOCUMENT_UPLOAD && stepsMap.get(StepType.DOCUMENT_UPLOAD) != null && stepsMap.get(StepType.DOCUMENT_UPLOAD).getStatus() == StepStatus.IN_REVIEW) {
+            resolvedStatus = OnboardingStatus.IN_REVIEW;
+        }
+
+        OnboardingStep whatsappStep = stepsMap.get(StepType.WHATSAPP_VERIFY);
+        String whatsappCode = null;
+        String whatsappPhone = null;
+        if (whatsappStep != null && whatsappStep.getData() != null) {
+            whatsappCode = (String) whatsappStep.getData().get("sentCode");
+            whatsappPhone = (String) whatsappStep.getData().get("phone");
         }
 
         return OnboardingSummaryDto.builder()
@@ -121,6 +139,8 @@ public class OnboardingProcessStateResolver {
                 .steps(stepsSummaryList)
                 .canProceed(canProceed)
                 .blockingIssues(blockingIssues)
+                .whatsappVerificationCode(whatsappCode)
+                .whatsappPhone(whatsappPhone)
                 .build();
     }
 

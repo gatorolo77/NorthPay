@@ -25,6 +25,17 @@ public class InvitationController {
         }
     }
 
+    @GetMapping("/{token}")
+    public ResponseEntity<?> getInvitationByToken(@PathVariable String token) {
+        try {
+            return authService.getInvitationByToken(token)
+                    .map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @Data
     public static class InvitationRequest {
         private String email;

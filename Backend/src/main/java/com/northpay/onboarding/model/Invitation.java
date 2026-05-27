@@ -27,6 +27,10 @@ public class Invitation {
     @Column(nullable = false)
     private InvitationStatus status;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
     @Column(name = "created_by", nullable = false)
     private Long createdBy;
 
@@ -44,6 +48,9 @@ public class Invitation {
         }
         if (this.status == null) {
             this.status = InvitationStatus.PENDING;
+        }
+        if (this.role == null) {
+            this.role = Role.CONTRACTOR;
         }
     }
 }

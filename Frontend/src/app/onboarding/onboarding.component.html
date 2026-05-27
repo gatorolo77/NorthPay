@@ -2,7 +2,7 @@
   <header class="glass-panel app-header">
     <div class="logo-container">
       <div class="logo-icon">
-        <span class="logo-letter">N</span>
+        <span class="logo-letter" style="line-height: 1; position: relative;">N<sup style="font-size: 0.65em; font-weight: 800; vertical-align: super; position: relative; top: -3px; letter-spacing: 0;">p</sup></span>
       </div>
       <div>
         <h1 class="font-display text-mint-gradient logo-title">NorthPay</h1>
@@ -45,7 +45,7 @@
     <section *ngIf="currentView === 'welcome'" class="glass-panel welcome-card">
       <div class="envelope-wrapper">
         <div class="logo-icon" style="width: 45px; height: 45px; border-radius: 10px;">
-          <span class="logo-letter" style="font-size: 1.5rem;">N</span>
+          <span class="logo-letter" style="font-size: 1.5rem; line-height: 1; position: relative;">N<sup style="font-size: 0.65em; font-weight: 800; vertical-align: super; position: relative; top: -3px; letter-spacing: 0;">p</sup></span>
         </div>
       </div>
       <h2 class="font-display text-gradient welcome-title">Portal de Onboarding</h2>
@@ -162,31 +162,108 @@
 
         <div *ngIf="summary.currentStep === 'WHATSAPP_VERIFY'" class="step-form-container">
           <h3 class="font-display text-gradient step-form-title">Paso 0: Verificación de WhatsApp</h3>
-          <p class="step-form-desc">
-            Para iniciar tu progreso de activación, ingresa tu número de WhatsApp para certificar tu identidad y
-            desbloquear el onboarding. ¡El envío por nuestro canal corporativo es gratuito!
-          </p>
+          
+          <!-- Phase 1: Enter Phone Number -->
+          <div *ngIf="!summary.whatsappVerificationCode">
+            <p class="step-form-desc">
+              Para iniciar tu progreso de activación, ingresa tu número de WhatsApp para certificar tu identidad y
+              desbloquear el onboarding de forma segura.
+            </p>
 
-          <div class="cyber-input-group">
-            <label class="cyber-input-label">NÚMERO DE WHATSAPP</label>
-            <input type="text" class="cyber-input" [(ngModel)]="whatsappPhone" placeholder="Ej. +34 600 000 000">
+            <div class="cyber-input-group">
+              <label class="cyber-input-label">NÚMERO DE TELÉFONO DE WHATSAPP</label>
+              <input type="text" class="cyber-input" [(ngModel)]="whatsappPhone" placeholder="Ej. +34 600 000 000" (ngModelChange)="autoDetectCountry(whatsappPhone)">
+              <div class="input-note" style="color: var(--text-muted); font-size: 0.75rem; margin-top: 6px;">
+                Ingresa tu número con prefijo internacional (ej. +54 para Argentina, +34 para España).
+              </div>
+            </div>
+
+            <button class="cyber-btn cyber-btn-primary submit-action-btn"
+              [disabled]="isSendingWhatsapp || !whatsappPhone" (click)="sendWhatsappCode()">
+              <span *ngIf="!isSendingWhatsapp">Generar Código de Activación</span>
+              <span *ngIf="isSendingWhatsapp">Generando Código...</span>
+            </button>
           </div>
 
-          <button class="cyber-btn cyber-btn-primary submit-action-btn" style="margin-bottom: 20px;"
-            [disabled]="isSendingWhatsapp || !whatsappPhone" (click)="sendWhatsappCode()">
-            {{ isSendingWhatsapp ? 'Enviando WhatsApp...' : 'Enviar Código de Verificación' }}
-          </button>
+          <!-- Phase 2: Send WhatsApp Message (Inverse Verification) -->
+          <div *ngIf="summary.whatsappVerificationCode" class="whatsapp-verification-flow">
+            <p class="step-form-desc">
+              Hemos generado un código de validación único para tu línea <strong>{{ whatsappPhone }}</strong>.
+              Sigue las instrucciones a continuación para completar la verificación de forma instantánea.
+            </p>
 
-          <div *ngIf="whatsappPhone" class="cyber-input-group" style="margin-top: 15px;">
-            <label class="cyber-input-label">INGRESAR CÓDIGO (6 DÍGITOS)</label>
-            <input type="text" class="cyber-input" [(ngModel)]="whatsappCode" placeholder="Ingresa 123456"
-              style="text-align: center; letter-spacing: 5px; font-size: 1.2rem;">
+            <div class="glass-panel instruction-box" style="padding: 20px; border-radius: 12px; margin-bottom: 25px; border-color: rgba(0, 245, 230, 0.15);">
+              <div class="instruction-step">
+                <span class="step-badge">1</span>
+                <span class="step-text">Presiona el botón de verificación para abrir WhatsApp con un mensaje pre-redactado.</span>
+              </div>
+              <div class="instruction-step">
+                <span class="step-badge">2</span>
+                <span class="step-text">Envía el mensaje predefinido con tu código de verificación sin alterarlo.</span>
+              </div>
+              <div class="instruction-step">
+                <span class="step-badge">3</span>
+                <span class="step-text">Regresa aquí. Tu progreso se desbloqueará de forma automática al recibir el mensaje.</span>
+              </div>
+            </div>
+
+            <!-- Code display panel -->
+            <div class="code-display-container">
+              <span class="code-label">TU CÓDIGO DE ACTIVACIÓN</span>
+              <div class="glowing-code">{{ summary.whatsappVerificationCode }}</div>
+            </div>
+
+            <!-- Verification Action Links/Buttons -->
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 15px; margin-top: 25px;">
+              <a [href]="getWhatsAppLink()" target="_blank" class="whatsapp-verify-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 10px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Verificar mi WhatsApp
+              </a>
+
+              <div class="waiting-indicator">
+                <div class="cyber-spinner"></div>
+                <span>Esperando confirmación desde WhatsApp...</span>
+              </div>
+            </div>
+
+            <!-- Force Refresh & Fallback -->
+            <div style="margin-top: 35px; border-top: 1px dashed var(--glass-border); padding-top: 25px;">
+              <div style="display: flex; gap: 15px; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                <div>
+                  <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">¿No se actualiza automáticamente?</h4>
+                  <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Presiona comprobar estado para forzar la sincronización manual.</p>
+                </div>
+                <button class="cyber-btn cyber-btn-secondary" (click)="refreshSummary()" style="height: 38px;">
+                  Comprobar Estado
+                </button>
+              </div>
+
+              <!-- Fallback Manual OTP Code Input -->
+              <div class="fallback-otp-container" style="margin-top: 20px; background: rgba(0,0,0,0.15); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                <label class="cyber-input-label" style="font-size: 0.75rem;">CÓDIGO DE FALLBACK (VERIFICACIÓN MANUAL)</label>
+                <div style="display: flex; gap: 10px; margin-top: 8px;">
+                  <input type="text" class="cyber-input" [(ngModel)]="whatsappCode" placeholder="Ej. NP-1234" style="text-align: center; text-transform: uppercase; max-width: 150px; height: 38px;">
+                  <button class="cyber-btn cyber-btn-primary" [disabled]="isVerifyingWhatsapp || !whatsappCode" (click)="verifyWhatsappCode()" style="height: 38px; padding: 0 15px;">
+                    Verificar Manualmente
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sandbox Local Simulation Controls -->
+            <div *ngIf="isLocalMock" class="sim-webhook-box" style="margin-top: 30px; border: 1px solid rgba(255, 190, 26, 0.2); background: rgba(255, 190, 26, 0.03); padding: 18px; border-radius: 10px;">
+              <h5 style="color: var(--accent-amber); font-weight: 700; font-size: 0.85rem; margin-top: 0; margin-bottom: 5px; display: flex; align-items: center; gap: 8px;">
+                ⚠️ MODO DE SIMULACIÓN LOCAL
+              </h5>
+              <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.4;">
+                Estás en modo offline/mock. Para simular que el servidor recibe el mensaje de WhatsApp desde tu teléfono móvil y activa tu onboarding, haz clic en el botón de simulación de webhook.
+              </p>
+              <button class="cyber-btn" style="background: rgba(255, 190, 26, 0.15); border: 1px solid var(--accent-amber); color: var(--accent-amber); font-weight: bold; width: 100%; transition: all 0.2s;" 
+                (click)="simulateWhatsappWebhookReceived()">
+                Simular Recepción WhatsApp (Webhook)
+              </button>
+            </div>
           </div>
-
-          <button *ngIf="whatsappPhone" class="cyber-btn cyber-btn-primary submit-action-btn" style="margin-top: 10px;"
-            [disabled]="isVerifyingWhatsapp || !whatsappCode" (click)="verifyWhatsappCode()">
-            {{ isVerifyingWhatsapp ? 'Verificando Código...' : 'Verificar y Desbloquear Onboarding' }}
-          </button>
         </div>
 
         <div *ngIf="summary.currentStep === 'PERSONAL_DATA'" class="step-form-container">
@@ -371,7 +448,7 @@
             Mercado Pago y PayPal.
           </p>
 
-          <!-- Fintech Multicurrency Picker -->
+          
           <div style="margin-bottom: 20px;">
             <label class="cyber-input-label" style="margin-bottom: 10px;">DIVISA DE COBRO / PREFERRED CURRENCY</label>
             <div style="display: flex; gap: 12px;">

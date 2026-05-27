@@ -57,4 +57,76 @@ public class EmailService {
             log.error("[NorthPay] Error enviando correo de invitación a {}: {}. ¿Están configuradas las propiedades SMTP en application.properties?", toEmail, e.getMessage());
         }
     }
+
+    public void sendOperatorInvitationEmail(String toEmail, String token) {
+        String activationLink = clientUrl + "/onboarding?token=" + token;
+        
+        log.info("[NorthPay] Generando correo de invitación de operador para: {} | Link: {}", toEmail, activationLink);
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject("¡Invitación de Operador NorthPay! Completa el registro de tu cuenta");
+
+            String htmlContent = "<html>" +
+                    "<body style='font-family: Arial, sans-serif; background-color: #0b0f19; color: #ffffff; padding: 30px;'>" +
+                    "  <div style='max-width: 600px; margin: 0 auto; background-color: #111827; padding: 40px; border-radius: 12px; border: 1px solid #1f2937;'>" +
+                    "    <h2 style='color: #00f0ff; text-align: center; font-family: sans-serif; letter-spacing: 1px;'>¡Hola! Invitación de Operador NorthPay</h2>" +
+                    "    <p style='font-size: 16px; line-height: 1.6; color: #9ca3af;'>Has sido invitado a registrarte en NorthPay como <strong>Operador</strong> para gestionar contratistas, revisar documentos y emitir pagos. Para completar el registro y establecer tu contraseña, presiona el botón de abajo:</p>" +
+                    "    <div style='text-align: center; margin: 40px 0;'>" +
+                    "      <a href='" + activationLink + "' style='background-color: #00f0ff; color: #0b0f19; padding: 15px 35px; font-weight: bold; font-size: 16px; text-decoration: none; border-radius: 6px; letter-spacing: 0.5px; box-shadow: 0 0 15px rgba(0,240,255,0.4); display: inline-block;'>Comenzar Registro de Operador</a>" +
+                    "    </div>" +
+                    "    <p style='font-size: 14px; color: #6b7280; text-align: center; margin-top: 30px;'>Este enlace expira en 3 días.</p>" +
+                    "    <hr style='border: 0; border-top: 1px solid #1f2937; margin: 30px 0;'>" +
+                    "    <p style='font-size: 12px; color: #4b5563; text-align: center;'>Si el botón no funciona, copia y pega este enlace en tu navegador:<br><a href='" + activationLink + "' style='color: #00f0ff;'>" + activationLink + "</a></p>" +
+                    "  </div>" +
+                    "</body>" +
+                    "</html>";
+
+            helper.setText(htmlContent, true);
+            mailSender.send(message);
+
+            log.info("[NorthPay] Correo de operador enviado exitosamente a: {}", toEmail);
+        } catch (Exception e) {
+            log.error("[NorthPay] Error enviando correo de invitación de operador a {}: {}", toEmail, e.getMessage());
+        }
+    }
+
+    public void sendVerificationCodeEmail(String toEmail, String code) {
+        log.info("[NorthPay] Generando correo de verificación de seguridad para: {} | Código: {}", toEmail, code);
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject("Tu Código de Verificación de NorthPay");
+
+            String htmlContent = "<html>" +
+                    "<body style='font-family: Arial, sans-serif; background-color: #0b0f19; color: #ffffff; padding: 30px;'>" +
+                    "  <div style='max-width: 600px; margin: 0 auto; background-color: #111827; padding: 40px; border-radius: 12px; border: 1px solid #1f2937;'>" +
+                    "    <h2 style='color: #00f0ff; text-align: center; font-family: sans-serif; letter-spacing: 1px;'>Verificación de Seguridad NorthPay</h2>" +
+                    "    <p style='font-size: 16px; line-height: 1.6; color: #9ca3af;'>Para completar el paso de verificación y continuar con tu proceso de onboarding, utiliza el siguiente código de verificación de 6 dígitos:</p>" +
+                    "    <div style='text-align: center; margin: 40px 0;'>" +
+                    "      <div style='background-color: #1f2937; color: #00f0ff; padding: 20px 40px; font-weight: bold; font-size: 32px; text-decoration: none; border-radius: 8px; letter-spacing: 5px; display: inline-block; border: 1px solid #00f0ff; box-shadow: 0 0 15px rgba(0,240,255,0.25);'>" + code + "</div>" +
+                    "    </div>" +
+                    "    <p style='font-size: 14px; color: #6b7280; text-align: center; margin-top: 30px;'>Este código expirará en 15 minutos. No compartas este código con nadie.</p>" +
+                    "    <hr style='border: 0; border-top: 1px solid #1f2937; margin: 30px 0;'>" +
+                    "    <p style='font-size: 12px; color: #4b5563; text-align: center;'>Este correo fue enviado de forma segura como parte de tu proceso de onboarding en NorthPay.</p>" +
+                    "  </div>" +
+                    "</body>" +
+                    "</html>";
+
+            helper.setText(htmlContent, true);
+            mailSender.send(message);
+
+            log.info("[NorthPay] Correo de verificación enviado exitosamente a: {}", toEmail);
+        } catch (Exception e) {
+            log.error("[NorthPay] Error enviando correo de verificación a {}: {}", toEmail, e.getMessage());
+        }
+    }
 }

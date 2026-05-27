@@ -43,6 +43,18 @@ public class OnboardingProcess {
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
+    @Transient
+    private String contractorName;
+
+    @Transient
+    private String contractorEmail;
+
+    @Transient
+    private String contractorCountry;
+
+    @Transient
+    private String contractorPhone;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();

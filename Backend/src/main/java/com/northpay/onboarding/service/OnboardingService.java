@@ -27,6 +27,8 @@ public class OnboardingService {
     private final OnboardingProcessStateResolver stateResolver;
     private final NotificationService notificationService;
     private final CloudinaryService cloudinaryService;
+    private final UserRepository userRepository;
+    private final EmailService emailService;
 
     @Transactional
     public OnboardingProcess getOrCreateProcess(Long contractorUserId) {
@@ -61,7 +63,16 @@ public class OnboardingService {
         OnboardingProcess process = processRepository.findById(processId)
                 .orElseThrow(() -> new IllegalArgumentException("Process not found with ID: " + processId));
         List<OnboardingStep> steps = stepRepository.findByProcessId(processId);
-        return stateResolver.resolve(process, steps);
+        OnboardingSummaryDto summary = stateResolver.resolve(process, steps);
+
+        profileRepository.findByUserId(process.getContractorUserId()).ifPresent(profile -> {
+            summary.setFirstName(profile.getFirstName());
+            summary.setLastName(profile.getLastName());
+            summary.setPersonalPhone(profile.getPhone());
+            summary.setCountry(profile.getCountry());
+        });
+
+        return summary;
     }
 
     @Transactional
@@ -292,7 +303,29 @@ public class OnboardingService {
     }
 
     public List<OnboardingProcess> listAllProcesses() {
-        return processRepository.findAll();
+        List<OnboardingProcess> processes = processRepository.findAll();
+        for (OnboardingProcess process : processes) {
+            userRepository.findById(process.getContractorUserId()).ifPresent(user -> {
+                process.setContractorEmail(user.getEmail());
+            });
+            profileRepository.findByUserId(process.getContractorUserId()).ifPresent(profile -> {
+                if (profile.getFirstName() != null || profile.getLastName() != null) {
+                    process.setContractorName(((profile.getFirstName() != null ? profile.getFirstName() : "") + " " + (profile.getLastName() != null ? profile.getLastName() : "")).trim());
+                }
+                process.setContractorCountry(profile.getCountry());
+                process.setContractorPhone(profile.getPhone());
+            });
+            if (process.getContractorName() == null || process.getContractorName().isEmpty()) {
+                process.setContractorName("Contratista #" + process.getContractorUserId());
+            }
+            if (process.getContractorCountry() == null || process.getContractorCountry().isEmpty()) {
+                process.setContractorCountry("España");
+            }
+            if (process.getContractorEmail() == null || process.getContractorEmail().isEmpty()) {
+                process.setContractorEmail("user-" + process.getContractorUserId() + "@northpay.com");
+            }
+        }
+        return processes;
     }
 
     @Transactional
@@ -303,14 +336,17 @@ public class OnboardingService {
         OnboardingStep step = stepRepository.findByProcessIdAndType(processId, StepType.WHATSAPP_VERIFY)
                 .orElseThrow(() -> new IllegalArgumentException("Step not found"));
 
+        // Generate dynamic NP-XXXX verification code (NP- + 4 random digits)
+        String code = "NP-" + String.format("%04d", new Random().nextInt(10000));
+
         Map<String, Object> data = new HashMap<>();
         data.put("phone", phone);
-        data.put("sentCode", "123456");
+        data.put("sentCode", code);
         step.setData(data);
         stepRepository.save(step);
 
-        notificationService.sendNotification(process.getContractorUserId(), 
-                "Código de activación enviado por WhatsApp al " + phone, "SUCCESS");
+        notificationService.sendNotification(process.getContractorUserId(),
+                "Tu código de verificación de WhatsApp de NorthPay es: " + code, "SUCCESS");
 
         return getOnboardingSummary(processId);
     }
@@ -323,9 +359,24 @@ public class OnboardingService {
         OnboardingStep step = stepRepository.findByProcessIdAndType(processId, StepType.WHATSAPP_VERIFY)
                 .orElseThrow(() -> new IllegalArgumentException("Step not found"));
 
-        if ("123456".equals(code)) {
+        // Get saved code from the step data
+        String savedCode = (step.getData() != null) ? (String) step.getData().get("sentCode") : null;
+        if (savedCode == null) {
+            throw new IllegalStateException("No se encontró un código de verificación activo. Por favor solicita uno nuevo.");
+        }
+
+        if (savedCode.equalsIgnoreCase(code)) {
             step.setStatus(StepStatus.COMPLETED);
             stepRepository.save(step);
+
+            // Save phone to contractor profile
+            String savedPhone = (String) step.getData().get("phone");
+            if (savedPhone != null) {
+                ContractorProfile profile = profileRepository.findByUserId(process.getContractorUserId())
+                        .orElseGet(() -> ContractorProfile.builder().userId(process.getContractorUserId()).build());
+                profile.setPhone(savedPhone);
+                profileRepository.save(profile);
+            }
 
             // Activate next step: PERSONAL_DATA
             stepRepository.findByProcessIdAndType(processId, StepType.PERSONAL_DATA)
@@ -346,6 +397,125 @@ public class OnboardingService {
         return getOnboardingSummary(processId);
     }
 
+    private boolean phoneNumbersMatch(String phone1, String phone2) {
+        if (phone1 == null || phone2 == null) return false;
+        String clean1 = phone1.replaceAll("\\D", "");
+        String clean2 = phone2.replaceAll("\\D", "");
+        if (clean1.isEmpty() || clean2.isEmpty()) return false;
+        
+        if (clean1.equals(clean2)) return true;
+        
+        int len1 = clean1.length();
+        int len2 = clean2.length();
+        if (len1 >= 8 && len2 >= 8) {
+            String suffix1 = clean1.substring(len1 - 8);
+            String suffix2 = clean2.substring(len2 - 8);
+            return suffix1.equals(suffix2);
+        }
+        return false;
+    }
+
+    @Transactional
+    public boolean processWhatsappWebhook(String senderPhone, String messageText) {
+        if (senderPhone == null || messageText == null) {
+            log.warn("Invalid webhook payload: senderPhone={} messageText={}", senderPhone, messageText);
+            return false;
+        }
+
+        log.info("Processing WhatsApp webhook for phone: {} with message: {}", senderPhone, messageText);
+
+        // Extract code from message using regex: NP-[0-9]{4}
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("NP-[0-9]{4}");
+        java.util.regex.Matcher matcher = pattern.matcher(messageText.toUpperCase());
+        if (!matcher.find()) {
+            log.warn("No verification code found in WhatsApp message: {}", messageText);
+            return false;
+        }
+        String extractedCode = matcher.group();
+
+        log.info("Extracted code from WhatsApp webhook: {}", extractedCode);
+
+        // Find all in-progress WhatsApp verification steps
+        List<OnboardingStep> steps = stepRepository.findAll().stream()
+                .filter(step -> step.getType() == StepType.WHATSAPP_VERIFY && step.getStatus() == StepStatus.IN_PROGRESS)
+                .toList();
+
+        for (OnboardingStep step : steps) {
+            if (step.getData() != null) {
+                String savedCode = (String) step.getData().get("sentCode");
+                String savedPhone = (String) step.getData().get("phone");
+                
+                if (extractedCode.equalsIgnoreCase(savedCode) && phoneNumbersMatch(senderPhone, savedPhone)) {
+                    log.info("Matching step found for code: {} and phone: {}. Completing step.", extractedCode, savedPhone);
+                    
+                    // Mark step as completed
+                    step.setStatus(StepStatus.COMPLETED);
+                    stepRepository.save(step);
+                    
+                    // Save phone to contractor profile
+                    OnboardingProcess process = processRepository.findById(step.getProcessId())
+                            .orElseThrow(() -> new IllegalArgumentException("Process not found"));
+                            
+                    ContractorProfile profile = profileRepository.findByUserId(process.getContractorUserId())
+                            .orElseGet(() -> ContractorProfile.builder().userId(process.getContractorUserId()).build());
+                    profile.setPhone(savedPhone);
+                    profileRepository.save(profile);
+                    
+                    // Activate next step: PERSONAL_DATA
+                    stepRepository.findByProcessIdAndType(process.getId(), StepType.PERSONAL_DATA)
+                            .ifPresent(nextStep -> {
+                                if (nextStep.getStatus() == StepStatus.NOT_STARTED) {
+                                    nextStep.setStatus(StepStatus.IN_PROGRESS);
+                                    stepRepository.save(nextStep);
+                                }
+                            });
+                            
+                    updateProcessOverallState(process.getId());
+                    notificationService.sendNotification(process.getContractorUserId(), 
+                            "¡WhatsApp verificado automáticamente! Onboarding desbloqueado.", "SUCCESS");
+                    
+                    return true;
+                }
+            }
+        }
+        
+        log.warn("No matching onboarding process found for code {} and phone {}", extractedCode, senderPhone);
+        return false;
+    }
+
+    @Transactional
+    public OnboardingSummaryDto updateContractorSettings(Long processId, ContractorSettingsDto dto) {
+        OnboardingProcess process = processRepository.findById(processId)
+                .orElseThrow(() -> new IllegalArgumentException("Process not found"));
+
+        if (dto.getWhatsappPhone() != null) {
+            ContractorProfile profile = profileRepository.findByUserId(process.getContractorUserId())
+                    .orElseGet(() -> ContractorProfile.builder().userId(process.getContractorUserId()).build());
+            profile.setPhone(dto.getWhatsappPhone());
+            profileRepository.save(profile);
+        }
+
+        if (dto.getPaymentProvider() != null) {
+            PaymentMethod paymentMethod = paymentMethodRepository.findByProcessId(processId)
+                    .orElseGet(() -> PaymentMethod.builder().processId(processId).build());
+            paymentMethod.setProvider(dto.getPaymentProvider());
+            paymentMethod.setData(dto.getPaymentData());
+            paymentMethod.setStatus(PaymentStatus.VERIFIED);
+            paymentMethodRepository.save(paymentMethod);
+
+            // Sync step data
+            OnboardingStep step = stepRepository.findByProcessIdAndType(processId, StepType.PAYMENT_METHOD)
+                    .orElseThrow(() -> new IllegalArgumentException("Step not found"));
+            step.setData(Map.of("provider", dto.getPaymentProvider()));
+            stepRepository.save(step);
+        }
+
+        notificationService.sendNotification(process.getContractorUserId(),
+                "Ajustes de perfil y método de pago actualizados con éxito", "SUCCESS");
+
+        return getOnboardingSummary(processId);
+    }
+
     private void updateProcessOverallState(Long processId) {
         OnboardingProcess process = processRepository.findById(processId).orElseThrow();
         OnboardingSummaryDto summary = getOnboardingSummary(processId);
@@ -359,5 +529,39 @@ public class OnboardingService {
             process.setCompletedAt(LocalDateTime.now());
         }
         processRepository.save(process);
+    }
+
+    public List<Document> getDocumentsByProcessId(Long processId) {
+        return documentRepository.findByProcessId(processId);
+    }
+
+    @Transactional
+    public OnboardingStep reviewStepByProcessAndType(Long processId, StepType type, Long operatorId, ReviewStepDto dto) {
+        OnboardingStep step = stepRepository.findByProcessIdAndType(processId, type)
+                .orElseThrow(() -> new IllegalArgumentException("Step not found"));
+        return reviewStep(step.getId(), operatorId, dto);
+    }
+
+    public void sendMessageToOperator(Long processId, String messageText) {
+        OnboardingProcess process = processRepository.findById(processId)
+                .orElseThrow(() -> new IllegalArgumentException("Process not found"));
+
+        ContractorProfile profile = profileRepository.findByUserId(process.getContractorUserId()).orElse(null);
+        String name = (profile != null && profile.getFirstName() != null) ? profile.getFirstName() : "Contratista #" + process.getContractorUserId();
+
+        String formattedMessage = "💬 Mensaje de " + name + ": " + messageText;
+
+        if (process.getAssignedOperatorId() != null) {
+            notificationService.sendNotification(process.getAssignedOperatorId(), formattedMessage, "INFO");
+        } else {
+            List<User> operators = userRepository.findByRole(Role.OPERATOR);
+            if (operators != null && !operators.isEmpty()) {
+                for (User op : operators) {
+                    notificationService.sendNotification(op.getId(), formattedMessage, "INFO");
+                }
+            } else {
+                notificationService.sendNotification(1L, formattedMessage, "INFO");
+            }
+        }
     }
 }

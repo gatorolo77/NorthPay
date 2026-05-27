@@ -18,7 +18,7 @@
         </div>
       </div>
 
-      <div class="metrics-grid">
+      <div class="metrics-grid" *ngIf="userRole !== 'OWNER'">
         <div class="glass-panel metric-card">
           <span class="metric-icon"></span>
           <div>
@@ -49,7 +49,39 @@
         </div>
       </div>
 
-      <div class="glass-panel operator-card">
+      <div class="metrics-grid" *ngIf="userRole === 'OWNER'">
+        <div class="glass-panel metric-card" style="border-color: rgba(255, 215, 0, 0.25);">
+          <span class="metric-icon">⚡</span>
+          <div>
+            <p class="metric-label" style="color: #ffd700;">Operadores Registrados</p>
+            <h3 class="font-display metric-value">{{ operators.length }}</h3>
+          </div>
+        </div>
+        <div class="glass-panel metric-card">
+          <span class="metric-icon">🔑</span>
+          <div>
+            <p class="metric-label">Total de Claves Generadas</p>
+            <h3 class="font-display metric-value">100</h3>
+          </div>
+        </div>
+        <div class="glass-panel metric-card" style="border-color: rgba(255, 82, 82, 0.25);">
+          <span class="metric-icon">🔒</span>
+          <div>
+            <p class="metric-label">Claves Utilizadas</p>
+            <h3 class="font-display metric-value">{{ getUsedKeysCount() }}</h3>
+          </div>
+        </div>
+        <div class="glass-panel metric-card" style="border-color: rgba(0, 255, 157, 0.25);">
+          <span class="metric-icon">🔓</span>
+          <div>
+            <p class="metric-label">Claves Disponibles</p>
+            <h3 class="font-display metric-value">{{ getAvailableKeysCount() }}</h3>
+          </div>
+        </div>
+      </div>
+
+     
+      <div class="glass-panel operator-card" *ngIf="userRole !== 'OWNER'">
         <div class="dashboard-list-header">
           <h4 class="font-display" style="font-size: 1.1rem; font-weight: 600;">{{ dashboardTranslations[selectedLang]['onbProcs'] }}</h4>
 
@@ -105,7 +137,7 @@
             <div style="display: flex; gap: 10px; align-items: center;">
               <button class="cyber-btn cyber-btn-secondary"
                 style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px;" *ngIf="p.status === 'IN_REVIEW'"
-                (click)="selectedProcessIdForReview = p.id">
+                (click)="openReviewModal(p.id)">
                 {{ dashboardTranslations[selectedLang]['revDocs'] }}
               </button>
               <button class="cyber-btn cyber-btn-primary"
@@ -122,7 +154,6 @@
                 {{ dashboardTranslations[selectedLang]['onbProc'] }}
               </span>
 
-              <!-- Botón de Eliminación Discreto y Seguro -->
               <button class="delete-contractor-btn" (click)="deleteContractor(p.id)"
                 style="background: transparent; border: none; color: var(--accent-coral); cursor: pointer; font-size: 0.9rem; opacity: 0.35; transition: all 0.25s ease-in-out; padding: 6px; display: flex; align-items: center; justify-content: center; border-radius: 6px;"
                 onmouseover="this.style.opacity='1'; this.style.transform='scale(1.2)'; this.style.background='rgba(255, 82, 82, 0.1)'"
@@ -140,13 +171,105 @@
         </div>
       </div>
 
+    
+      <div class="glass-panel operator-card" *ngIf="userRole === 'OWNER'" style="border-color: rgba(255, 215, 0, 0.25);">
+        <div class="dashboard-list-header" style="border-bottom: 1px solid rgba(255, 215, 0, 0.15); padding-bottom: 10px; margin-bottom: 15px;">
+          <h4 class="font-display" style="font-size: 1.15rem; font-weight: 700; color: #ffd700; display: flex; align-items: center; gap: 8px;">
+            Operadores Activos en el Sistema
+          </h4>
+          <span style="font-size: 0.75rem; color: var(--text-muted);">
+            Supervisión y control en tiempo real
+          </span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+          <div *ngFor="let op of operators" class="glass-panel contractor-row" style="border-color: rgba(255, 255, 255, 0.08); background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: space-between; padding: 15px 20px;">
+            <div>
+              <h5 class="font-display" style="font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0 0 5px 0; display: flex; align-items: center; gap: 8px;">
+                <span></span> {{ op.email }}
+                <span class="glass-panel" style="font-size: 0.65rem; color: var(--accent-mint); border-color: rgba(0, 255, 157, 0.2); padding: 2px 8px; border-radius: 20px; font-weight: 800; text-transform: uppercase;">
+                  ACTIVO
+                </span>
+              </h5>
+              <span style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">
+                Clave utilizada: {{ op.keyUsed }}
+              </span>
+            </div>
+
+            <div style="text-align: right;">
+              <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-bottom: 2px;">
+                Fecha de Registro
+              </span>
+              <strong style="font-size: 0.85rem; color: var(--text-primary);">
+                {{ op.registeredAt | date:'medium' }}
+              </strong>
+            </div>
+          </div>
+
+          <div *ngIf="operators.length === 0" style="text-align: center; padding: 30px; color: var(--text-muted); font-style: italic;">
+            No hay operadores registrados en el sistema.
+          </div>
+        </div>
+      </div>
 
 
-      <!-- Changes History / Audit log widget -->
-      <div class="glass-panel audit-log-card" style="margin-top: 25px;">
-        <h4 class="font-display text-gradient" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 15px;">
-          {{ dashboardTranslations[selectedLang]['auditTitle'] }}</h4>
-        <div style="display: flex; flex-direction: column; gap: 10px;">
+
+      <div class="glass-panel operator-card" *ngIf="userRole === 'OWNER'" style="margin-top: 25px; border-color: rgba(255, 215, 0, 0.25);">
+        <div class="dashboard-list-header" style="border-bottom: 1px solid rgba(255, 215, 0, 0.15); padding-bottom: 10px; margin-bottom: 15px;">
+          <h4 class="font-display" style="font-size: 1.2rem; font-weight: 700; color: #ffd700; display: flex; align-items: center; gap: 8px;">
+            🔑 Claves de Activación para Operadores
+          </h4>
+          <span style="font-size: 0.75rem; color: var(--text-muted);">
+            Exclusivo Propietario (Owner) • 100 Claves Seeded en H2
+          </span>
+        </div>
+
+        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 15px; line-height: 1.4;">
+          Copia y envía cualquiera de las claves disponibles a los futuros operadores autorizados para permitir su registro en el sistema NorthPay.
+        </p>
+
+        <div class="keys-grid" style="max-height: 250px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; border: 1px solid var(--glass-border);">
+          <div *ngFor="let k of operatorKeys" class="glass-panel" 
+            [style.border-color]="k.used ? 'rgba(255, 82, 82, 0.2)' : 'rgba(0, 255, 157, 0.2)'"
+            [style.background]="k.used ? 'rgba(255, 82, 82, 0.03)' : 'rgba(0, 255, 157, 0.03)'"
+            style="padding: 10px; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between; min-height: 70px;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="font-display" style="font-size: 0.85rem; font-weight: 700; font-family: monospace; color: var(--text-primary);">
+                {{ k.secretKey }}
+              </span>
+              <button (click)="copyToClipboard(k.secretKey)" *ngIf="!k.used"
+                style="background: transparent; border: none; cursor: pointer; font-size: 0.85rem; padding: 2px; transition: transform 0.2s;"
+                onmouseover="this.style.transform='scale(1.2)'"
+                onmouseout="this.style.transform='scale(1)'"
+                title="Copiar Clave">
+                📋
+              </button>
+            </div>
+
+            <div style="font-size: 0.7rem; display: flex; flex-direction: column; gap: 1px; margin-top: 5px;">
+              <span [style.color]="k.used ? 'var(--accent-coral)' : 'var(--accent-mint)'" style="font-weight: 700;">
+                {{ k.used ? '❌ Utilizada' : '✅ Disponible' }}
+              </span>
+              <span *ngIf="k.used" style="color: var(--text-muted); font-size: 0.65rem; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" [title]="k.usedByEmail">
+                Por: {{ k.usedByEmail }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-panel audit-log-card" style="margin-top: 25px;" [style.border-color]="userRole === 'OWNER' ? 'rgba(255, 215, 0, 0.25)' : 'var(--glass-border)'">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; width: 100%; gap: 15px;">
+          <h4 class="font-display" style="font-size: 1.1rem; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 8px;" [style.color]="userRole === 'OWNER' ? '#ffd700' : 'var(--accent-cyan)'">
+            {{ userRole === 'OWNER' ? '📈 Pipeline e Historial de Movimientos de Operadores' : dashboardTranslations[selectedLang]['auditTitle'] }}
+          </h4>
+          <button *ngIf="changeHistory.length > 0" (click)="exportAuditLogToPDF()" class="cyber-btn" title="Descargar PDF / Imprimir" 
+            style="padding: 4px 12px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; border-color: rgba(255, 255, 255, 0.15); height: 30px; border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--text-primary); font-weight: 600; cursor: pointer;">
+            📥 Exportar PDF
+          </button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px; max-height: 250px; overflow-y: auto; padding-right: 8px;" class="custom-scrollbar">
           <div *ngFor="let h of changeHistory; let first = first" class="audit-log-item"
             [style.border-left-color]="first ? 'var(--accent-cyan)' : 'var(--glass-border)'">
             <span class="audit-dot"
@@ -154,14 +277,14 @@
             <span style="color: var(--text-secondary); font-size: 0.85rem;">{{ h }}</span>
           </div>
           
-          <!-- Elegant Empty State Message -->
+          
           <div *ngIf="changeHistory.length === 0"
             style="color: var(--text-muted); font-style: italic; font-size: 0.82rem; text-align: center; padding: 15px 0; background: rgba(255,255,255,0.01); border-radius: 8px; border: 1px dashed var(--glass-border);">
             🌌 {{ dashboardTranslations[selectedLang]['auditEmpty'] }}
           </div>
         </div>
       </div>
-      <!-- Payment Confirmation Modal -->
+    
       <div class="glass-modal-backdrop" *ngIf="selectedProcessForPayment">
         <div class="glass-panel cyber-modal-card">
           <div class="modal-header"
@@ -214,7 +337,7 @@
         </div>
       </div>
 
-      <!-- Document Review Modal -->
+      
       <div class="glass-modal-backdrop" *ngIf="getSelectedContractorForReview()">
         <div class="glass-panel cyber-modal-card" style="max-width: 680px;">
           <div class="modal-header"
@@ -237,11 +360,17 @@
                 <p style="margin: 0;"><strong>{{ dashboardTranslations[selectedLang]['names'] }}:</strong> {{ getSelectedContractorForReview()?.name }}</p>
                 <p style="margin: 0;"><strong>{{ dashboardTranslations[selectedLang]['email'] }}:</strong> {{ getSelectedContractorForReview()?.email }}</p>
                 <p style="margin: 0;"><strong>{{ dashboardTranslations[selectedLang]['country'] }}:</strong> {{ getSelectedContractorForReview()?.country }}</p>
-                <p style="margin: 0;"><strong>{{ dashboardTranslations[selectedLang]['docType'] }}:</strong> PASAPORTE</p>
                 
-                <p style="margin-top: 15px; color: var(--accent-mint); text-decoration: underline; cursor: pointer; font-weight: 600; font-size: 0.9rem;">
-                  📄 {{ dashboardTranslations[selectedLang]['viewFile'] }} (DOCUMENT_ID.PDF)
-                </p>
+                <div *ngFor="let doc of reviewDocuments" style="margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px;">
+                  <p style="margin: 0 0 5px 0;"><strong>{{ dashboardTranslations[selectedLang]['docType'] }}:</strong> {{ doc.type }}</p>
+                  <a [href]="doc.fileUrl" target="_blank" style="color: var(--accent-mint); text-decoration: underline; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 5px;">
+                    📄 {{ dashboardTranslations[selectedLang]['viewFile'] }} ({{ doc.filename || 'Ver Documento' }})
+                  </a>
+                </div>
+
+                <div *ngIf="reviewDocuments.length === 0" style="margin-top: 10px; color: var(--text-muted); font-style: italic;">
+                  No hay documentos cargados aún.
+                </div>
               </div>
 
               <div class="cyber-input-group" style="margin-bottom: 0; display: flex; flex-direction: column;">

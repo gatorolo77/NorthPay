@@ -17,4 +17,10 @@ public class OnboardingSummaryDto {
     private List<StepSummaryDto> steps;
     private Boolean canProceed;
     private List<String> blockingIssues;
+    private String whatsappVerificationCode;
+    private String whatsappPhone;
+    private String firstName;
+    private String lastName;
+    private String personalPhone;
+    private String country;
 }

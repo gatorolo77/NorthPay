@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 interface OnboardingSummary {
@@ -8,6 +8,12 @@ interface OnboardingSummary {
   steps: { type: string; status: string }[];
   canProceed: boolean;
   blockingIssues: string[];
+  whatsappVerificationCode?: string;
+  whatsappPhone?: string;
+  firstName?: string;
+  lastName?: string;
+  personalPhone?: string;
+  country?: string;
 }
 
 interface Notification {
@@ -16,6 +22,7 @@ interface Notification {
   message: string;
   type: string;
   isRead: boolean;
+  isFadingOut?: boolean;
   createdAt: string;
 }
 
@@ -35,25 +42,54 @@ interface OnboardingProcess {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
-  currentView: 'landing' | 'welcome' | 'register' | 'onboarding' | 'operator' | 'login' | 'contractor_login' = 'landing';
-  previousView: 'landing' | 'welcome' | 'register' | 'onboarding' | 'login' | 'contractor_login' = 'landing';
-  apiBaseUrl = 'http://localhost:8080/api';
-  isLocalMock = true;
+export class AppComponent implements OnInit, OnDestroy {
+  @ViewChild('langCarousel') langCarousel!: ElementRef;
+
+  languagesList = [
+    { code: 'en', name: 'English', flag: 'https://flagcdn.com/us.svg' },
+    { code: 'es', name: 'Español', flag: 'https://flagcdn.com/es.svg' },
+    { code: 'fr', name: 'Français', flag: 'https://flagcdn.com/fr.svg' },
+    { code: 'pt', name: 'Português', flag: 'https://flagcdn.com/pt.svg' },
+    { code: 'zh', name: '中文', flag: 'https://flagcdn.com/cn.svg' },
+    { code: 'it', name: 'Italiano', flag: 'https://flagcdn.com/it.svg' }
+  ];
+
+  currentView: 'landing' | 'welcome' | 'register' | 'onboarding' | 'operator' | 'login' | 'contractor_login' | 'legal' = 'landing';
+  previousView: 'landing' | 'welcome' | 'register' | 'onboarding' | 'login' | 'contractor_login' | 'legal' = 'landing';
+  apiBaseUrl = window.location.hostname === 'localhost' 
+    ? 'http://localhost:8080/api' 
+    : 'https://northpay-production.up.railway.app/api';
   isOperatorDemoMode = true;
+  userRole = 'OPERATOR';
+  
+  showDisclaimer: boolean = false;
   cloudinaryCloudName = 'northpay-demo';
   cloudinaryUploadPreset = 'northpay_preset';
 
+  initialToken: string | null = null;
   invitationToken = '';
-  invitationEmail = 'contractor@northpay.com';
-  registerPassword = 'password123';
+  invitationEmail = '';
+  invitationRole = 'CONTRACTOR';
+  registerPassword = '';
+  registerConfirmPassword = '';
+  registerSecretKey = '';
   showRegisterPassword = false;
-  loginEmail = 'contractor@northpay.com';
-  loginPassword = 'password123';
-  showLoginPassword = false;
-  adminUser = 'admin@northpay.com';
-  adminPass = 'admin123';
+  loginPass = '';
+  loginEmail = '';
+  loginPassword = '';
+
+  contractorMessage = '';
+  isSendingMessage = false;
+  isSignModalOpen = false;
+
   userId = 1;
+  showLoginPassword = false;
+  adminUser = '';
+  adminPass = '';
+  adminSetupKey = '';
+  isOperatorRegisterMode = false;
+  isOwnerMode = false;
+  showAdminPassword = false;
   processId = 1;
   showContractorSettings = false;
 
@@ -73,6 +109,7 @@ export class AppComponent implements OnInit {
     blockingIssues: []
   };
 
+  whatsappInterval: any;
   whatsappPhone = '';
   whatsappCode = '';
   isSendingWhatsapp = false;
@@ -95,6 +132,14 @@ export class AppComponent implements OnInit {
   signedContractUrl = '';
   isSigningContract = false;
   docusealEmbedSrc = 'https://www.docuseal.com/d/demo';
+
+  get currentLocalDateString(): string {
+    return new Date().toLocaleDateString(this.selectedLang === 'es' ? 'es-AR' : 'en-US', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  }
 
   @HostListener('document:docuseal:completed', ['$event'])
   onDocuSealCompleted(event: any) {
@@ -148,7 +193,9 @@ export class AppComponent implements OnInit {
       propTitle3: "Biometría KYC",
       propDesc3: "Comprobación de identidad de última generación respaldada por motores biométricos avanzados.",
       btnOperator: "Panel de Operaciones (Demo)",
+      tooltipOperator: "🧪 Este es un panel de pruebas con datos simulados. No afecta operaciones reales.",
       btnActivate: "Iniciar Activación ",
+      tooltipActivate: "🛡️ Al iniciar la activación aceptas nuestros Términos de Servicio y Políticas de Privacidad de NorthPay.",
       btnPortalLogin: "Ingresar al Portal",
       preloading: "Precargando recursos...",
       statusReady: "Portal NorthPay listo para operar ⚡",
@@ -202,7 +249,7 @@ export class AppComponent implements OnInit {
       persCountry: "PAÍS DE RESIDENCIA FISCAL",
       persBtnSave: "Guardar y Siguiente Paso",
       navOperator: "Panel de Operaciones",
-      notifCodeSent: "Código de activación listo: escribe 123456 en pantalla.",
+      notifCodeSent: "✅ Código de WhatsApp generado con éxito. Se abrirá WhatsApp para enviar el código.",
       notifWsSuccess: "WhatsApp verificado correctamente. ¡Onboarding desbloqueado!",
       notifWsFail: "Código incorrecto. Intenta de nuevo.",
       notifPersSave: "Datos personales guardados con éxito.",
@@ -219,7 +266,8 @@ export class AppComponent implements OnInit {
       loginPassLabel: "CONTRASEÑA",
       loginBtnBack: "Volver",
       loginBtnSubmit: "Iniciar Sesión",
-      loginTip: "🔐 Usa admin@northpay.com / admin123"
+      loginTip: "🔐 Usa admin@northpay.com / admin123",
+      btnLegales: "LEGALES"
     },
     en: {
       logoSubtitle: "WELCOME PORTAL",
@@ -232,7 +280,9 @@ export class AppComponent implements OnInit {
       propTitle3: "KYC Biometrics",
       propDesc3: "Next-generation identity verification powered by advanced biometric engines.",
       btnOperator: "Operator Panel (Demo)",
+      tooltipOperator: "🧪 This is a test panel with simulated data. It does not affect real operations.",
       btnActivate: "Start Activation",
+      tooltipActivate: "🛡️ By starting activation you accept NorthPay’s Terms of Service and Privacy Policy.",
       btnPortalLogin: "Access Portal",
       preloading: "Preloading resources...",
       statusReady: "NorthPay Portal ready to operate ⚡",
@@ -286,7 +336,7 @@ export class AppComponent implements OnInit {
       persCountry: "TAX RESIDENCE COUNTRY",
       persBtnSave: "Save and Next Step",
       navOperator: "Operator Panel",
-      notifCodeSent: "Activation code ready: type 123456 on screen.",
+      notifCodeSent: "✅ WhatsApp verification code generated. WhatsApp will open to send the code.",
       notifWsSuccess: "WhatsApp verified successfully. Onboarding unlocked!",
       notifWsFail: "Incorrect code. Please try again.",
       notifPersSave: "Personal data saved successfully.",
@@ -303,7 +353,8 @@ export class AppComponent implements OnInit {
       loginPassLabel: "PASSWORD",
       loginBtnBack: "Back",
       loginBtnSubmit: "Log In",
-      loginTip: "🔐 Use admin@northpay.com / admin123"
+      loginTip: "🔐 Use admin@northpay.com / admin123",
+      btnLegales: "LEGAL"
     },
     fr: {
       logoSubtitle: "PORTAIL DE BIENVENUE",
@@ -316,7 +367,9 @@ export class AppComponent implements OnInit {
       propTitle3: "Biométrie KYC",
       propDesc3: "Vérification d'identité de pointe optimisée par des moteurs biométriques avancés.",
       btnOperator: "Panneau Opérateur (Démo)",
+      tooltipOperator: "🧪 Il s’agit d’un panneau de test avec des données simulées. Il n’affecte pas les opérations réelles.",
       btnActivate: "Lancer l'activation ",
+      tooltipActivate: "🛡️ En lançant l’activation, vous acceptez les Conditions d’Utilisation et la Politique de Confidentialité de NorthPay.",
       btnPortalLogin: "Accéder au Portail",
       preloading: "Préchargement des ressources...",
       statusReady: "Portail NorthPay prêt à fonctionner ⚡",
@@ -370,7 +423,7 @@ export class AppComponent implements OnInit {
       persCountry: "PAYS DE RÉSIDENCE FISCALE",
       persBtnSave: "Enregistrer et Étape Suivante",
       navOperator: "Panneau Opérateur",
-      notifCodeSent: "Code d'activation prêt : tapez 123456 à l'écran.",
+      notifCodeSent: "✅ Code WhatsApp généré. WhatsApp s'ouvrira pour envoyer le code.",
       notifWsSuccess: "WhatsApp vérifié avec succès. Intégration déverrouillée !",
       notifWsFail: "Code incorrect. Veuillez réessayer.",
       notifPersSave: "Données personnelles enregistrées avec succès.",
@@ -387,7 +440,8 @@ export class AppComponent implements OnInit {
       loginPassLabel: "MOT DE PASSE",
       loginBtnBack: "Retour",
       loginBtnSubmit: "Se Connecter",
-      loginTip: "🔐 Utilisez admin@northpay.com / admin123"
+      loginTip: "🔐 Utilisez admin@northpay.com / admin123",
+      btnLegales: "LÉGAL"
     },
     pt: {
       logoSubtitle: "PORTAL DE BOAS-VINDAS",
@@ -400,7 +454,9 @@ export class AppComponent implements OnInit {
       propTitle3: "Biometria KYC",
       propDesc3: "Verificação de identidade de última geração com suporte de motores biométricos avançados.",
       btnOperator: "Painel do Operador (Demo)",
+      tooltipOperator: "🧪 Este é um painel de testes com dados simulados. Não afeta operações reais.",
       btnActivate: "Iniciar Ativação ",
+      tooltipActivate: "🛡️ Ao iniciar a ativação você aceita os Termos de Serviço e a Política de Privacidade da NorthPay.",
       btnPortalLogin: "Acessar o Portal",
       preloading: "Pré-carregando recursos...",
       statusReady: "Portal NorthPay pronto para operar ⚡",
@@ -454,7 +510,7 @@ export class AppComponent implements OnInit {
       persCountry: "PAÍS DE RESIDÊNCIA FISCAL",
       persBtnSave: "Salvar e Próxima Etapa",
       navOperator: "Painel de Operações",
-      notifCodeSent: "Código de ativação pronto: digite 123456 na tela.",
+      notifCodeSent: "✅ Código do WhatsApp gerado com sucesso. O WhatsApp abrirá para enviar o código.",
       notifWsSuccess: "WhatsApp verificado com sucesso. Integração desbloqueada!",
       notifWsFail: "Código incorreto. Por favor tente novamente.",
       notifPersSave: "Dados pessoais salvos com sucesso.",
@@ -471,7 +527,8 @@ export class AppComponent implements OnInit {
       loginPassLabel: "SENHA",
       loginBtnBack: "Voltar",
       loginBtnSubmit: "Iniciar Sessão",
-      loginTip: "🔐 Use admin@northpay.com / admin123"
+      loginTip: "🔐 Use admin@northpay.com / admin123",
+      btnLegales: "LEGAIS"
     },
     zh: {
       logoSubtitle: "欢迎门户",
@@ -484,7 +541,9 @@ export class AppComponent implements OnInit {
       propTitle3: "KYC 生物识别",
       propDesc3: "由先进 of 生物识别引擎支持的新一代身份验证。",
       btnOperator: "运营商面板 (演示)",
+      tooltipOperator: "🧪 这是一个使用模拟数据的测试面板，不会影响真实操作。",
       btnActivate: "开始激活",
+      tooltipActivate: "🛡️ 开始激活即表示您接受 NorthPay 的服务条款和隐私政策。",
       btnPortalLogin: "登录门户",
       preloading: "正在预载资源...",
       statusReady: "NorthPay 门户已准备就绪 ⚡",
@@ -538,7 +597,7 @@ export class AppComponent implements OnInit {
       persCountry: "税务居留国",
       persBtnSave: "保存并下一步",
       navOperator: "操作面板",
-      notifCodeSent: "激活码已就绪：请在屏幕上输入 123456。",
+      notifCodeSent: "✅ 已生成 WhatsApp 验证码。将自动打开 WhatsApp 并发送消息。",
       notifWsSuccess: "WhatsApp 验证成功。入职流程已解锁！",
       notifWsFail: "代码错误。请再试一次。",
       notifPersSave: "个人数据已成功保存。",
@@ -555,7 +614,8 @@ export class AppComponent implements OnInit {
       loginPassLabel: "密码",
       loginBtnBack: "返回",
       loginBtnSubmit: "登录",
-      loginTip: "🔐 请使用 admin@northpay.com / admin123"
+      loginTip: "🔐 请使用 admin@northpay.com / admin123",
+      btnLegales: "法律条款"
     },
     it: {
       logoSubtitle: "PORTALE DI BENVENUTO",
@@ -568,7 +628,9 @@ export class AppComponent implements OnInit {
       propTitle3: "Biometria KYC",
       propDesc3: "Verifica dell'identità di nuova generazione supportata da motori biometrici avanzati.",
       btnOperator: "Pannello Operazioni (Demo)",
+      tooltipOperator: "🧪 Questo è un pannello di test con dati simulati. Non influisce sulle operazioni reali.",
       btnActivate: "Avvia Attivazione",
+      tooltipActivate: "🛡️ Avviando l’attivazione accetti i Termini di Servizio e l’Informativa sulla Privacy di NorthPay.",
       btnPortalLogin: "Accedi al Portale",
       preloading: "Precaricamento risorse...",
       statusReady: "Portale NorthPay pronto a operare ⚡",
@@ -622,7 +684,7 @@ export class AppComponent implements OnInit {
       persCountry: "PAESE DI RESIDENZA FISCALE",
       persBtnSave: "Salva e Prossimo Passo",
       navOperator: "Pannello Operazioni",
-      notifCodeSent: "Codice di attivazione pronto: digita 123456 sullo schermo.",
+      notifCodeSent: "✅ Codice di verifica WhatsApp generato con successo. Si aprirà WhatsApp per inviare il messaggio.",
       notifWsSuccess: "WhatsApp verificato con successo. Onboarding sbloccato!",
       notifWsFail: "Codice non corretto. Riprova.",
       notifPersSave: "Dati personali salvati con successo.",
@@ -639,7 +701,8 @@ export class AppComponent implements OnInit {
       loginPassLabel: "PASSWORD",
       loginBtnBack: "Indietro",
       loginBtnSubmit: "Accedi",
-      loginTip: "🔐 Usa admin@northpay.com / admin123"
+      loginTip: "🔐 Usa admin@northpay.com / admin123",
+      btnLegales: "LEGALI"
     }
   };
 
@@ -689,21 +752,39 @@ export class AppComponent implements OnInit {
     let symbol = '$';
 
     if (curr === 'EUR') {
-      converted = baseAmount * 0.92; // Simulador de Tasa de Cambio EUR/USD
+      if (baseAmount === 2500) {
+        converted = baseAmount * 0.92;
+      }
       symbol = '€';
     } else if (curr === 'USDT') {
       symbol = '₮';
     }
 
-    const formatted = converted.toLocaleString('en-US', { 
-      minimumFractionDigits: 2, 
-      maximumFractionDigits: 2 
+    const formatted = converted.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
     });
 
     return `${showPlus ? '+' : ''}${symbol}${formatted} ${curr}`;
   }
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+
+    let finalToken = token;
+    if (!finalToken && window.location.href.includes('token=')) {
+      const parts = window.location.href.split('token=');
+      if (parts.length > 1) {
+        finalToken = parts[1].split('&')[0];
+      }
+    }
+
+    if (finalToken) {
+      this.initialToken = finalToken;
+      console.log('[NorthPay] Token capturado sincrónicamente:', this.initialToken);
+    }
+  }
 
   ngOnInit() {
     const savedTheme = localStorage.getItem('northpay-theme') as 'dark' | 'light';
@@ -716,71 +797,117 @@ export class AppComponent implements OnInit {
   }
 
   testBackendConnection() {
-
-    this.http.get(`${this.apiBaseUrl}/onboarding/1/summary`).subscribe({
+    this.http.get(`${this.apiBaseUrl}/auth/health`, { responseType: 'text' }).subscribe({
       next: () => {
-        this.isLocalMock = false;
         console.log('[NorthPay] Connected to NorthPay server.');
         this.addLocalNotification('Conectado al servidor de NorthPay', 'SUCCESS');
+        this.checkUrlForToken();
       },
       error: () => {
-        this.isLocalMock = true;
-        console.warn('[NorthPay] Spring Boot offline. Running in premium Local Simulation mode.');
-        this.loadMockInitialState();
+        console.warn('[NorthPay] Spring Boot offline.');
+        this.checkUrlForToken();
       }
     });
   }
 
+  checkUrlForToken() {
+    const finalToken = this.initialToken;
 
-  generateInvitation() {
-    if (this.isLocalMock) {
-      this.invitationToken = 'NP_INV_' + Math.random().toString(36).substring(2, 10).toUpperCase();
-      this.addLocalNotification(`Invitación creada para ${this.invitationEmail}`, 'SUCCESS');
-      this.currentView = 'register';
-    } else {
-      this.http.post(`${this.apiBaseUrl}/invitations/send`, {
-        email: this.invitationEmail,
-        operatorId: 1
-      }).subscribe({
-        next: (res: any) => {
-          this.invitationToken = res.token;
-          this.addLocalNotification(`Invitación enviada para ${this.invitationEmail}`, 'SUCCESS');
-          this.currentView = 'register';
+    if (finalToken) {
+      console.log('[NorthPay] RUTA DE ACTIVACIÓN DETECTADA. Token:', finalToken);
+      this.http.get(`${this.apiBaseUrl}/invitations/${finalToken}`).subscribe({
+        next: (invitation: any) => {
+          console.log('[NorthPay] Invitación obtenida:', invitation);
+          if (invitation && invitation.status === 'PENDING') {
+            this.invitationToken = invitation.token;
+            this.invitationEmail = invitation.email;
+            this.invitationRole = invitation.role || 'CONTRACTOR';
+            this.currentView = 'register';
+            this.addLocalNotification('Token de activación válido detectado. Configura tu contraseña.', 'SUCCESS');
+          } else {
+            this.addLocalNotification('El token de activación ya ha sido utilizado o ha expirado.', 'ERROR');
+          }
         },
-        error: (err) => this.handleError(err)
+        error: (err) => {
+          console.error('[NorthPay] Error validando token:', err);
+          this.invitationToken = finalToken!;
+          this.invitationRole = 'CONTRACTOR';
+          this.currentView = 'register';
+          this.addLocalNotification('Token detectado. Por favor ingresa tu correo y contraseña.', 'INFO');
+        }
       });
+
+      this.initialToken = null;
     }
   }
 
 
-  register() {
-    if (this.isLocalMock) {
-      this.userId = 100;
-      this.processId = 500;
+  generateInvitation() {
+    this.http.post(`${this.apiBaseUrl}/invitations/send`, {
+      email: this.invitationEmail,
+      operatorId: 1
+    }).subscribe({
+      next: (res: any) => {
+        this.invitationToken = res.token;
+        this.addLocalNotification(`Invitación enviada para ${this.invitationEmail}`, 'SUCCESS');
+        this.currentView = 'landing';
+      },
+      error: (err) => this.handleError(err)
+    });
+  }
 
-      // ✨ Warm Default Pre-fill for high-quality Sandbox UX
-      if (!this.personalData.firstName) {
-        this.personalData.firstName = 'Juan';
-        this.personalData.lastName = 'Pérez';
-      }
 
-      this.addLocalNotification('Usuario registrado con éxito', 'SUCCESS');
-      this.summary.status = 'IN_PROGRESS';
-      this.currentView = 'onboarding';
-    } else {
-      this.http.post(`${this.apiBaseUrl}/auth/register`, {
-        email: this.invitationEmail,
-        password: this.registerPassword,
-        token: this.invitationToken
-      }).subscribe({
-        next: (user: any) => {
-          this.userId = user.id;
-          this.addLocalNotification('Registrado correctamente', 'SUCCESS');
-          this.initiateOnboarding();
-        },
-        error: (err) => this.handleError(err)
-      });
+  sendOperatorInvitation() {
+    if (!this.adminUser || !this.adminUser.includes('@')) {
+      this.addLocalNotification('Por favor ingresa un correo electrónico válido.', 'ERROR');
+      return;
     }
+    this.http.post(`${this.apiBaseUrl}/auth/invite-operator`, {
+      email: this.adminUser
+    }).subscribe({
+      next: () => {
+        this.addLocalNotification(`Enlace de registro enviado a ${this.adminUser}. Revisá tu correo.`, 'SUCCESS');
+        this.isOperatorRegisterMode = false;
+        this.adminUser = '';
+      },
+      error: (err) => this.handleError(err)
+    });
+  }
+
+
+  register() {
+    if (this.registerPassword !== this.registerConfirmPassword) {
+      this.addLocalNotification('Las contraseñas no coinciden. Por favor verificalas.', 'ERROR');
+      return;
+    }
+    if (this.registerPassword.length < 6) {
+      this.addLocalNotification('La contraseña debe tener al menos 6 caracteres.', 'ERROR');
+      return;
+    }
+
+    this.http.post(`${this.apiBaseUrl}/auth/register`, {
+      email: this.invitationEmail,
+      password: this.registerPassword,
+      token: this.invitationToken,
+      secretKey: this.registerSecretKey ? this.registerSecretKey.trim().toUpperCase() : ''
+    }).subscribe({
+      next: (user: any) => {
+        this.addLocalNotification('Registrado correctamente', 'SUCCESS');
+        this.registerPassword = '';
+        this.registerConfirmPassword = '';
+        this.registerSecretKey = '';
+        
+        if (this.invitationRole === 'OPERATOR') {
+          this.adminUser = this.invitationEmail;
+          this.currentView = 'login'; // Redirect to operator login
+          this.addLocalNotification('Tu cuenta de operador ha sido activada. Ya podés iniciar sesión.', 'SUCCESS');
+        } else {
+          this.userId = user.id;
+          this.initiateOnboarding();
+        }
+      },
+      error: (err) => this.handleError(err)
+    });
   }
 
   initiateOnboarding() {
@@ -795,13 +922,34 @@ export class AppComponent implements OnInit {
   }
 
   refreshSummary() {
-    if (this.isLocalMock) {
-      this.resolveLocalState();
-      return;
-    }
     this.http.get<OnboardingSummary>(`${this.apiBaseUrl}/onboarding/${this.processId}/summary`).subscribe({
       next: (summary) => {
         this.summary = summary;
+        if (summary.whatsappPhone) {
+          this.whatsappPhone = summary.whatsappPhone;
+        }
+
+        // Populate personal data fields if they exist in the summary
+        if (summary.firstName) this.personalData.firstName = summary.firstName;
+        if (summary.lastName) this.personalData.lastName = summary.lastName;
+
+        // Load personal phone or fallback to verified WhatsApp phone
+        this.personalData.phone = summary.personalPhone || summary.whatsappPhone || '';
+
+        if (summary.country) {
+          this.personalData.country = summary.country;
+        } else if (this.personalData.phone) {
+          // Detect country if country is empty or Spain by default but phone prefix doesn't match
+          const cleanNum = this.personalData.phone.replace(/\D/g, '');
+          if (cleanNum.startsWith('54')) this.personalData.country = 'Argentina';
+          else if (cleanNum.startsWith('34')) this.personalData.country = 'Spain';
+          else if (cleanNum.startsWith('52')) this.personalData.country = 'Mexico';
+          else if (cleanNum.startsWith('57')) this.personalData.country = 'Colombia';
+          else if (cleanNum.startsWith('55')) this.personalData.country = 'Brazil';
+          else if (cleanNum.startsWith('56')) this.personalData.country = 'Chile';
+          else if (cleanNum.startsWith('1')) this.personalData.country = 'United States';
+        }
+
         this.loadNotifications();
       },
       error: (err) => this.handleError(err)
@@ -810,20 +958,13 @@ export class AppComponent implements OnInit {
 
 
   submitPersonalData() {
-    if (this.isLocalMock) {
-      this.summary.steps[1].status = 'COMPLETED';
-      this.summary.steps[2].status = 'IN_PROGRESS';
-      this.addLocalNotification(this.translations[this.selectedLang]['notifPersSave'], 'SUCCESS');
-      this.refreshSummary();
-    } else {
-      this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/personal-data`, this.personalData).subscribe({
-        next: () => {
-          this.addLocalNotification(this.translations[this.selectedLang]['notifPersSave'], 'SUCCESS');
-          this.refreshSummary();
-        },
-        error: (err) => this.handleError(err)
-      });
-    }
+    this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/personal-data`, this.personalData).subscribe({
+      next: () => {
+        this.addLocalNotification(this.translations[this.selectedLang]['notifPersSave'], 'SUCCESS');
+        this.refreshSummary();
+      },
+      error: (err) => this.handleError(err)
+    });
   }
 
 
@@ -854,107 +995,77 @@ export class AppComponent implements OnInit {
   uploadDocument() {
     if (!this.selectedFile) return;
     this.isUploadingDoc = true;
-
-    if (this.isLocalMock) {
-      const formData = new FormData();
-      formData.append('file', this.selectedFile);
-      formData.append('upload_preset', this.cloudinaryUploadPreset);
-
-      this.http.post(`https://api.cloudinary.com/v1_1/${this.cloudinaryCloudName}/image/upload`, formData).subscribe({
-        next: (res: any) => {
-          this.isUploadingDoc = false;
-          this.uploadedDocs.push({
-            type: this.selectedDocType,
-            filename: this.selectedFile ? this.selectedFile.name : 'doc_id.pdf',
-            fileUrl: res.secure_url
-          });
-          this.summary.steps[2].status = 'IN_REVIEW';
-          this.addLocalNotification(`Documento '${this.selectedDocType}' subido con éxito a Cloudinary.`, 'SUCCESS');
-          this.selectedFile = null;
-          this.refreshSummary();
-        },
-        error: () => {
-          // Graceful fallback to simulation if the Cloudinary preset is not configured yet
-          this.isUploadingDoc = false;
-          const filename = this.selectedFile ? this.selectedFile.name : 'doc_id.pdf';
-          this.uploadedDocs.push({
-            type: this.selectedDocType,
-            filename: filename,
-            fileUrl: 'https://res.cloudinary.com/demo/image/upload/' + filename
-          });
-          this.summary.steps[2].status = 'IN_REVIEW';
-          this.addLocalNotification(`Documento '${this.selectedDocType}' subido (Simulación). Esperando aprobación.`, 'INFO');
-          this.selectedFile = null;
-          this.refreshSummary();
-        }
-      });
-    } else {
-      const formData = new FormData();
-      formData.append('type', this.selectedDocType);
-      formData.append('file', this.selectedFile);
-
-      this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/documents`, formData).subscribe({
-        next: () => {
-          this.isUploadingDoc = false;
-          this.selectedFile = null;
-          this.addLocalNotification('Documento subido.', 'SUCCESS');
-          this.refreshSummary();
-        },
-        error: (err) => {
-          this.isUploadingDoc = false;
-          this.handleError(err);
-        }
-      });
-    }
+    const formData = new FormData();
+    formData.append('type', this.selectedDocType);
+    formData.append('file', this.selectedFile);
+    this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/documents`, formData).subscribe({
+      next: () => {
+        this.isUploadingDoc = false;
+        this.selectedFile = null;
+        this.addLocalNotification('Documento subido.', 'SUCCESS');
+        this.refreshSummary();
+      },
+      error: (err) => {
+        this.isUploadingDoc = false;
+        this.handleError(err);
+      }
+    });
   }
 
+
+  showSignModal() {
+    this.isSignModalOpen = true;
+  }
+
+  sendMessageToOperator() {
+    if (!this.contractorMessage || this.contractorMessage.trim() === '') return;
+    this.isSendingMessage = true;
+    this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/operator-message`, {
+      message: this.contractorMessage
+    }).subscribe({
+      next: () => {
+        this.addLocalNotification('Mensaje enviado al operador', 'SUCCESS');
+        this.contractorMessage = '';
+        this.isSendingMessage = false;
+      },
+      error: (err) => {
+        this.addLocalNotification('Error al enviar mensaje', 'ERROR');
+        console.error(err);
+        this.isSendingMessage = false;
+      }
+    });
+  }
 
   signContract() {
     this.isSigningContract = true;
     setTimeout(() => {
       this.isSigningContract = false;
       this.signedContractUrl = 'https://res.cloudinary.com/demo/contract/signed_contract_doe.pdf';
-
-      if (this.isLocalMock) {
-        this.summary.steps[3].status = 'COMPLETED';
-        this.summary.steps[4].status = 'IN_PROGRESS';
-        this.addLocalNotification('Contrato firmado digitalmente.', 'SUCCESS');
-        this.refreshSummary();
-      } else {
-        const mockBlob = new Blob(['signed contract'], { type: 'text/plain' });
-        const mockFile = new File([mockBlob], 'signed_contract.txt');
-        const formData = new FormData();
-        formData.append('file', mockFile);
-
-        this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/contract/sign`, formData).subscribe({
-          next: () => {
-            this.addLocalNotification('Contrato enviado y firmado.', 'SUCCESS');
-            this.refreshSummary();
-          },
-          error: (err) => this.handleError(err)
-        });
-      }
-    }, 1500);
-  }
-
-  savePaymentMethod() {
-    if (this.isLocalMock) {
-      this.summary.steps[4].status = 'COMPLETED';
-      this.summary.steps[5].status = 'IN_PROGRESS';
-      this.addLocalNotification('Método de pago configurado con éxito.', 'SUCCESS');
-      this.refreshSummary();
-    } else {
-      this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/payment-method`, {
-        provider: this.paymentMethod.provider,
-        data: this.paymentMethod
-      }).subscribe({
+      const mockBlob = new Blob(['signed contract'], { type: 'text/plain' });
+      const mockFile = new File([mockBlob], 'signed_contract.txt');
+      const formData = new FormData();
+      formData.append('file', mockFile);
+      this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/contract/sign`, formData).subscribe({
         next: () => {
-          this.addLocalNotification('Método de pago guardado.', 'SUCCESS');
+          this.addLocalNotification('Contrato enviado y firmado.', 'SUCCESS');
           this.refreshSummary();
         },
         error: (err) => this.handleError(err)
       });
-    }
+    }, 1500);
+  }
+
+  savePaymentMethod() {
+    this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/payment-method`, {
+      provider: this.paymentMethod.provider,
+      data: this.paymentMethod
+    }).subscribe({
+      next: () => {
+        this.addLocalNotification('Método de pago guardado.', 'SUCCESS');
+        this.refreshSummary();
+      },
+      error: (err) => this.handleError(err)
+    });
   }
 
   startIdentityScanning() {
@@ -966,37 +1077,24 @@ export class AppComponent implements OnInit {
         clearInterval(interval);
         this.isScanningIdentity = false;
 
-        if (this.isLocalMock) {
-          if (this.scanSuccess) {
-            this.summary.steps[5].status = 'COMPLETED';
-            this.summary.status = 'COMPLETED';
-            this.addLocalNotification('Identidad verificada biométricamente. ¡Onboarding completado!', 'SUCCESS');
-          } else {
-            this.summary.steps[5].status = 'REJECTED';
-            this.addLocalNotification('Fallo en escáner facial. Por favor intente nuevamente.', 'ERROR');
-          }
-          this.refreshSummary();
-        } else {
-          this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/identity-verification?provider=${this.identityProvider}&success=${this.scanSuccess}`, {}).subscribe({
+        this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/identity-verification?provider=${this.identityProvider}&success=${this.scanSuccess}`, {}).subscribe({
             next: () => {
               this.addLocalNotification('Verificación biométrica procesada.', 'SUCCESS');
               this.refreshSummary();
             },
             error: (err) => this.handleError(err)
           });
-        }
       }
     }, 300);
   }
 
   startOnboarding() {
-    this.notifications = []; // Remove residual toasts from the landing page
+    this.notifications = [];
     this.currentView = 'welcome';
-    this.playGreetingAudio(); // Activate localized greeting audio
+    this.playGreetingAudio();
   }
 
   playGreetingAudio() {
-    // Resilient format chain: scan sequentially for modern OGG, raw WAV, or universal MP3
     const formats = ['ogg', 'wav', 'mp3'];
     this.playFallbackAudio(formats, 0);
   }
@@ -1011,32 +1109,25 @@ export class AppComponent implements OnInit {
     const currentFormat = formats[index];
     audio.src = `assets/audio/greeting_${this.selectedLang}.${currentFormat}`;
 
-    // Apply global master settings from the topbar controls!
     audio.volume = this.audioVolume / 100;
     audio.muted = this.isMuted;
 
-    // Clean reference completely upon track completion
     audio.onended = () => {
       this.currentAudio = null;
     };
 
-    // Hook into errors (file not found or format unsupported) to advance the chain
     audio.onerror = () => {
       this.playFallbackAudio(formats, index + 1);
     };
-
-    // Hook into successfully loaded metadata/buffers to start playback immediately
     audio.oncanplaythrough = () => {
-      this.currentAudio = audio; // Register globally as actively playing
+      this.currentAudio = audio;
       audio.play().catch(e => {
-        // In case play fails, suppress and continue scanning fallback chain
         this.playFallbackAudio(formats, index + 1);
       });
-      // Remove listener once successfully fired to prevent double trigger re-entry
       audio.oncanplaythrough = null;
     };
 
-    audio.load(); // Fire up the network load
+    audio.load();
   }
 
   toggleMute() {
@@ -1051,7 +1142,6 @@ export class AppComponent implements OnInit {
     this.audioVolume = inputVal;
     if (this.currentAudio) {
       this.currentAudio.volume = this.audioVolume / 100;
-      // Automatically unmute if user adjusts volume to give great immediate feedback
       if (this.isMuted && this.audioVolume > 0) {
         this.isMuted = false;
         this.currentAudio.muted = false;
@@ -1060,85 +1150,152 @@ export class AppComponent implements OnInit {
   }
 
   submitAdminLogin() {
-    if (this.isLocalMock) {
-      // Soft Sandbox validation to enable a smooth user trial with realistic feel!
-      if (this.adminUser.toLowerCase() === 'admin@northpay.com' && this.adminPass === 'admin123') {
-        this.addLocalNotification('Acceso Autorizado. Cargando terminal de Operador Real...', 'SUCCESS');
+    this.http.post<any>(`${this.apiBaseUrl}/auth/login`, {
+      email: this.adminUser,
+      password: this.adminPass
+    }).subscribe({
+      next: (user) => {
+        this.userId = user.id;
+        this.userRole = user.role;
         this.isOperatorDemoMode = false;
-        this.loadOperatorPanel();
-      } else {
-        this.addLocalNotification('Error de Acceso: Credenciales incorrectas. Utiliza admin@northpay.com / admin123', 'ERROR');
-      }
-    } else {
-      this.http.post(`${this.apiBaseUrl}/auth/login`, {
-        username: this.adminUser,
-        password: this.adminPass
-      }).subscribe({
-        next: () => {
-          this.addLocalNotification('Bienvenido de vuelta, Administrador.', 'SUCCESS');
-          this.isOperatorDemoMode = false;
-          this.loadOperatorPanel();
-        },
-        error: (err) => {
-          this.addLocalNotification('Acceso Denegado: Verifica usuario y clave.', 'ERROR');
+        this.isOwnerMode = false;
+        if (user.role === 'OWNER') {
+          this.addLocalNotification('Bienvenido de vuelta, Propietario (Owner).', 'SUCCESS');
+        } else {
+          this.addLocalNotification('Bienvenido de vuelta, Operador.', 'SUCCESS');
         }
-      });
-    }
+        this.loadOperatorPanel();
+      },
+      error: () => {
+        this.addLocalNotification('Acceso Denegado: Verifica usuario y clave.', 'ERROR');
+      }
+    });
+  }
+
+  openOwnerDirectLogin() {
+    this.currentView = 'login';
+    this.isOperatorRegisterMode = false;
+    this.isOwnerMode = true;
+    this.adminUser = 'owner@northpay.com';
+    this.adminPass = '';
+    this.addLocalNotification('Terminal de Propietario: Por favor ingresá tu Llave de Oro.', 'INFO');
+  }
+
+  goBackToLanding() {
+    this.currentView = 'landing';
+    this.isOperatorRegisterMode = false;
+    this.isOwnerMode = false;
+    this.adminUser = '';
+    this.adminPass = '';
+  }
+
+  submitOperatorRegister() {
+    this.http.post(`${this.apiBaseUrl}/auth/register-operator`, {
+      email: this.adminUser,
+      password: this.adminPass,
+      setupKey: this.adminSetupKey
+    }).subscribe({
+      next: () => {
+        this.addLocalNotification('¡Operador registrado con éxito! Ahora podés iniciar sesión.', 'SUCCESS');
+        this.isOperatorRegisterMode = false;
+        this.adminSetupKey = '';
+      },
+      error: (err) => {
+        const msg = err?.error || 'Error al registrar operador. Verificá la clave de configuración.';
+        this.addLocalNotification(msg, 'ERROR');
+      }
+    });
   }
 
   submitContractorPortalLogin() {
-    const targetEmail = this.invitationEmail || 'contractor@northpay.com';
-    const targetPass = this.registerPassword || 'password123';
-    
-    if (this.loginEmail.toLowerCase() === targetEmail.toLowerCase() && this.loginPassword === targetPass) {
-      this.addLocalNotification('Sesión iniciada correctamente. Cargando tu Dashboard...', 'SUCCESS');
-      
-      // Sincronizar estados de simulación a COMPLETADO para evitar hacer el onboarding
-      this.summary.status = 'COMPLETED';
-      this.summary.progress = 100;
-      this.summary.steps.forEach(s => s.status = 'COMPLETED');
-      
-      this.currentView = 'onboarding';
-    } else {
-      this.addLocalNotification('Credenciales incorrectas. Revisa tu correo y contraseña.', 'ERROR');
+    this.http.post<any>(`${this.apiBaseUrl}/auth/login`, {
+      email: this.loginEmail,
+      password: this.loginPassword
+    }).subscribe({
+      next: (user) => {
+        this.addLocalNotification('Sesión iniciada correctamente. Cargando tu Dashboard...', 'SUCCESS');
+        this.userId = user.id;
+        this.invitationEmail = this.loginEmail;
+        this.http.post<any>(`${this.apiBaseUrl}/onboarding/initiate?contractorUserId=${this.userId}`, {}).subscribe({
+          next: (process) => {
+            this.processId = process.id;
+            this.refreshSummary();
+            this.currentView = 'onboarding';
+          },
+          error: (err) => {
+            console.error('[NorthPay] Failed to initiate process:', err);
+            this.addLocalNotification('Error al inicializar proceso de onboarding', 'ERROR');
+          }
+        });
+      },
+      error: (err) => {
+        console.error('[NorthPay] Live contractor login failed:', err);
+        this.addLocalNotification('Credenciales incorrectas o usuario no registrado.', 'ERROR');
+      }
+    });
+  }
+
+  openContractorSettings() {
+    this.showContractorSettings = true;
+    if (!this.whatsappPhone) {
+      this.whatsappPhone = this.personalData.phone || '+34 600 000 000';
     }
   }
 
+  saveContractorSettings() {
+    const pData: Record<string, any> = {};
+    const provider = this.paymentMethod.provider;
+
+    if (provider === 'BANK_TRANSFER') {
+      pData['bankName'] = this.paymentMethod.bankName;
+      pData['accountNumber'] = this.paymentMethod.accountNumber;
+      pData['swiftCode'] = this.paymentMethod.swiftCode;
+    } else if (provider === 'MERCADO_PAGO') {
+      pData['mpAliasOrCvu'] = this.paymentMethod.mpAliasOrCvu;
+      pData['mpAccountHolder'] = this.paymentMethod.mpAccountHolder;
+    } else if (provider === 'PAYONEER' || provider === 'PAYPAL') {
+      pData['paypalEmail'] = this.paymentMethod.paypalEmail;
+      pData['paypalName'] = this.paymentMethod.paypalName;
+    } else if (provider === 'CRYPTO') {
+      pData['cryptoNetwork'] = this.paymentMethod.cryptoNetwork;
+      pData['cryptoAddress'] = this.paymentMethod.cryptoAddress;
+    }
+
+    const payload = {
+      whatsappPhone: this.whatsappPhone,
+      paymentProvider: provider,
+      paymentData: pData
+    };
+
+
+    this.http.put(`${this.apiBaseUrl}/onboarding/${this.processId}/settings`, payload).subscribe({
+      next: (updatedSummary: any) => {
+        this.addLocalNotification('Perfil y método de pago actualizados con éxito', 'SUCCESS');
+        this.personalData.phone = this.whatsappPhone;
+        if (updatedSummary) {
+          this.summary = updatedSummary;
+        }
+        this.showContractorSettings = false;
+      },
+      error: (err) => {
+        console.error('[NorthPay] Failed to save settings:', err);
+        this.addLocalNotification('Error al guardar ajustes en el servidor', 'ERROR');
+      }
+    });
+  }
+
   loadOperatorPanel() {
-    this.notifications = []; // Clear alerts for cleaner operator interface
+    this.notifications = [];
     this.previousView = this.currentView as any;
     this.currentView = 'operator';
-
-    const currentName = this.personalData.firstName ? `${this.personalData.firstName} ${this.personalData.lastName}` : 'Juan Pérez (Tú)';
-    const currentCountry = this.personalData.country || 'España';
-    const currentStatus = this.summary.steps[2].status === 'IN_REVIEW' ? 'IN_REVIEW' : this.summary.status;
-
-    this.mockContractors = [
-      { id: 500, name: currentName, country: currentCountry, email: this.invitationEmail, progress: this.summary.progress, status: this.paidContractorIds.includes(500) ? 'PAID' : currentStatus, date: '07/05/2026', currentStep: this.summary.currentStep || 'COMPLETED' },
-      { id: 501, name: 'María Gómez', country: 'Colombia', email: 'maria.gomez@gmail.com', progress: 100, status: this.paidContractorIds.includes(501) ? 'PAID' : 'COMPLETED', date: '05/05/2026', currentStep: 'COMPLETED' },
-      { id: 502, name: 'Pierre Dubois', country: 'Francia', email: 'pierre.dubois@yahoo.fr', progress: 20, status: this.paidContractorIds.includes(502) ? 'PAID' : 'IN_PROGRESS', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD' },
-      { id: 503, name: 'Yuki Tanaka', country: 'Japón', email: 'tanaka.yuki@gmail.com', progress: 40, status: this.paidContractorIds.includes(503) ? 'PAID' : 'IN_REVIEW', date: '06/05/2026', currentStep: 'DOCUMENT_UPLOAD' }
-    ];
-
-    if (this.isLocalMock) {
-      this.operatorProcesses = [
-        {
-          id: 500,
-          contractorUserId: 100,
-          status: currentStatus,
-          currentStep: this.summary.currentStep || 'COMPLETED',
-          progress: this.summary.progress,
-          assignedOperatorId: 1,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }
-      ];
-    } else {
-      this.http.get<OnboardingProcess[]>(`${this.apiBaseUrl}/operator/processes`).subscribe({
-        next: (procs) => this.operatorProcesses = procs,
-        error: (err) => this.handleError(err)
-      });
+    if (this.isOperatorDemoMode) {
+      this.userRole = 'OPERATOR';
+      return;
     }
+    this.http.get<OnboardingProcess[]>(`${this.apiBaseUrl}/operator/processes`).subscribe({
+      next: (procs) => this.operatorProcesses = procs,
+      error: (err) => this.handleError(err)
+    });
   }
 
   exitOperatorPanel() {
@@ -1146,7 +1303,8 @@ export class AppComponent implements OnInit {
       this.currentView = 'landing';
       this.adminUser = '';
       this.adminPass = '';
-      // Clean sandbox state upon logout for max realism!
+      this.isOperatorDemoMode = true;
+      this.userRole = 'OPERATOR';
       this.addLocalNotification(this.selectedLang === 'es' ? 'Sesión cerrada correctamente.' : 'Successfully logged out.', 'INFO');
     } else {
       this.currentView = this.previousView as any;
@@ -1157,32 +1315,17 @@ export class AppComponent implements OnInit {
     const feedbackMsg = approved ? 'Documentación válida y certificada.' : this.reviewFeedback || 'Faltan firmas o nitidez.';
     const stepId = 2;
     this.selectedProcessIdForReview = null;
-
-    if (this.isLocalMock) {
-      if (approved) {
-        this.summary.steps[2].status = 'COMPLETED';
-        this.summary.steps[3].status = 'IN_PROGRESS';
-        this.addLocalNotification(this.translations[this.selectedLang]['notifStep2App'], 'SUCCESS');
-      } else {
-        this.summary.steps[2].status = 'REJECTED';
-        this.addLocalNotification(this.translations[this.selectedLang]['notifStep2Rej'], 'ERROR');
-      }
-      this.reviewFeedback = '';
-      this.refreshSummary();
-      this.loadOperatorPanel();
-    } else {
-      this.http.post(`${this.apiBaseUrl}/operator/steps/${stepId}/review?operatorId=1`, {
-        approved: approved,
-        feedback: feedbackMsg
-      }).subscribe({
-        next: () => {
-          this.addLocalNotification(`Paso de documentos revisado con éxito.`, 'SUCCESS');
-          this.refreshSummary();
-          this.loadOperatorPanel();
-        },
-        error: (err) => this.handleError(err)
-      });
-    }
+    this.http.post(`${this.apiBaseUrl}/operator/steps/${stepId}/review?operatorId=1`, {
+      approved: approved,
+      feedback: feedbackMsg
+    }).subscribe({
+      next: () => {
+        this.addLocalNotification(`Paso de documentos revisado con éxito.`, 'SUCCESS');
+        this.refreshSummary();
+        this.loadOperatorPanel();
+      },
+      error: (err) => this.handleError(err)
+    });
   }
 
   openPaymentModal(contractor: any) {
@@ -1216,63 +1359,144 @@ export class AppComponent implements OnInit {
 
   sendWhatsappCode() {
     this.isSendingWhatsapp = true;
-    setTimeout(() => {
-      this.isSendingWhatsapp = false;
-      this.addLocalNotification('Redirigiendo a WhatsApp real...', 'INFO');
-      this.whatsappCode = '123456';
-
-      const cleanPhone = this.whatsappPhone.replace(/[^0-9]/g, '');
-      const text = `¡Hola NorthPay! Confirmo mi identidad para el proceso de Onboarding. Mi código de activación de prueba es: 123456`;
-      const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
-
-      window.open(url, '_blank');
-      this.addLocalNotification(this.translations[this.selectedLang]['notifCodeSent'], 'SUCCESS');
-    }, 1200);
+    // Open a blank tab synchronously to prevent popup blocker from blocking it
+    const waWindow = window.open('', '_blank');
+    
+    this.http.post<OnboardingSummary>(`${this.apiBaseUrl}/onboarding/${this.processId}/whatsapp/send?phone=${encodeURIComponent(this.whatsappPhone)}`, {}).subscribe({
+      next: (summary) => {
+        this.isSendingWhatsapp = false;
+        this.summary = summary;
+        this.addLocalNotification(this.translations[this.selectedLang]['notifCodeSent'], 'SUCCESS');
+        
+        // Generate the WhatsApp Link dynamically and navigate the tab
+        const companyPhone = '5493415109918';
+        const code = summary.whatsappVerificationCode || 'NP-XXXX';
+        const text = `Hola NorthPay, mi código de verificación es: ${code}`;
+        const waLink = `https://wa.me/${companyPhone}?text=${encodeURIComponent(text)}`;
+        
+        if (waWindow) {
+          waWindow.location.href = waLink;
+        }
+        
+        this.refreshSummary();
+        this.startWhatsappPolling();
+      },
+      error: (err) => {
+        this.isSendingWhatsapp = false;
+        if (waWindow) {
+          waWindow.close();
+        }
+        this.handleError(err);
+      }
+    });
   }
 
   verifyWhatsappCode() {
     this.isVerifyingWhatsapp = true;
-    setTimeout(() => {
-      this.isVerifyingWhatsapp = false;
-      if (this.whatsappCode === '123456') {
+    this.http.post(`${this.apiBaseUrl}/onboarding/${this.processId}/whatsapp/verify?code=${encodeURIComponent(this.whatsappCode)}`, {}).subscribe({
+      next: () => {
+        this.isVerifyingWhatsapp = false;
         this.whatsappVerified = true;
         this.personalData.phone = this.whatsappPhone;
-
-        // 🌐 Smart Country Auto-Detection based on verification dial-code
         const cleanNum = this.whatsappPhone.replace(/\D/g, '');
-        if (cleanNum.startsWith('54')) {
-          this.personalData.country = 'Argentina';
-        } else if (cleanNum.startsWith('34')) {
-          this.personalData.country = 'Spain';
-        } else if (cleanNum.startsWith('52')) {
-          this.personalData.country = 'Mexico';
-        } else if (cleanNum.startsWith('57')) {
-          this.personalData.country = 'Colombia';
-        } else if (cleanNum.startsWith('55')) {
-          this.personalData.country = 'Brazil';
-        } else if (cleanNum.startsWith('56')) {
-          this.personalData.country = 'Chile';
-        } else if (cleanNum.startsWith('1')) {
-          this.personalData.country = 'United States';
-        }
-        this.summary.steps[0].status = 'COMPLETED';
-        this.summary.steps[1].status = 'IN_PROGRESS';
+        if (cleanNum.startsWith('54')) this.personalData.country = 'Argentina';
+        else if (cleanNum.startsWith('34')) this.personalData.country = 'Spain';
+        else if (cleanNum.startsWith('52')) this.personalData.country = 'Mexico';
+        else if (cleanNum.startsWith('57')) this.personalData.country = 'Colombia';
+        else if (cleanNum.startsWith('55')) this.personalData.country = 'Brazil';
+        else if (cleanNum.startsWith('56')) this.personalData.country = 'Chile';
+        else if (cleanNum.startsWith('1')) this.personalData.country = 'United States';
         this.addLocalNotification(this.translations[this.selectedLang]['notifWsSuccess'], 'SUCCESS');
         this.refreshSummary();
-      } else {
-        this.addLocalNotification(this.translations[this.selectedLang]['notifWsFail'], 'ERROR');
+        this.stopWhatsappPolling();
+      },
+      error: (err) => {
+        this.isVerifyingWhatsapp = false;
+        this.handleError(err);
       }
-    }, 1200);
+    });
   }
 
-  handlePaymentCompleted(contractorId: number) {
-    if (contractorId === 500) { // 500 is our simulated process ID for the sandbox
+  getWhatsAppLink(): string {
+    const companyPhone = '5493415109918';
+    const code = this.summary.whatsappVerificationCode || 'NP-XXXX';
+    const text = `Hola NorthPay, mi código de verificación es: ${code}`;
+    return `https://wa.me/${companyPhone}?text=${encodeURIComponent(text)}`;
+  }
+
+  getContractorFullName(): string {
+    if (this.personalData.firstName && this.personalData.firstName.trim() !== '') {
+      return this.personalData.firstName + ' ' + (this.personalData.lastName || '');
+    }
+    if (this.summary && this.summary.firstName && this.summary.firstName.trim() !== '') {
+      return this.summary.firstName + ' ' + (this.summary.lastName || '');
+    }
+    return 'Rodrigo Daremberg';
+  }
+
+  startWhatsappPolling() {
+    this.stopWhatsappPolling();
+    this.whatsappInterval = setInterval(() => {
+      this.http.get<OnboardingSummary>(`${this.apiBaseUrl}/onboarding/${this.processId}/summary`).subscribe({
+        next: (sum) => {
+          this.summary = sum;
+          const step0 = sum.steps.find(s => s.type === 'WHATSAPP_VERIFY');
+          if (sum.currentStep !== 'WHATSAPP_VERIFY' || (step0 && step0.status === 'COMPLETED')) {
+            this.stopWhatsappPolling();
+            this.addLocalNotification('¡WhatsApp verificado! Avance automático al Paso 1.', 'SUCCESS');
+            this.personalData.phone = this.whatsappPhone;
+            const cleanNum = this.whatsappPhone.replace(/\D/g, '');
+            if (cleanNum.startsWith('54')) this.personalData.country = 'Argentina';
+            else if (cleanNum.startsWith('34')) this.personalData.country = 'Spain';
+            else if (cleanNum.startsWith('52')) this.personalData.country = 'Mexico';
+            else if (cleanNum.startsWith('57')) this.personalData.country = 'Colombia';
+            else if (cleanNum.startsWith('55')) this.personalData.country = 'Brazil';
+            else if (cleanNum.startsWith('56')) this.personalData.country = 'Chile';
+            else if (cleanNum.startsWith('1')) this.personalData.country = 'United States';
+          }
+        },
+        error: (err) => console.error('[NorthPay] Error polling WhatsApp step status:', err)
+      });
+    }, 4000);
+  }
+
+  stopWhatsappPolling() {
+    if (this.whatsappInterval) {
+      clearInterval(this.whatsappInterval);
+      this.whatsappInterval = null;
+    }
+  }
+
+  simulateOtpReceived() {
+    if (this.summary.whatsappVerificationCode) {
+      this.whatsappCode = this.summary.whatsappVerificationCode;
+      this.addLocalNotification('Código de prueba recibido (Simulación). Presiona Verificar.', 'INFO');
+    } else {
+      this.addLocalNotification('No se ha generado ningún código aún.', 'ERROR');
+    }
+  }
+
+  ngOnDestroy() {
+    this.stopWhatsappPolling();
+  }
+
+  handlePaymentCompleted(event: any) {
+    const contractorId = typeof event === 'object' ? event.id : event;
+    const amount = typeof event === 'object' ? event.amount : null;
+
+    if (amount !== null) {
+      this.paymentAmount = amount;
+    }
+
+    if (contractorId === 500) {
       this.summary.status = 'PAID';
-      this.addLocalNotification('¡Felicidades! Se ha emitido tu pago y el balance ha sido actualizado.', 'SUCCESS');
+      const curr = this.paymentMethod.currency || 'USD';
+      let symbol = curr === 'EUR' ? '€' : curr === 'USDT' ? '₮' : '$';
+      const formatted = this.paymentAmount.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      this.addLocalNotification(`¡Felicidades! Se ha emitido tu pago de ${symbol}${formatted} ${curr} y el balance ha sido actualizado.`, 'SUCCESS');
       this.refreshSummary();
     }
 
-    // Persist the state globally in case the operator panel reloads!
     if (!this.globalPaidIds.includes(contractorId)) {
       this.globalPaidIds.push(contractorId);
     }
@@ -1284,12 +1508,12 @@ export class AppComponent implements OnInit {
     const blockingIssues: string[] = [];
     let canProceed = true;
 
-    const s0 = this.summary.steps[0].status; // WHATSAPP_VERIFY
-    const s1 = this.summary.steps[1].status; // PERSONAL_DATA
-    const s2 = this.summary.steps[2].status; // DOCUMENT_UPLOAD
-    const s3 = this.summary.steps[3].status; // CONTRACT_SIGN
-    const s4 = this.summary.steps[4].status; // PAYMENT_METHOD
-    const s5 = this.summary.steps[5].status; // IDENTITY_VERIFICATION
+    const s0 = this.summary.steps[0].status;
+    const s1 = this.summary.steps[1].status;
+    const s2 = this.summary.steps[2].status;
+    const s3 = this.summary.steps[3].status;
+    const s4 = this.summary.steps[4].status;
+    const s5 = this.summary.steps[5].status;
 
     if (s0 === 'COMPLETED') progress += 16;
     if (s1 === 'COMPLETED') progress += 16;
@@ -1360,9 +1584,17 @@ export class AppComponent implements OnInit {
       message: message,
       type: type,
       isRead: false,
-      createdAt: new Date().toLocaleTimeString()
+      createdAt: new Date().toLocaleTimeString(),
+      isFadingOut: false
     };
     this.notifications.unshift(newNotif);
+
+    setTimeout(() => {
+      newNotif.isFadingOut = true;
+      setTimeout(() => {
+        newNotif.isRead = true;
+      }, 500);
+    }, 4500);
   }
 
   getUnreadNotificationsCount() {
@@ -1371,6 +1603,10 @@ export class AppComponent implements OnInit {
 
   getUnreadNotifications() {
     return this.notifications.filter(n => !n.isRead);
+  }
+
+  trackById(index: number, item: Notification) {
+    return item.id;
   }
 
   markAllNotificationsAsRead(event: Event) {
@@ -1521,6 +1757,48 @@ export class AppComponent implements OnInit {
     }
   }
 
+  getD(langCode: string): number {
+    const targetIndex = this.languagesList.findIndex(l => l.code === langCode);
+    const activeIndex = this.languagesList.findIndex(l => l.code === this.selectedLang);
+    if (targetIndex === -1 || activeIndex === -1) return 0;
+    
+    let diff = targetIndex - activeIndex;
+    const n = this.languagesList.length;
+    
+    if (diff > n / 2) {
+      diff -= n;
+    } else if (diff < -n / 2) {
+      diff += n;
+    }
+    return diff;
+  }
+
+  getAbsD(langCode: string): number {
+    return Math.abs(this.getD(langCode));
+  }
+
+  onLangWheel(event: WheelEvent) {
+    event.preventDefault();
+    if (event.deltaY < 0) {
+      this.scrollLanguages('up');
+    } else if (event.deltaY > 0) {
+      this.scrollLanguages('down');
+    }
+  }
+
+  scrollLanguages(direction: 'up' | 'down') {
+    const activeIndex = this.languagesList.findIndex(l => l.code === this.selectedLang);
+    if (activeIndex === -1) return;
+    
+    let newIndex = activeIndex;
+    if (direction === 'up') {
+      newIndex = (activeIndex - 1 + this.languagesList.length) % this.languagesList.length;
+    } else {
+      newIndex = (activeIndex + 1) % this.languagesList.length;
+    }
+    this.changeLanguage(this.languagesList[newIndex].code);
+  }
+
   loadNotifications() {
     this.http.get<Notification[]>(`${this.apiBaseUrl}/notifications?userId=${this.userId}`).subscribe({
       next: (notifs) => this.notifications = notifs,
@@ -1529,20 +1807,36 @@ export class AppComponent implements OnInit {
   }
 
   markNotificationRead(id: number) {
-    if (this.isLocalMock) {
-      const notif = this.notifications.find(n => n.id === id);
-      if (notif) {
-        notif.isRead = true;
-      }
-    } else {
-      this.http.post(`${this.apiBaseUrl}/notifications/${id}/read`, {}).subscribe({
-        next: () => this.loadNotifications()
-      });
-    }
+    this.http.post(`${this.apiBaseUrl}/notifications/${id}/read`, {}).subscribe({
+      next: () => this.loadNotifications()
+    });
   }
 
   handleError(err: any) {
     console.error('[NorthPay Error]', err);
-    this.addLocalNotification('Error de conexión o validación en el servidor.', 'ERROR');
+    let errorMsg = 'Error de conexión o validación en el servidor.';
+    if (err) {
+      if (typeof err.error === 'string' && err.error.trim().length > 0) {
+        errorMsg = err.error;
+      } else if (err.error && typeof err.error.message === 'string' && err.error.message.trim().length > 0) {
+        errorMsg = err.error.message;
+      } else if (err.message && typeof err.message === 'string' && err.message.trim().length > 0) {
+        errorMsg = err.message;
+      }
+    }
+    this.addLocalNotification(errorMsg, 'ERROR');
+  }
+
+  openLegalView() {
+    this.previousView = this.currentView as any;
+    this.currentView = 'legal';
+  }
+
+  closeLegalView() {
+    this.currentView = this.previousView as any || 'landing';
+  }
+
+  toggleDisclaimer() {
+    this.showDisclaimer = !this.showDisclaimer;
   }
 }

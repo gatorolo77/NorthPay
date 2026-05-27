@@ -3,7 +3,7 @@
   <header class="glass-panel app-header" *ngIf="currentView !== 'landing'">
     <div class="logo-container">
       <div class="logo-icon">
-        <span class="logo-letter">N</span>
+        <span class="logo-letter" style="line-height: 1; position: relative;">N<sup style="font-size: 0.65em; font-weight: 800; vertical-align: super; position: relative; top: -3px; letter-spacing: 0;">p</sup></span>
       </div>
       <div>
         <h1 class="font-display text-mint-gradient logo-title">NorthPay</h1>
@@ -13,12 +13,10 @@
 
     <div class="header-nav">
       <div class="glass-panel status-badge" *ngIf="currentView !== 'register'">
-        <span class="status-bullet"
-          [style.background-color]="isLocalMock ? 'var(--accent-amber)' : 'var(--accent-mint)'"
-          [style.color]="isLocalMock ? 'var(--accent-amber)' : 'var(--accent-mint)'">
+        <span class="status-bullet" style="background-color: var(--accent-mint); color: var(--accent-mint);">
         </span>
         <span style="color: var(--text-secondary);">
-          {{ isLocalMock ? 'Local' : 'Servidor NorthPay' }}
+          Servidor NorthPay
         </span>
       </div>
 
@@ -85,7 +83,8 @@
   </header>
 
   <div class="alerts-container alerts-view-{{currentView}}" *ngIf="getUnreadNotificationsCount() > 0">
-    <div *ngFor="let n of getUnreadNotifications().slice(0, 1)" class="glass-panel alert-panel"
+    <div *ngFor="let n of getUnreadNotifications().slice(0, 1); trackBy: trackById" class="glass-panel alert-panel"
+      [class.fading-out]="n.isFadingOut"
       [style.border-left-color]="n.type === 'SUCCESS' ? 'var(--accent-mint)' : n.type === 'ERROR' ? 'var(--accent-coral)' : 'var(--accent-cyan)'">
       <div class="alert-content">
         <span>{{ n.type === 'SUCCESS' ? '✅' : n.type === 'ERROR' ? '❌' : 'ℹ️' }}</span>
@@ -97,198 +96,245 @@
 
   <main class="main-content">
     <div *ngIf="currentView === 'landing'" class="landing-wrapper"
-      style="display: flex; align-items: center; justify-content: center; gap: 25px; width: 100%; max-width: 860px; margin: auto; animation: slideUp 0.6s ease-out;">
-      <section class="glass-panel landing-card"
-        style="width: 720px; min-width: 720px; max-width: 100%; flex-shrink: 0; padding: 25px 35px; text-align: center; margin: 0; position: relative;">
+      style="display: flex; align-items: center; justify-content: center; gap: 25px; width: fit-content; max-width: 100%; margin: auto; animation: slideUp 0.6s ease-out;">
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <section class="glass-panel landing-card"
+          style="width: 720px; min-width: 720px; min-height: 520px; max-width: 100%; flex-shrink: 0; padding: 25px 35px; text-align: center; margin: 0; position: relative;">
 
-        <button (click)="currentView = 'login'" class="admin-badge-link" title="Acceso Administrativo Real">
-          <span>🔐</span> {{ translations[selectedLang]['loginEntryLink'] }}
-        </button>
-
-        <button (click)="currentView = 'contractor_login'" class="admin-badge-link"
-          style="top: 52px; right: 20px; border-color: rgba(0, 245, 230, 0.35);" title="Ingreso Directo de Contratista">
-          <span>👤</span> {{ translations[selectedLang]['loginContractorEntry'] }}
-        </button>
-
-        <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 15px;">
-          <div class="logo-icon"
-            style="width: 45px; height: 45px; border-radius: 10px; box-shadow: 0 0 20px var(--accent-cyan-glow); margin: 0; display: flex; align-items: center; justify-content: center;">
-            <span class="logo-letter" style="font-size: 1.5rem; display: block; height: auto; width: auto;">N</span>
-          </div>
-          <h2 class="font-display text-mint-gradient"
-            style="font-size: 2rem; font-weight: 800; margin: 0; letter-spacing: -0.5px; line-height: 1;">NorthPay</h2>
-        </div>
-
-        <h1 class="font-display text-gradient"
-          style="font-size: 2.1rem; font-weight: 800; margin-top: 10px; margin-bottom: 15px; letter-spacing: -0.5px;">
-          {{ translations[selectedLang]['heroTitle'] }}
-        </h1>
-        <p class="landing-hero-desc">
-          {{ translations[selectedLang]['heroDesc'] }}
-        </p>
-
-
-
-        <div class="landing-prop-grid"
-          style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; text-align: left;">
-          <div class="glass-panel"
-            style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.01); border-color: rgba(0, 245, 230, 0.05); min-height: 135px; display: flex; flex-direction: column; justify-content: flex-start;">
-            <div style="font-size: 1.5rem; margin-bottom: 8px;">💸</div>
-            <h4 class="font-display"
-              style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">{{
-              translations[selectedLang]['propTitle1'] }}</h4>
-            <p style="color: var(--text-muted); font-size: 0.75rem; line-height: 1.3; margin: 0;">{{
-              translations[selectedLang]['propDesc1'] }}</p>
-          </div>
-
-          <div class="glass-panel"
-            style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.01); border-color: rgba(0, 245, 230, 0.05); min-height: 135px; display: flex; flex-direction: column; justify-content: flex-start;">
-            <div style="font-size: 1.5rem; margin-bottom: 8px;">✍️</div>
-            <h4 class="font-display"
-              style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">{{
-              translations[selectedLang]['propTitle2'] }}</h4>
-            <p style="color: var(--text-muted); font-size: 0.75rem; line-height: 1.3; margin: 0;">{{
-              translations[selectedLang]['propDesc2'] }}</p>
-          </div>
-
-          <div class="glass-panel"
-            style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.01); border-color: rgba(0, 245, 230, 0.05); min-height: 135px; display: flex; flex-direction: column; justify-content: flex-start;">
-            <div style="font-size: 1.5rem; margin-bottom: 8px;">🛡️</div>
-            <h4 class="font-display"
-              style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">{{
-              translations[selectedLang]['propTitle3'] }}</h4>
-            <p style="color: var(--text-muted); font-size: 0.75rem; line-height: 1.3; margin: 0;">{{
-              translations[selectedLang]['propDesc3'] }}</p>
-          </div>
-        </div>
-
-
-        <div style="display: flex; justify-content: center; gap: 15px;">
-          <button class="cyber-btn cyber-btn-secondary"
-            style="padding: 10px 25px; font-size: 0.85rem; font-weight: 700; border-radius: 8px; cursor: pointer;"
-            (click)="isOperatorDemoMode = true; loadOperatorPanel()">
-            {{ translations[selectedLang]['btnOperator'] }}
+          <button (click)="openOwnerDirectLogin()"
+            style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); outline: none; z-index: 10;"
+            onmouseover="this.style.color='var(--accent-cyan)'; this.style.transform='rotate(90deg) scale(1.15)'; this.style.background='rgba(0, 245, 230, 0.08)'; this.style.boxShadow='0 0 12px rgba(0, 245, 230, 0.25)';"
+            onmouseout="this.style.color='var(--text-muted)'; this.style.transform='rotate(0deg) scale(1)'; this.style.background='transparent'; this.style.boxShadow='none';"
+            title="Acceso Propietario (Owner)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 2px currentColor);">
+              <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+              <line x1="12" y1="2" x2="12" y2="12"></line>
+            </svg>
           </button>
-          <button class="cyber-btn cyber-btn-primary"
-            style="padding: 10px 30px; font-size: 0.85rem; font-weight: 800; border-radius: 8px; background: linear-gradient(135deg, var(--accent-mint), #00b0ff); color: var(--bg-darker); box-shadow: 0 0 15px rgba(0, 255, 157, 0.35); cursor: pointer;"
-            (click)="startOnboarding()">
-            {{ translations[selectedLang]['btnActivate'] }}
-          </button>
-        </div>
 
 
-        <div
-          style="margin-top: 20px; text-align: left; max-width: 450px; margin-left: auto; margin-right: auto; animation: fadeIn 0.8s ease-in-out;">
-          <div
-            style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 5px;">
-            <span class="font-display" style="font-weight: 600;">{{ preloadStatus }}</span>
-            <span style="font-weight: 700;">{{ preloadProgress }}%</span>
+
+          <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 15px;">
+            <div class="logo-icon"
+              style="width: 45px; height: 45px; border-radius: 10px; box-shadow: 0 0 20px var(--accent-cyan-glow); margin: 0; display: flex; align-items: center; justify-content: center; padding-left: 7px; padding-right: 0;">
+              <span class="logo-letter"
+                style="font-size: 1.5rem; display: block; height: auto; width: auto; line-height: 1; position: relative;">N<sup
+                  style="font-size: 0.95rem; font-weight: 800; vertical-align: super; position: relative; top: -6px; letter-spacing: 0;">p</sup></span>
+            </div>
+            <h2 class="font-display text-mint-gradient"
+              style="font-size: 2rem; font-weight: 800; margin: 0; letter-spacing: -0.5px; line-height: 1;">NorthPay
+            </h2>
           </div>
-          <div
-            style="width: 100%; height: 5px; background: rgba(0,0,0,0.15); border-radius: 3px; overflow: hidden; border: 1px solid var(--glass-border);">
-            <div [style.width.%]="preloadProgress"
-              style="height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-mint)); transition: width 0.15s ease-out; box-shadow: 0 0 10px var(--accent-cyan-glow);">
+
+          <h1 class="font-display text-gradient"
+            style="font-size: 2.1rem; font-weight: 800; margin-top: 10px; margin-bottom: 15px; letter-spacing: -0.5px;">
+            {{ translations[selectedLang]['heroTitle'] }}
+          </h1>
+          <p class="landing-hero-desc">
+            {{ translations[selectedLang]['heroDesc'] }}
+          </p>
+
+
+
+          <div class="landing-prop-grid"
+            style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; text-align: left;">
+            <div class="glass-panel"
+              style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.07); border-color: rgba(0, 245, 230, 0.18); min-height: 170px; display: flex; flex-direction: column; justify-content: flex-start;">
+              <div style="font-size: 1.5rem; margin-bottom: 8px;">💸</div>
+              <h4 class="font-display"
+                style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">{{
+                translations[selectedLang]['propTitle1'] }}</h4>
+              <p style="color: var(--text-muted); font-size: 0.75rem; line-height: 1.3; margin: 0;">{{
+                translations[selectedLang]['propDesc1'] }}</p>
+            </div>
+
+            <div class="glass-panel"
+              style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.07); border-color: rgba(0, 245, 230, 0.18); min-height: 170px; display: flex; flex-direction: column; justify-content: flex-start;">
+              <div style="font-size: 1.5rem; margin-bottom: 8px;">✍️</div>
+              <h4 class="font-display"
+                style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">{{
+                translations[selectedLang]['propTitle2'] }}</h4>
+              <p style="color: var(--text-muted); font-size: 0.75rem; line-height: 1.3; margin: 0;">{{
+                translations[selectedLang]['propDesc2'] }}</p>
+            </div>
+
+            <div class="glass-panel"
+              style="padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.07); border-color: rgba(0, 245, 230, 0.18); min-height: 170px; display: flex; flex-direction: column; justify-content: flex-start;">
+              <div style="font-size: 1.5rem; margin-bottom: 8px;">✨</div>
+              <h4 class="font-display"
+                style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">{{
+                translations[selectedLang]['propTitle3'] }}</h4>
+              <p style="color: var(--text-muted); font-size: 0.75rem; line-height: 1.3; margin: 0;">{{
+                translations[selectedLang]['propDesc3'] }}</p>
             </div>
           </div>
+
+
+          <div style="display: flex; justify-content: center; gap: 15px;">
+            <div class="np-tooltip-wrapper">
+              <button class="cyber-btn cyber-btn-secondary"
+                style="padding: 10px 25px; font-size: 0.85rem; font-weight: 700; border-radius: 8px; cursor: pointer;"
+                (click)="isOperatorDemoMode = true; loadOperatorPanel()">
+                {{ translations[selectedLang]['btnOperator'] }}
+              </button>
+              <div class="np-tooltip">
+                {{ translations[selectedLang]['tooltipOperator'] }}
+              </div>
+            </div>
+            <div class="np-tooltip-wrapper">
+              <button class="cyber-btn cyber-btn-primary"
+                style="padding: 10px 30px; font-size: 0.85rem; font-weight: 800; border-radius: 8px; background: linear-gradient(135deg, var(--accent-mint), #00b0ff); color: var(--bg-darker); box-shadow: 0 0 15px rgba(0, 255, 157, 0.35); cursor: pointer;"
+                (click)="startOnboarding()">
+                {{ translations[selectedLang]['btnActivate'] }}
+              </button>
+              <div class="np-tooltip">
+                {{ translations[selectedLang]['tooltipActivate'] }}
+              </div>
+            </div>
+          </div>
+
+
+          <div
+            style="margin-top: 20px; text-align: left; max-width: 450px; margin-left: auto; margin-right: auto; animation: fadeIn 0.8s ease-in-out;">
+            <div
+              style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 5px;">
+              <span class="font-display" style="font-weight: 600;">{{ preloadStatus }}</span>
+              <span style="font-weight: 700;">{{ preloadProgress }}%</span>
+            </div>
+            <div
+              style="width: 100%; height: 5px; background: rgba(0,0,0,0.15); border-radius: 3px; overflow: hidden; border: 1px solid var(--glass-border);">
+              <div [style.width.%]="preloadProgress"
+                style="height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-mint)); transition: width 0.15s ease-out; box-shadow: 0 0 10px var(--accent-cyan-glow);">
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="glass-panel"
+          style="display: flex; width: 385px; margin: 0 auto; border-radius: 20px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.18); background: rgba(255, 255, 255, 0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: all 0.3s ease;">
+          <button (click)="currentView = 'login'"
+            style="flex: 1; padding: 6px 14px; background: transparent; border: none; border-right: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-primary); cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.2s;"
+            onmouseover="this.style.background='rgba(255,255,255,0.1)'"
+            onmouseout="this.style.background='transparent'">
+            <span style="font-size: 0.85rem;">🔐</span> {{ translations[selectedLang]['loginEntryLink'] }}
+          </button>
+          <button (click)="currentView = 'contractor_login'"
+            style="flex: 1; padding: 6px 14px; background: transparent; border: none; color: var(--text-primary); cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.2s;"
+            onmouseover="this.style.background='rgba(0, 245, 230, 0.15)'"
+            onmouseout="this.style.background='transparent'">
+            {{ translations[selectedLang]['loginContractorEntry'] }}
+          </button>
         </div>
-      </section>
+      </div>
 
 
-      <div class="lang-selector-sidebar"
-        style="display: flex; flex-direction: column; gap: 12px; animation: fadeIn 0.8s ease-in-out;">
-        <button (click)="changeLanguage('en')" class="glass-panel lang-btn"
-          [style.border-color]="selectedLang === 'en' ? 'var(--accent-cyan)' : 'var(--glass-border)'"
-          style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-          <img src="https://flagcdn.com/us.svg" alt="USA Flag"
-            style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
-          <span class="font-display"
-            style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">English</span>
+      <div class="lang-carousel-wrapper" style="animation: fadeIn 0.8s ease-in-out;">
+        <button class="lang-nav-btn up-btn" (click)="scrollLanguages('up')" aria-label="Scroll Up">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+          </svg>
         </button>
-        <button (click)="changeLanguage('es')" class="glass-panel lang-btn"
-          [style.border-color]="selectedLang === 'es' ? 'var(--accent-cyan)' : 'var(--glass-border)'"
-          style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-          <img src="https://flagcdn.com/es.svg" alt="Spain Flag"
-            style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
-          <span class="font-display"
-            style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">Español</span>
-        </button>
-        <button (click)="changeLanguage('fr')" class="glass-panel lang-btn"
-          [style.border-color]="selectedLang === 'fr' ? 'var(--accent-cyan)' : 'var(--glass-border)'"
-          style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-          <img src="https://flagcdn.com/fr.svg" alt="France Flag"
-            style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
-          <span class="font-display"
-            style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">Français</span>
-        </button>
-        <button (click)="changeLanguage('pt')" class="glass-panel lang-btn"
-          [style.border-color]="selectedLang === 'pt' ? 'var(--accent-cyan)' : 'var(--glass-border)'"
-          style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-          <img src="https://flagcdn.com/pt.svg" alt="Portugal Flag"
-            style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
-          <span class="font-display"
-            style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">Português</span>
-        </button>
-        <button (click)="changeLanguage('zh')" class="glass-panel lang-btn"
-          [style.border-color]="selectedLang === 'zh' ? 'var(--accent-cyan)' : 'var(--glass-border)'"
-          style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-          <img src="https://flagcdn.com/cn.svg" alt="China Flag"
-            style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
-          <span class="font-display" style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">中文</span>
-        </button>
-        <button (click)="changeLanguage('it')" class="glass-panel lang-btn"
-          [style.border-color]="selectedLang === 'it' ? 'var(--accent-cyan)' : 'var(--glass-border)'"
-          style="padding: 12px 10px; border-radius: 12px; cursor: pointer; background: var(--glass-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 85px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
-          <img src="https://flagcdn.com/it.svg" alt="Italy Flag"
-            style="width: 24px; height: auto; border-radius: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 6px;" />
-          <span class="font-display"
-            style="font-size: 0.7rem; font-weight: 700; color: var(--text-primary);">Italiano</span>
+        
+        <div class="lang-carousel-track" (wheel)="onLangWheel($event)">
+          <button *ngFor="let lang of languagesList" 
+                  (click)="changeLanguage(lang.code)"
+                  class="glass-panel lang-btn"
+                  [class.active]="selectedLang === lang.code"
+                  [style.pointer-events]="getAbsD(lang.code) > 2 ? 'none' : 'auto'"
+                  [style.--d]="getD(lang.code)"
+                  [style.--abs-d]="getAbsD(lang.code)">
+            <img [src]="lang.flag" [alt]="lang.name" />
+            <span class="font-display">{{ lang.name }}</span>
+          </button>
+        </div>
+        
+        <button class="lang-nav-btn down-btn" (click)="scrollLanguages('down')" aria-label="Scroll Down">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
         </button>
       </div>
     </div>
 
-    <section *ngIf="currentView === 'login'" class="glass-panel admin-login-card">
+    <section *ngIf="currentView === 'login'" class="glass-panel admin-login-card"
+      [style.border-color]="isOwnerMode ? 'rgba(255, 215, 0, 0.45)' : 'var(--glass-border)'"
+      [style.box-shadow]="isOwnerMode ? '0 0 25px rgba(255, 215, 0, 0.18)' : 'none'">
       <div style="text-align: center; margin-bottom: 12px;">
         <div class="logo-icon" style="width: 40px; height: 40px; border-radius: 10px; margin: 0 auto 10px auto;">
           <span class="logo-letter" style="font-size: 1.4rem;">A</span>
         </div>
-        <h2 class="font-display text-gradient" style="font-size: 1.4rem; font-weight: 800; margin-bottom: 4px;">{{
-          translations[selectedLang]['loginTitle'] }}</h2>
-        <p style="color: var(--text-secondary); font-size: 0.8rem;">{{ translations[selectedLang]['loginSubtitle'] }}
+        <h2 class="font-display text-gradient" style="font-size: 1.4rem; font-weight: 800; margin-bottom: 4px;">
+          {{ isOperatorRegisterMode ? 'Registrar Operador' : translations[selectedLang]['loginTitle'] }}
+        </h2>
+        <p style="color: var(--text-secondary); font-size: 0.8rem;">
+          {{ isOperatorRegisterMode ? 'Ingresá tu correo corporativo para recibir un enlace de registro seguro.' : translations[selectedLang]['loginSubtitle'] }}
         </p>
       </div>
 
-      <div class="cyber-input-group" style="margin-bottom: 12px;">
-        <label class="cyber-input-label" style="font-size: 0.7rem; margin-bottom: 4px;">{{
-          translations[selectedLang]['loginUserLabel'] }}</label>
-        <input type="text" class="cyber-input" [(ngModel)]="adminUser" placeholder="admin@northpay.com"
-          style="padding: 10px 12px; font-size: 0.85rem;">
+      <!-- Modo Invitación/Registro de Operador -->
+      <div *ngIf="isOperatorRegisterMode">
+        <div class="cyber-input-group" style="margin-bottom: 12px;">
+          <label class="cyber-input-label" style="font-size: 0.7rem; margin-bottom: 4px;">CORREO ELECTRÓNICO DEL OPERADOR</label>
+          <input type="email" class="cyber-input" [(ngModel)]="adminUser" placeholder="operador@empresa.com"
+            style="padding: 10px 12px; font-size: 0.85rem;">
+        </div>
+
+        <div style="display: flex; gap: 15px; margin-top: 18px;">
+          <button class="cyber-btn cyber-btn-secondary"
+            style="flex: 1; border-radius: 8px; padding: 9px; font-size: 0.85rem;" (click)="goBackToLanding()">
+            {{ translations[selectedLang]['loginBtnBack'] }}
+          </button>
+          <button class="cyber-btn cyber-btn-primary"
+            style="flex: 2; border-radius: 8px; padding: 9px; background: linear-gradient(135deg, var(--accent-cyan), #0080ff); color: var(--bg-darker); font-weight: 700; font-size: 0.85rem;"
+            (click)="sendOperatorInvitation()">
+            Enviar Enlace de Registro
+          </button>
+        </div>
       </div>
 
-      <div class="cyber-input-group" style="margin-bottom: 0;">
-        <label class="cyber-input-label" style="font-size: 0.7rem; margin-bottom: 4px;">{{
-          translations[selectedLang]['loginPassLabel'] }}</label>
-        <input type="password" class="cyber-input" [(ngModel)]="adminPass" placeholder="••••••••"
-          style="padding: 10px 12px; font-size: 0.85rem;">
+      <div *ngIf="!isOperatorRegisterMode">
+        <div class="cyber-input-group" style="margin-bottom: 12px;">
+          <label class="cyber-input-label" style="font-size: 0.7rem; margin-bottom: 4px;">{{ translations[selectedLang]['loginUserLabel'] }}</label>
+          <input type="text" class="cyber-input" [(ngModel)]="adminUser" placeholder="operador@empresa.com"
+            style="padding: 10px 12px; font-size: 0.85rem;">
+        </div>
+
+        <div class="cyber-input-group" style="margin-bottom: 0;">
+          <label class="cyber-input-label" style="font-size: 0.7rem; margin-bottom: 4px;">{{ translations[selectedLang]['loginPassLabel'] }}</label>
+          <div style="position: relative;">
+            <input [type]="showAdminPassword ? 'text' : 'password'" class="cyber-input" [(ngModel)]="adminPass"
+              placeholder="••••••••" style="padding: 10px 35px 10px 12px; font-size: 0.85rem; width: 100%;">
+            <button class="password-toggle-btn" (click)="showAdminPassword = !showAdminPassword"
+              style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; padding: 0; z-index: 10;">
+              {{ showAdminPassword ? '👁️' : '👁️‍🗨️' }}
+            </button>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 15px; margin-top: 18px;">
+          <button class="cyber-btn cyber-btn-secondary"
+            style="flex: 1; border-radius: 8px; padding: 9px; font-size: 0.85rem;" (click)="goBackToLanding()">
+            {{ translations[selectedLang]['loginBtnBack'] }}
+          </button>
+          <button class="cyber-btn cyber-btn-primary"
+            style="flex: 2; border-radius: 8px; padding: 9px; background: linear-gradient(135deg, var(--accent-cyan), #0080ff); color: var(--bg-darker); font-weight: 700; font-size: 0.85rem;"
+            (click)="submitAdminLogin()">
+            {{ translations[selectedLang]['loginBtnSubmit'] }}
+          </button>
+        </div>
       </div>
 
-      <div style="display: flex; gap: 15px; margin-top: 18px;">
-        <button class="cyber-btn cyber-btn-secondary"
-          style="flex: 1; border-radius: 8px; padding: 9px; font-size: 0.85rem;" (click)="currentView = 'landing'">
-          {{ translations[selectedLang]['loginBtnBack'] }}
+      <div style="text-align: center; margin-top: 14px; border-top: 1px solid var(--glass-border); padding-top: 12px;">
+        <button style="background: none; border: none; cursor: pointer; font-size: 0.75rem; color: var(--accent-cyan); text-decoration: underline;"
+          (click)="isOperatorRegisterMode = !isOperatorRegisterMode;">
+          {{ isOperatorRegisterMode ? '← Ya tengo cuenta. Iniciar sesión' : '¿Primera vez? Solicitar enlace de acceso para operador' }}
         </button>
-        <button class="cyber-btn cyber-btn-primary"
-          style="flex: 2; border-radius: 8px; padding: 9px; background: linear-gradient(135deg, var(--accent-cyan), #0080ff); color: var(--bg-darker); font-weight: 700; font-size: 0.85rem;"
-          (click)="submitAdminLogin()">
-          {{ translations[selectedLang]['loginBtnSubmit'] }}
-        </button>
       </div>
 
-      <div style="margin-top: 12px; text-align: center; font-size: 0.7rem; color: var(--text-muted);">
-        {{ translations[selectedLang]['loginTip'] }}
-      </div>
     </section>
 
-    <!-- Ingreso de Contratista (Bypass a Dashboard) -->
+
+
     <section *ngIf="currentView === 'contractor_login'" class="glass-panel admin-login-card"
       style="border-color: rgba(0, 245, 230, 0.15);">
       <div style="text-align: center; margin-bottom: 12px;">
@@ -342,7 +388,7 @@
     <section *ngIf="currentView === 'welcome'" class="glass-panel welcome-card">
       <div class="envelope-wrapper">
         <div class="logo-icon" style="width: 45px; height: 45px; border-radius: 10px;">
-          <span class="logo-letter" style="font-size: 1.5rem;">N</span>
+          <span class="logo-letter" style="font-size: 1.5rem; line-height: 1; position: relative;">N<sup style="font-size: 0.65em; font-weight: 800; vertical-align: super; position: relative; top: -3px; letter-spacing: 0;">p</sup></span>
         </div>
       </div>
       <h2 class="font-display text-gradient welcome-title">{{ translations[selectedLang]['onboardingPortalTitle'] }}
@@ -363,9 +409,11 @@
 
 
     <section *ngIf="currentView === 'register'" class="glass-panel register-card">
-      <h2 class="font-display text-mint-gradient register-title">{{ translations[selectedLang]['registerTitle'] }}</h2>
+      <h2 class="font-display text-mint-gradient register-title">
+        {{ invitationRole === 'OPERATOR' ? 'Completar Registro de Operador' : translations[selectedLang]['registerTitle'] }}
+      </h2>
       <p class="register-text">
-        {{ translations[selectedLang]['regDesc'] }}
+        {{ invitationRole === 'OPERATOR' ? 'Se ha detectado una invitación de operador válida. Configura tu contraseña de acceso.' : translations[selectedLang]['regDesc'] }}
       </p>
 
       <div class="cyber-input-group">
@@ -378,6 +426,13 @@
         <input type="text" class="cyber-input" [(ngModel)]="invitationToken" disabled class="cyber-input token-code">
       </div>
 
+      
+      <div class="cyber-input-group" *ngIf="invitationRole === 'OPERATOR'">
+        <label class="cyber-input-label" style="color: #ffd700;">CLAVE SECRETA DE OPERADOR (PROPORCIONADA POR EL OWNER)</label>
+        <input type="text" class="cyber-input" [(ngModel)]="registerSecretKey" placeholder="NP-XXXX-XXXX"
+          style="border-color: rgba(255, 215, 0, 0.35); font-family: monospace; font-weight: 700; text-transform: uppercase;">
+      </div>
+
       <div class="cyber-input-group">
         <label class="cyber-input-label">{{ translations[selectedLang]['regPassLabel'] }}</label>
         <div style="position: relative; width: 100%;">
@@ -385,14 +440,14 @@
             placeholder="••••••••" style="padding-right: 45px; width: 100%;">
           <button type="button" class="password-toggle-btn" (click)="showRegisterPassword = !showRegisterPassword"
             [title]="showRegisterPassword ? 'Ocultar' : 'Mostrar'">
-            <!-- Feather icon eye -->
+
             <svg *ngIf="!showRegisterPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
               viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
               <circle cx="12" cy="12" r="3"></circle>
             </svg>
-            <!-- Feather icon eye-off -->
+
             <svg *ngIf="showRegisterPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
               viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round">
@@ -405,8 +460,16 @@
         </div>
       </div>
 
+      <div class="cyber-input-group">
+        <label class="cyber-input-label">CONFIRMAR CONTRASEÑA</label>
+        <div style="position: relative; width: 100%;">
+          <input [type]="showRegisterPassword ? 'text' : 'password'" class="cyber-input" [(ngModel)]="registerConfirmPassword"
+            placeholder="••••••••" style="padding-right: 45px; width: 100%;">
+        </div>
+      </div>
+
       <button class="cyber-btn cyber-btn-primary register-submit-btn" (click)="register()">
-        {{ translations[selectedLang]['regBtnStart'] }}
+        {{ invitationRole === 'OPERATOR' ? 'Confirmar y Guardar Operador' : translations[selectedLang]['regBtnStart'] }}
       </button>
     </section>
 
@@ -478,32 +541,64 @@
         <div *ngIf="summary.currentStep === 'WHATSAPP_VERIFY'" class="step-form-container">
           <h3 class="font-display text-gradient step-form-title">{{ translations[selectedLang]['stepLabel'] }} 1: {{
             translations[selectedLang]['step0'] }}</h3>
+
           <p class="step-form-desc">
             {{ translations[selectedLang]['wsDesc'] }}
           </p>
 
+          <!-- Always Visible Phone Input -->
           <div class="cyber-input-group">
             <label class="cyber-input-label">{{ translations[selectedLang]['wsLabel'] }}</label>
             <input type="text" class="cyber-input" [(ngModel)]="whatsappPhone" placeholder="Ej. +34 600 000 000">
           </div>
 
+          <!-- Always Visible Request/Resend Code Button -->
           <button class="cyber-btn cyber-btn-primary submit-action-btn" style="margin-bottom: 20px;"
             [disabled]="isSendingWhatsapp || !whatsappPhone" (click)="sendWhatsappCode()">
-            {{ isSendingWhatsapp ? translations[selectedLang]['wsBtnSending'] : translations[selectedLang]['wsBtnSend']
-            }}
+            {{ isSendingWhatsapp ? translations[selectedLang]['wsBtnSending'] : (summary.whatsappVerificationCode ? 'Reenviar código de verificación' : translations[selectedLang]['wsBtnSend']) }}
           </button>
 
-          <div *ngIf="whatsappPhone" class="cyber-input-group" style="margin-top: 15px;">
-            <label class="cyber-input-label">{{ translations[selectedLang]['wsLabelCode'] }}</label>
-            <input type="text" class="cyber-input" [(ngModel)]="whatsappCode" placeholder="Ingresa 123456"
-              style="text-align: center; letter-spacing: 5px; font-size: 1.2rem;">
+          <!-- Phase 2: Enter WhatsApp Verification Code (OTP Standard) -->
+          <div *ngIf="summary.whatsappVerificationCode" class="whatsapp-verification-flow">
+            <p class="step-form-desc" style="margin-bottom: 15px;">
+              Hemos generado tu código de verificación. Sigue los siguientes pasos para completar el proceso:
+            </p>
+
+            <div class="glass-panel instruction-box" style="padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(0, 245, 230, 0.15);">
+              <div class="instruction-step" style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px;">
+                <span class="step-badge">1</span>
+                <span class="step-text" style="font-size: 0.8rem;">Haz clic en el botón de WhatsApp abajo para abrir tu chat con el mensaje listo conteniendo tu código dinámico.</span>
+              </div>
+              <div class="instruction-step" style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px;">
+                <span class="step-badge">2</span>
+                <span class="step-text" style="font-size: 0.8rem;">Envía el mensaje desde tu WhatsApp. Esto registrará el código en la conversación de tu celular.</span>
+              </div>
+              <div class="instruction-step" style="display: flex; align-items: flex-start; gap: 10px;">
+                <span class="step-badge">3</span>
+                <span class="step-text" style="font-size: 0.8rem;">Escribe el código <strong>NP-XXXX</strong> que has enviado en la casilla de abajo y presiona "Verificar".</span>
+              </div>
+            </div>
+
+            <!-- WhatsApp Direct Link Button (Paso 1) -->
+            <div style="text-align: center; margin-bottom: 20px;">
+              <a [href]="getWhatsAppLink()" target="_blank" class="whatsapp-verify-btn" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Paso 1: Abrir WhatsApp y Enviar Código
+              </a>
+            </div>
+
+            <!-- OTP Input Form (Paso 2) -->
+            <div class="cyber-input-group" style="margin-top: 15px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+              <label class="cyber-input-label" style="font-size: 0.8rem; letter-spacing: 1px;">Paso 2: INGRESAR CÓDIGO ENVIADO</label>
+              <input type="text" class="cyber-input" [(ngModel)]="whatsappCode" placeholder="Ej. NP-1234" 
+                style="text-align: center; text-transform: uppercase; max-width: 180px; height: 42px; font-size: 1.3rem; letter-spacing: 2px; font-weight: 700; border-color: var(--accent-cyan); text-shadow: 0 0 10px var(--accent-cyan-glow);">
+            </div>
+
+            <button class="cyber-btn cyber-btn-primary submit-action-btn" style="margin-top: 15px; width: 100%;"
+              [disabled]="isVerifyingWhatsapp || !whatsappCode" (click)="verifyWhatsappCode()">
+              {{ isVerifyingWhatsapp ? translations[selectedLang]['wsBtnVerifying'] : translations[selectedLang]['wsBtnVerify'] }}
+            </button>
           </div>
-
-          <button *ngIf="whatsappPhone" class="cyber-btn cyber-btn-primary submit-action-btn" style="margin-top: 10px;"
-            [disabled]="isVerifyingWhatsapp || !whatsappCode" (click)="verifyWhatsappCode()">
-            {{ isVerifyingWhatsapp ? translations[selectedLang]['wsBtnVerifying'] :
-            translations[selectedLang]['wsBtnVerify'] }}
-          </button>
         </div>
 
         <div *ngIf="summary.currentStep === 'PERSONAL_DATA'" class="step-form-container">
@@ -633,53 +728,90 @@
             {{ translations[selectedLang]['step3Desc'] }}
           </p>
 
-          <div *ngIf="isLocalMock" class="glass-panel contract-viewer" style="margin-bottom: 20px;">
-            <h4 style="text-align: center; color: var(--text-primary); margin-bottom: 15px; font-weight: 700;">ACUERDO
-              DE CONTRATACIÓN INDEPENDIENTE</h4>
-            <p>Este acuerdo se celebra el día de hoy entre <strong>NorthPay Ltd.</strong> ("La Compañía") y el
-              Contratista registrado ("El Contratista").</p>
-            <br>
-            <p><strong>1. Servicios:</strong> El Contratista acuerda prestar servicios de desarrollo y soporte bajo
-              demanda a los clientes asignados de NorthPay.</p>
-            <p><strong>2. Compensación:</strong> La Compañía compensará al Contratista según el método de cobro
-              establecido en el Paso 4 del onboarding.</p>
-            <p><strong>3. Confidencialidad:</strong> Toda información sobre clientes, claves API y operaciones internas
-              se considerará Estrictamente Confidencial.</p>
-            <br>
-            <p style="margin-bottom: 20px;"><em>Al hacer clic en el botón de firma digital, certifico que he leído y
-                acepto los términos de este acuerdo legal.</em></p>
 
-            <div style="border-top: 1px dashed var(--glass-border); padding-top: 20px; margin-top: 20px;">
-              <p
-                style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 700; margin-bottom: 10px; letter-spacing: 0.5px;">
-                DEMOSTRACIÓN INTERACTIVA DE DOCUSEAL:</p>
+          <div class="glass-panel contract-viewer"
+            style="margin-bottom: 20px; padding: 30px; border-radius: 12px; max-height: 400px; overflow-y: auto; border: 1px solid rgba(0, 255, 157, 0.15); background: rgba(10, 20, 30, 0.7); box-shadow: inset 0 0 20px rgba(0, 255, 157, 0.05); text-align: left;">
+            <div style="text-align: center; margin-bottom: 25px;">
+              <span
+                style="color: var(--accent-mint); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">NorthPay
+                Legal Ledger</span>
+              <h4
+                style="color: var(--text-primary); font-weight: 800; font-size: 1.3rem; margin-top: 5px; text-transform: uppercase;">
+                ACUERDO DE CONTRATACIÓN INDEPENDIENTE</h4>
+              <div style="width: 50px; height: 2px; background: var(--accent-mint); margin: 15px auto 0 auto;"></div>
+            </div>
 
-              <docuseal-form data-src="https://www.docuseal.com/d/demo"
-                [attr.data-email]="invitationEmail || 'contractor@northpay.com'">
-              </docuseal-form>
+            <div
+              style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; text-align: justify; display: flex; flex-direction: column; gap: 15px;">
+              <p>
+                Este Acuerdo de Contratación Independiente (en adelante, el "Acuerdo") se celebra el día de hoy,
+                <strong>{{ currentLocalDateString }}</strong>, por y entre:
+              </p>
+
+              <div
+                style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 8px; border-left: 3px solid var(--accent-mint); margin: 5px 0;">
+                <p style="margin: 0 0 8px 0;"><strong>LA COMPAÑÍA:</strong> <strong>NorthPay Ltd.</strong>, con oficinas
+                  centrales registradas y operando bajo las leyes vigentes de servicios financieros digitales
+                  ("NorthPay").</p>
+                <p style="margin: 0;"><strong>EL CONTRATISTA:</strong> <strong>{{ getContractorFullName() }}</strong>, con correo
+                  de registro <strong>{{ (invitationEmail === 'contractor@northpay.com' ? loginEmail : invitationEmail)
+                    || 'rodrigo.daremberg@gmail.com' }}</strong> y teléfono verificado <strong>{{ whatsappPhone ||
+                    '+5491160001234' }}</strong>.</p>
+              </div>
+
+              <p>Ambas partes, reconociendo su capacidad legal para contratar y obligarse, acuerdan las siguientes
+                cláusulas:</p>
+
+              <p><strong>CLÁUSULA PRIMERA - OBJETO:</strong> El Contratista acuerda prestar servicios profesionales
+                independientes de consultoría, soporte operativo o desarrollo tecnológico para el ecosistema global de
+                NorthPay y sus empresas aliadas según la demanda.</p>
+
+              <p><strong>CLÁUSULA SEGUNDA - COMPENSACIÓN:</strong> NorthPay compensará al Contratista por los servicios
+                efectivamente prestados de acuerdo con las tarifas pactadas y procesadas a través del método de pago que
+                el Contratista declare y verifique en el Paso 5 de este onboarding.</p>
+
+              <p><strong>CLÁUSULA TERCERA - CONFIDENCIALIDAD:</strong> El Contratista se obliga a mantener estricto
+                secreto y no divulgar a terceros información técnica, comercial, financiera o datos de usuarios
+                procesados dentro de la plataforma de NorthPay (Acuerdo de No Divulgación - NDA).</p>
+
+              <p><strong>CLÁUSULA CUARTA - DURACIÓN:</strong> Este acuerdo tendrá una duración indefinida a partir de la
+                firma digital del mismo, pudiendo cualquiera de las partes rescindirlo mediante notificación previa por
+                escrito de 15 días.</p>
+
+              <div style="border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px; margin-top: 10px;">
+                <p
+                  style="font-size: 0.8rem; color: var(--text-muted); font-style: italic; text-align: center; margin: 0;">
+                  "Al proceder con la firma digital, el Contratista declara bajo juramento haber leído, comprendido y
+                  aceptado en su totalidad los términos jurídicos expresados en este instrumento digital."
+                </p>
+              </div>
             </div>
           </div>
 
-          <div *ngIf="!isLocalMock" class="glass-panel contract-viewer" style="margin-bottom: 20px;">
 
-            <docuseal-form [attr.data-src]="docusealEmbedSrc || 'https://www.docuseal.com/d/demo'"
-              [attr.data-email]="invitationEmail || 'contractor@northpay.com'">
-            </docuseal-form>
-          </div>
+          <div class="glass-panel signature-box"
+            style="margin-bottom: 20px; border: 1px solid rgba(0, 255, 157, 0.1); background: rgba(0, 0, 0, 0.3); padding: 20px; border-radius: 8px; text-align: center;">
+            <p class="signature-label"
+              style="font-size: 0.75rem; color: var(--accent-mint); font-weight: 700; letter-spacing: 1.5px; margin-bottom: 12px; text-transform: uppercase;">
+              CERTIFICACIÓN CRIPTOGRÁFICA DE FIRMA DIGITAL</p>
 
-          <div class="glass-panel signature-box" style="margin-bottom: 20px;">
-            <p class="signature-label">CERTIFICACIÓN CRIPTOGRÁFICA DE DOCUSEAL</p>
-            <div class="signature-text" style="font-size: 14px; text-transform: uppercase;">
-              {{ personalData.firstName ? personalData.firstName + ' ' + personalData.lastName : 'John Doe' }}
+            <div
+              style="font-family: 'Courier New', monospace; font-size: 1.4rem; color: var(--accent-cyan); font-weight: 700; letter-spacing: 1px; padding: 10px; border: 1px dashed rgba(0, 255, 157, 0.2); background: rgba(0,255,157,0.02); display: inline-block; border-radius: 6px; margin-bottom: 10px; min-width: 250px;">
+              {{ getContractorFullName() }}
             </div>
-            <span class="signature-certificate">
-              Certificado Integrado SHA256: NP_DOCUSEAL_948271
-            </span>
+
+            <div
+              style="display: flex; flex-direction: column; gap: 3px; font-size: 0.75rem; color: var(--text-muted); text-align: center;">
+              <span>Firmante: {{ (invitationEmail === 'contractor@northpay.com' ? loginEmail : invitationEmail) ||
+                'rodrigo.daremberg@gmail.com' }}</span>
+              <span>Fecha Local: {{ currentLocalDateString }}</span>
+              <span>Certificado Único SHA256: NP_DOCUSEAL_948271_SECURE</span>
+            </div>
           </div>
 
           <button class="cyber-btn cyber-btn-primary submit-action-btn" [disabled]="isSigningContract"
             (click)="signContract()">
-            {{ isSigningContract ? 'Procesando firma...' : 'Confirmar y Firmar Acuerdo Legal de Forma Segura' }}
+            {{ isSigningContract ? 'Procesando firma...' : '✍️ Confirmar y Firmar Acuerdo Legal de Forma Segura' }}
           </button>
         </div>
 
@@ -690,7 +822,7 @@
             {{ translations[selectedLang]['step4Desc'] }}
           </p>
 
-          <!-- Fintech Multicurrency Picker -->
+
           <div style="margin-bottom: 20px;">
             <label class="cyber-input-label" style="margin-bottom: 10px;">DIVISA DE COBRO / PREFERRED CURRENCY</label>
             <div style="display: flex; gap: 12px;">
@@ -746,7 +878,7 @@
             </div>
           </div>
 
-          <!-- Crypto Form Structure -->
+
           <div *ngIf="paymentMethod.currency === 'USDT'"
             style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px;">
             <div class="glass-panel payment-card glass-panel-active"
@@ -904,13 +1036,17 @@
       <div class="operator-header" style="margin-bottom: 25px;">
         <div>
           <h2 class="font-display text-mint-gradient" style="font-size: 1.8rem; font-weight: 800; margin-bottom: 5px;">
-            ¡Bienvenido, {{ personalData.firstName || 'Contratista' }}!
+            ¡Bienvenido, {{ getContractorFullName() }}!
           </h2>
           <p style="color: var(--text-secondary); font-size: 0.95rem;">Tu perfil de cobro y cumplimiento internacional
             se encuentra 100% activo y regulado.</p>
         </div>
         <div style="display: flex; gap: 15px; align-items: center;">
-          <button class="settings-btn" (click)="showContractorSettings = true" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.3rem; padding: 5px; transition: all 0.3s; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.color='var(--accent-cyan)'; this.style.transform='rotate(90deg)'" onmouseout="this.style.color='var(--text-muted)'; this.style.transform='rotate(0deg)'" title="Configuración de Perfil">
+          <button class="settings-btn" (click)="openContractorSettings()"
+            style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.3rem; padding: 5px; transition: all 0.3s; display: flex; align-items: center; justify-content: center;"
+            onmouseover="this.style.color='var(--accent-cyan)'; this.style.transform='rotate(90deg)'"
+            onmouseout="this.style.color='var(--text-muted)'; this.style.transform='rotate(0deg)'"
+            title="Configuración de Perfil">
             ⚙️
           </button>
           <div class="glass-panel status-badge"
@@ -1035,12 +1171,29 @@
         </div>
       </div>
 
-      <!-- Settings Modal -->
+      <div class="glass-panel support-card" style="padding: 25px; margin-bottom: 30px; border-color: rgba(255, 126, 103, 0.2);">
+        <h4 class="font-display text-gradient" style="font-size: 1.2rem; font-weight: 700; margin-bottom: 15px;">
+          Centro de Soporte Operativo</h4>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px;">
+          ¿Tienes alguna duda sobre tus pagos o configuración? Envía un mensaje directo a tu operador asignado.
+        </p>
+        <textarea class="cyber-input" [(ngModel)]="contractorMessage" rows="3" placeholder="Escribe tu consulta aquí..."
+          style="width: 100%; border-color: var(--glass-border); margin-bottom: 15px; resize: none;"></textarea>
+        <button class="cyber-btn cyber-btn-primary" [disabled]="!contractorMessage.trim() || isSendingMessage"
+          (click)="sendMessageToOperator()"
+          style="width: 100%; padding: 12px; font-size: 0.95rem; display: flex; justify-content: center; align-items: center; gap: 8px;">
+          <span *ngIf="isSendingMessage" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Enviar Mensaje al Operador
+        </button>
+      </div>
+
+
       <div class="glass-modal-backdrop" *ngIf="showContractorSettings">
         <div class="glass-panel cyber-modal-card" style="max-width: 480px; border-color: rgba(0, 245, 230, 0.25);">
           <div class="modal-header"
-            style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0, 245, 230, 0.15); padding-bottom: 15px; margin-bottom: 20px;">
-            <h3 class="font-display text-gradient" style="font-size: 1.3rem; font-weight: 800; margin: 0; color: var(--accent-cyan) !important;">
+            style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0, 245, 230, 0.15); padding-bottom: 10px; margin-bottom: 15px;">
+            <h3 class="font-display text-gradient"
+              style="font-size: 1.3rem; font-weight: 800; margin: 0; color: var(--accent-cyan) !important;">
               Configuración de Perfil</h3>
             <button class="modal-close-btn"
               style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem;"
@@ -1048,12 +1201,13 @@
           </div>
 
           <div class="modal-body">
-            <div class="cyber-input-group" style="margin-bottom: 20px;">
+            <div class="cyber-input-group" style="margin-bottom: 12px;">
               <label class="cyber-input-label">NÚMERO DE WHATSAPP REGISTRADO</label>
-              <input type="text" class="cyber-input" [(ngModel)]="whatsappPhone" style="border-color: var(--accent-cyan);">
+              <input type="text" class="cyber-input" [(ngModel)]="whatsappPhone"
+                style="border-color: var(--accent-cyan);">
             </div>
 
-            <div class="cyber-input-group" style="margin-bottom: 20px;">
+            <div class="cyber-input-group" style="margin-bottom: 12px;">
               <label class="cyber-input-label">MÉTODO DE PAGO ACTIVO</label>
               <select class="cyber-input" [(ngModel)]="paymentMethod.provider" style="cursor: pointer;">
                 <option value="BANK_TRANSFER">Transferencia Bancaria (SWIFT/IBAN)</option>
@@ -1063,15 +1217,83 @@
                 <option value="CRYPTO">Criptomonedas (USDT/USDC)</option>
               </select>
             </div>
-            
-            <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px;">
-              * Al cambiar el método de pago, los próximos pagos mensuales se enrutarán automáticamente a la nueva plataforma seleccionada.
+
+
+            <div *ngIf="paymentMethod.provider === 'BANK_TRANSFER'" class="glass-panel"
+              style="padding: 10px 15px; border-radius: 10px; margin-bottom: 12px; border-color: rgba(0, 245, 230, 0.15); animation: fadeIn 0.3s ease;">
+              <div class="cyber-input-group" style="margin-bottom: 8px;">
+                <label class="cyber-input-label">Nombre del Banco</label>
+                <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.bankName"
+                  placeholder="Ej. Chase Bank">
+              </div>
+              <div class="cyber-input-group" style="margin-bottom: 8px;">
+                <label class="cyber-input-label">Número de Cuenta / IBAN</label>
+                <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.accountNumber"
+                  placeholder="ES91 2100 0418...">
+              </div>
+              <div class="cyber-input-group">
+                <label class="cyber-input-label">Código SWIFT/BIC</label>
+                <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.swiftCode" placeholder="CHASUS33XXX">
+              </div>
+            </div>
+
+            <div *ngIf="paymentMethod.provider === 'MERCADO_PAGO'" class="glass-panel"
+              style="padding: 10px 15px; border-radius: 10px; margin-bottom: 12px; border-color: rgba(0, 245, 230, 0.15); animation: fadeIn 0.3s ease;">
+              <div class="cyber-input-group" style="margin-bottom: 8px;">
+                <label class="cyber-input-label">Alias o CVU</label>
+                <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.mpAliasOrCvu"
+                  placeholder="tu.alias.mp">
+              </div>
+              <div class="cyber-input-group">
+                <label class="cyber-input-label">Titular de la Cuenta</label>
+                <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.mpAccountHolder"
+                  placeholder="Juan Pérez">
+              </div>
+            </div>
+
+            <div *ngIf="paymentMethod.provider === 'PAYONEER' || paymentMethod.provider === 'PAYPAL'"
+              class="glass-panel"
+              style="padding: 10px 15px; border-radius: 10px; margin-bottom: 12px; border-color: rgba(0, 245, 230, 0.15); animation: fadeIn 0.3s ease;">
+              <div class="cyber-input-group" style="margin-bottom: 8px;">
+                <label class="cyber-input-label">Correo Registrado en {{ paymentMethod.provider === 'PAYPAL' ? 'PayPal'
+                  : 'Payoneer' }}</label>
+                <input type="email" class="cyber-input" [(ngModel)]="paymentMethod.paypalEmail"
+                  placeholder="correo@ejemplo.com">
+              </div>
+              <div class="cyber-input-group">
+                <label class="cyber-input-label">Nombre del Titular</label>
+                <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.paypalName" placeholder="Juan Pérez">
+              </div>
+            </div>
+
+            <div *ngIf="paymentMethod.provider === 'CRYPTO'" class="glass-panel"
+              style="padding: 10px 15px; border-radius: 10px; margin-bottom: 12px; border-color: rgba(0, 245, 230, 0.15); animation: fadeIn 0.3s ease;">
+              <div class="cyber-input-group" style="margin-bottom: 8px;">
+                <label class="cyber-input-label">Red / Network</label>
+                <select class="cyber-input" [(ngModel)]="paymentMethod.cryptoNetwork">
+                  <option value="TRC20">Tron (TRC20)</option>
+                  <option value="ERC20">Ethereum (ERC20)</option>
+                  <option value="BEP20">Binance Smart Chain (BEP20)</option>
+                  <option value="POLYGON">Polygon</option>
+                </select>
+              </div>
+              <div class="cyber-input-group">
+                <label class="cyber-input-label">Dirección de la Wallet</label>
+                <input type="text" class="cyber-input" [(ngModel)]="paymentMethod.cryptoAddress" placeholder="T...">
+              </div>
+            </div>
+
+            <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; margin-bottom: 5px;">
+              * Al cambiar el método de pago, los próximos pagos mensuales se enrutarán automáticamente a la nueva
+              plataforma seleccionada.
             </p>
           </div>
 
-          <div class="modal-footer" style="display: flex; justify-content: flex-end; margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
-            <button class="cyber-btn cyber-btn-primary" style="padding: 10px 25px; border-radius: 8px; font-weight: 700; width: 100%;"
-              (click)="showContractorSettings = false; addLocalNotification(translations[selectedLang]['persBtnSave'] || 'Perfil actualizado correctamente', 'SUCCESS')">
+          <div class="modal-footer"
+            style="display: flex; justify-content: flex-end; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">
+            <button class="cyber-btn cyber-btn-primary"
+              style="padding: 10px 25px; border-radius: 8px; font-weight: 700; width: 100%;"
+              (click)="saveContractorSettings()">
               Guardar Cambios
             </button>
           </div>
@@ -1080,17 +1302,35 @@
     </div>
 
     <app-admin-dashboard *ngIf="currentView === 'operator'" [summary]="summary" [personalData]="personalData"
-      [isLocalMock]="isLocalMock" [selectedLang]="selectedLang" [whatsappPhone]="whatsappPhone"
-      [paidContractorIds]="globalPaidIds" [isDemoMode]="isOperatorDemoMode" [paymentMethod]="paymentMethod"
-      (reviewCompleted)="refreshSummary()" (paymentCompleted)="handlePaymentCompleted($event)">
+      [selectedLang]="selectedLang" [whatsappPhone]="whatsappPhone" [paidContractorIds]="globalPaidIds"
+      [isDemoMode]="isOperatorDemoMode" [paymentMethod]="paymentMethod" [uploadedDocs]="uploadedDocs"
+      [email]="invitationEmail" [realProcessId]="processId" [userRole]="userRole" (reviewCompleted)="refreshSummary()"
+      (paymentCompleted)="handlePaymentCompleted($event)">
     </app-admin-dashboard>
-
-
-
 
 
   </main>
   <footer class="glass-panel app-footer">
-    <span>&copy; 2026 NorthPay Global Payments & Compliance Inc.<p class="gato">Gatorolo</p></span>
+    <div [class.footer-offset]="currentView === 'landing'">
+      <span>&copy; 2026 NorthPay Global Payments & Compliance Inc.<p class="gato">Gatorolo</p></span>
+    </div>
   </footer>
+</div>
+
+<div class="disclaimer-side" [class.is-open]="showDisclaimer">
+  <button class="disclaimer-tab" (click)="toggleDisclaimer()" [class.hint-anim]="!showDisclaimer">
+    <span>{{ translations[selectedLang]['btnLegales'] }}</span>
+  </button>
+  <div class="disclaimer-content">
+    <h3>1. Términos de Uso</h3>
+    <p>Al acceder y utilizar la plataforma NorthPay, usted acepta cumplir con estos términos en su totalidad. El servicio es proporcionado "tal cual" para facilitar la gestión de pagos y onboarding de contratistas internacionales. Nos reservamos el derecho de actualizar la plataforma o suspender el servicio temporalmente por mantenimiento.</p>
+    <p>El usuario se compromete a proporcionar información veraz, actual y completa durante el registro y activación de la cuenta, incluyendo, pero no limitándose a, su número de WhatsApp, documentos de identidad e información bancaria o de pago.</p>
+    <p>NorthPay se reserva el derecho de rechazar la activación de cuentas o de suspender usuarios que incumplan con normativas internacionales o locales, especialmente aquellas vinculadas a la prevención de lavado de dinero y cumplimiento (Compliance).</p>
+
+    <h3>2. Política de Privacidad</h3>
+    <p>En NorthPay valoramos su privacidad y protegemos sus datos. Recopilamos información personal estrictamente necesaria para facilitar la activación de su cuenta de contratista remoto, validar su identidad y procesar los pagos de forma segura y transparente.</p>
+    <p><strong style="color: var(--accent-mint);">Uso de la Información:</strong> Utilizamos su número de WhatsApp para la verificación de identidad mediante códigos OTP y para el envío de notificaciones relevantes de pagos y estado de cuenta. Sus documentos se utilizan únicamente para el proceso KYC (Know Your Customer).</p>
+    <p><strong style="color: var(--accent-mint);">Protección de Datos:</strong> Mantenemos estándares rigurosos de cifrado de extremo a extremo y seguridad de la información. No compartimos su información con terceros sin su consentimiento explícito, excepto cuando sea requerido por obligaciones legales o autoridades competentes.</p>
+    <p><strong style="color: var(--accent-mint);">Retención y Derechos:</strong> Sus documentos y datos se retienen el tiempo que su cuenta permanezca activa. Usted tiene el derecho de solicitar la revisión, modificación o eliminación de sus datos. En caso de solicitar la eliminación, procesaremos la baja de sus datos en un plazo de 30 días, salvo información retenida por mandato de regulaciones financieras.</p>
+  </div>
 </div>

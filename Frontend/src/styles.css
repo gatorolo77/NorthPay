@@ -263,9 +263,6 @@ body {
 
 
 .admin-badge-link {
-  position: absolute;
-  top: 15px;
-  right: 20px;
   background: rgba(255, 255, 255, 0.07);
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 20px;
@@ -276,7 +273,9 @@ body {
   cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
+  width: 200px;
   transition: all 0.3s ease;
   z-index: 10;
 }
@@ -323,7 +322,6 @@ body {
   font-weight: 600 !important;
 }
 
-/* Interactive Password Reveal Toggle (Cyber Eye) */
 .password-toggle-btn {
   position: absolute;
   right: 12px;
@@ -361,10 +359,6 @@ body {
   transform: translateY(-50%) scale(0.94);
 }
 
-/* ==========================================================================
-   GLOBAL ALERT TOAST WRAPPER (ENCAPSULATION BUSTED & FULLY ACCESSIBLE)
-   ========================================================================== */
-
 .alerts-container {
   position: fixed;
   margin-top: 0.5%;
@@ -376,63 +370,47 @@ body {
   gap: 8px;
   pointer-events: none;
   z-index: 9999 !important;
-  /* Force toast alerts above modals and sticky elements */
   width: calc(100% - 50px);
   max-width: 320px;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ==========================================================================
-   SECCIÓN DE POSICIONAMIENTO MANUAL DE ALERTAS POR CADA VISTA
-   Modifica los valores de top, left, right, bottom y transform según tu gusto
-   para evitar colisiones visuales con el contenido de cada sección.
-   ========================================================================== */
 
-/* 🌅 Vista: Landing Page (Página de Inicio) */
 .alerts-container.alerts-view-landing {
   top: 3.5%;
   left: 29%;
-  /* Mantén el valor actual, o cámbialo a 50% si deseas centrado */
 }
 
-/* 👋 Vista: Welcome (Ingreso de Correo de Contratista) */
 .alerts-container.alerts-view-welcome {
   top: 3%;
   left: 30%;
 }
 
-/* 📝 Vista: Register (Configuración de Contraseña y Token) */
 .alerts-container.alerts-view-register {
   top: 4.5%;
   left: 33%;
 }
 
-/* 📊 Vista: Onboarding (Pasos de Documentación, Panel Principal) */
 .alerts-container.alerts-view-onboarding {
   top: 6%;
   left: 30%;
 }
 
-/* 🔐 Vista: Login (Acceso Administrativo de Operador Real) */
 .alerts-container.alerts-view-login {
   top: 5%;
   left: 30%;
 }
 
-/* 🖥️ Vista: Operator (Panel de Monitoreo Sandbox / Dashboard Oficial) */
 .alerts-container.alerts-view-operator {
   top: 5%;
   left: 30%;
 }
 
-/* 🛸 Vista: Contractor Login (Bypass Directo al Dashboard de Pagos) */
 .alerts-container.alerts-view-contractor_login {
   top: 5%;
   left: 30%;
 }
 
-/* 📱 Adaptación Responsiva Especial para Tablets y Pantallas Intermedias (770px - 1100px) 
-   Evita que las alertas colisionen con el logo/título superior en esta franja de ancho */
 @media (min-width: 769px) and (max-width: 1100px) {
   .alerts-container {
     top: 95px !important;
