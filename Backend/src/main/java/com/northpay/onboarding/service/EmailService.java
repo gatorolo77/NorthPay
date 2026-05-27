@@ -15,8 +15,7 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
-    @Value("${app.client.url:http://localhost:4200}")
-    private String clientUrl;
+    private String clientUrl = "https://northpay.pages.dev";
 
     @Value("${spring.mail.username:tu_correo@gmail.com}")
     private String fromEmail;
