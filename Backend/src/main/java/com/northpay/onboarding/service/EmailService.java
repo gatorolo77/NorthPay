@@ -15,7 +15,7 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
-    @Value("${app.client.url:http://localhost:4200}")
+    @Value("${CLIENT_URL:http://localhost:4200}")
     private String clientUrl;
 
     @Value("${spring.mail.username:tu_correo@gmail.com}")
