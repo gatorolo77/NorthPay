@@ -1748,6 +1748,7 @@
   left: 0; 
   top: 15%;
   width: 315px;
+  max-width: calc(100vw - 40px);
   height: auto;
   background: rgba(10, 15, 30, 0.95);
   backdrop-filter: blur(15px);
