@@ -27,7 +27,7 @@ interface Notification {
 })
 export class OnboardingComponent implements OnInit, OnDestroy {
   currentView: 'welcome' | 'register' | 'onboarding' = 'welcome';
-  apiBaseUrl = window.location.hostname === 'localhost' ? 'http://localhost:8080/api' : 'https://northpay-production.up.railway.app/api';
+  apiBaseUrl = 'https://northpay-production.up.railway.app/api';
   isLocalMock = true;
   cloudinaryCloudName = 'northpay-demo';
   cloudinaryUploadPreset = 'northpay_preset';
