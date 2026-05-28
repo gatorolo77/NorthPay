@@ -56,9 +56,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   currentView: 'landing' | 'welcome' | 'register' | 'onboarding' | 'operator' | 'login' | 'contractor_login' | 'legal' = 'landing';
   previousView: 'landing' | 'welcome' | 'register' | 'onboarding' | 'login' | 'contractor_login' | 'legal' = 'landing';
-  apiBaseUrl = window.location.hostname === 'localhost' 
-    ? 'http://localhost:8080/api' 
-    : 'https://northpay-production.up.railway.app/api';
+  apiBaseUrl = 'https://northpay-production.up.railway.app/api';
   isOperatorDemoMode = true;
   userRole = 'OPERATOR';
   
