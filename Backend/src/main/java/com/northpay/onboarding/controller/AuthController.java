@@ -73,6 +73,24 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/validate-token")
+    public ResponseEntity<?> validateToken(@RequestParam String token) {
+        try {
+            Invitation invitation = authService.getInvitationByToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
+            
+            if (invitation.getStatus() != InvitationStatus.PENDING) {
+                return ResponseEntity.badRequest().body("Token is no longer valid");
+            }
+            
+            return ResponseEntity.ok(java.util.Map.of(
+                "email", invitation.getEmail(),
+                "role", invitation.getRole().name()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
